@@ -4,7 +4,7 @@ import premiumImage from '../assets/ten.png';
 
 const Plan = () => {
   return (
-    <div className="flex justify-center mt-10">
+    <div name='plan' className="flex justify-center mt-10">
       {/* Free Account */}
       <div className="w-80 bg-white rounded-lg p-6 m-4">
         <div className="text-center mb-6">

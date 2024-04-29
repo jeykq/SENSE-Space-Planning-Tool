@@ -10,8 +10,8 @@ import { ServiceData } from '../Constants'
 
 const TemplateSlideshow = () => {
   return (
-    <div className='flex items-center justify-center flex-col h-screen'>
-      <h1 className='text-white text-4xl text-center m-20 font-semibold'>Templates</h1>
+    <div name="templates" className='flex items-center justify-center flex-col h-screen'>
+      <h1 className='text-black text-4xl text-center m-20 font-semibold'>Templates</h1>
       <Swiper
           breakpoints={{
             340: {

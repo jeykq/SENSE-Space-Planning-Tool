@@ -4,6 +4,7 @@ import backgroundImage from '../assets/p2.png';
 const Sense = () => {
   return (
     <div
+      name='sense'
       className="w-full min-h-screen flex items-center justify-center"
       style={{
         backgroundImage: `linear-gradient(rgba(8, 0, 58, 0.7), rgba(8, 0, 58, 0.7)), url(${backgroundImage})`,

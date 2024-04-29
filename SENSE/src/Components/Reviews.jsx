@@ -13,8 +13,8 @@ const Reviews = () => {
         slidesToScroll: 1
     };
   return (
-    <div className='w-3/4 m-auto mb-4'>
-        <h2 className='text-white text-4xl text-center m-20 font-semibold '>Reviews</h2>
+    <div name='reviews' className='w-3/4 m-auto mb-4'>
+        <h2 className='text-black text-4xl text-center m-20 font-semibold '>Reviews</h2>
         <div>
         <Slider {...settings}>
             {data.map((d) => (
