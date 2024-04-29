@@ -16,9 +16,10 @@ const Plan = () => {
         </div>
         <hr className="border-gray-400 mb-6" />
         <ul className="list-disc list-inside">
-          <li>Feature 1</li>
-          <li>Feature 2</li>
-          <li>Feature 3</li>
+          <li>Create your own room</li>
+          <li>Access to ready-made templates</li>
+          <li>Access to selected trial objects</li>
+          <li>Cannot export rooms</li>
           {/* Add more features as needed */}
         </ul>
       </div>
@@ -34,9 +35,13 @@ const Plan = () => {
         </div>
         <hr className="border-gray-400 mb-6" />
         <ul className="list-disc list-inside">
-          <li>Feature 1</li>
-          <li>Feature 2</li>
-          <li>Feature 3</li>
+          <li>Create your own room</li>
+          <li>Access to ready-made templates</li>
+          <li>Access to the whole collection of objects we offer</li>
+          <li>Can export rooms</li>
+          <li>Able to customise display settings (dark/light mode, text sizes, etc.)</li>
+          <li>Access to premium only tips</li>
+          <li>Easily manage your subscription, cancel anytime.</li>
           {/* Add more features as needed */}
         </ul>
       </div>
