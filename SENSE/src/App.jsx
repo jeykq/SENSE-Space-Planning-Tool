@@ -6,6 +6,8 @@ import Reviews from './Components/Reviews'
 import Video from './Components/Video'
 import TemplateSlideshow from './Components/TemplateSlideshow'
 import MissionContact from './Components/MissionContact'
+import Footer from './Components/Footer'
+
 
 const App = () => {
   return (
@@ -17,6 +19,7 @@ const App = () => {
       <Video/>
       <TemplateSlideshow/>
       <MissionContact/>
+      <Footer/>
     </div>
   )
 }
