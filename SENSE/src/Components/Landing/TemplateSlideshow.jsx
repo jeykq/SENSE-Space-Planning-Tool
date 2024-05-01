@@ -6,7 +6,7 @@ import {FreeMode, Pagination} from 'swiper/modules'
 import { RxArrowTopRight } from 'react-icons/rx'
 
 import React from 'react'
-import { ServiceData } from '../Constants'
+import { ServiceData } from '../../Constants'
 
 const TemplateSlideshow = () => {
   return (

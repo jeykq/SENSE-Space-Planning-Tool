@@ -1,5 +1,5 @@
 import React from 'react';
-import backgroundImage from '../assets/p2.png';
+import backgroundImage from '../../assets/p2.png';
 
 const Sense = () => {
   return (

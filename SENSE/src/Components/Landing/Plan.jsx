@@ -1,8 +1,11 @@
 import React from 'react';
-import freeImage from '../assets/zero.jpeg';
-import premiumImage from '../assets/ten.png';
+import freeImage from '../../assets/zero.jpeg';
+import premiumImage from '../../assets/ten.png';
+import { useNavigate } from 'react-router-dom';
 
 const Plan = () => {
+  const navigate = useNavigate();
+  const handleClick = () => navigate('/signup');
   return (
     <div name='plan' className="flex justify-center mt-10">
       {/* Free Account */}
@@ -12,7 +15,7 @@ const Plan = () => {
         </div>
         <img src={freeImage} alt="Free Account" className="mx-auto mb-6 w-35 h-30" />
         <div className="text-center mb-6">
-          <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full">Create Account</button>
+          <button onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full">Create Account</button>
         </div>
         <hr className="border-gray-400 mb-6" />
         <ul className="list-disc list-inside">

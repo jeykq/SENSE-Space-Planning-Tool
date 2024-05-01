@@ -1,26 +1,18 @@
-import React from 'react'
-import Navbar from './Components/Navbar'
-import Sense from './Components/Sense'
-import Plan from './Components/Plan'
-import Reviews from './Components/Reviews'
-import Video from './Components/Video'
-import TemplateSlideshow from './Components/TemplateSlideshow'
-import MissionContact from './Components/MissionContact'
-import Footer from './Components/Footer'
+import * as React from 'react'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import SignUpForm from './Components/SignUp/SignUpForm';
+import Landing from './Components/Landing/Landing';
 
 
 const App = () => {
   return (
-    <div>
-      <Navbar/>
-      <Sense/>
-      <Plan/>
-      <Reviews/>
-      <Video/>
-      <TemplateSlideshow/>
-      <MissionContact/>
-      <Footer/>
-    </div>
+    <Router>
+      <Routes>
+          <Route path="/" exact element={<Landing />} />
+          <Route path="/signup" element={<SignUpForm />} /> 
+      </Routes>
+    </Router>
+      
   )
 }
 

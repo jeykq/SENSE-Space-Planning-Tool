@@ -13,7 +13,7 @@
   background: #ccbfbf;
 } */
 body{
-background: #a38fa7;
+background: #e4e0e0;
 }
 a{
   text-decoration: none;
@@ -37,7 +37,11 @@ a{
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  margin-top: 5px;
 }
 .slick-slide > div {
   margin: 0 10px;
 }
+
+
+

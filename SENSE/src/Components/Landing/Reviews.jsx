@@ -1,5 +1,5 @@
 import React from 'react'
-import jenImage from '../assets/jen.jpeg';
+import jenImage from '../../assets/jen.jpeg';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
