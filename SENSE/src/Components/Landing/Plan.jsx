@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 
 const Plan = () => {
   const navigate = useNavigate();
-  const handleClick = () => navigate('/signup');
+  const handleClickCreateAcc = () => navigate('/signup');
+  const handleClickBuyPlan = () => navigate('/paid-signup');
   return (
     <div name='plan' className="flex justify-center mt-10">
       {/* Free Account */}
@@ -15,7 +16,7 @@ const Plan = () => {
         </div>
         <img src={freeImage} alt="Free Account" className="mx-auto mb-6 w-35 h-30" />
         <div className="text-center mb-6">
-          <button onClick={handleClick} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full">Create Account</button>
+          <button onClick={handleClickCreateAcc} className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-full">Create Account</button>
         </div>
         <hr className="border-gray-400 mb-6" />
         <ul className="list-disc list-inside">
@@ -34,7 +35,7 @@ const Plan = () => {
         </div>
         <img src={premiumImage} alt="Premium" className="mx-auto mb-6 w-35 h-30" />
         <div className="text-center mb-6">
-          <button className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-full">Buy Plan</button>
+          <button onClick={handleClickBuyPlan} className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-full">Buy Plan</button>
         </div>
         <hr className="border-gray-400 mb-6" />
         <ul className="list-disc list-inside">

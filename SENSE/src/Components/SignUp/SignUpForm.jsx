@@ -13,7 +13,7 @@ const SignUpForm = () => {
                 <h1 className="text-3xl mb-3">Welcome to Sense Spaces Planning Tool</h1>
               </div>
               <div className="w-1/2 py-16 px-12">
-                <h2 className="text-3xl mb-4 text-center">Sign Up</h2>
+                <h2 className="text-3xl mb-4 text-center">Sign Up Free</h2>
                 <form>
                   <div className="grid grid-cols-2 gap-5">
                     <input type="text" placeholder="First Name" className="border border-gray-400 py-1 px-2" />
@@ -22,6 +22,17 @@ const SignUpForm = () => {
                   <input type="text" placeholder="Email" className="border border-gray-400 py-1 px-2 w-full mt-5" />
                   <input type="password" placeholder="Password" className="border border-gray-400 py-1 px-2 w-full mt-5" />
                   <input type="password" placeholder="Confirm Password" className="border border-gray-400 py-1 px-2 w-full mt-5" />
+                  <div className="grid grid-cols-2 gap-5">
+                    <input type="text" placeholder="Age" className="border border-gray-400 py-1 px-2 w-full mt-5" />
+                    <select id="industry" name="industry" className="border border-gray-400 py-1 px-2 w-full mt-5" >
+                      <option value="" disabled selected hidden>Job Industry</option>
+                      <option value="designer">Designer</option>
+                      <option value="educator">Educator</option>
+                      <option value="whs">WHS</option>
+                      <option value="supportworker">Support Worker</option>
+                    </select>
+                  </div>
+
                   <div className="flex items-center mt-5">
                     <input type="checkbox" className="border border-gray-400 mr-2" />
                     <span>
