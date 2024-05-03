@@ -24,12 +24,14 @@ const SignUpForm = () => {
                   <input type="password" placeholder="Confirm Password" className="border border-gray-400 py-1 px-2 w-full mt-5" />
                   <div className="grid grid-cols-2 gap-5">
                     <input type="text" placeholder="Age" className="border border-gray-400 py-1 px-2 w-full mt-5" />
-                    <select id="industry" name="industry" className="border border-gray-400 py-1 px-2 w-full mt-5" >
+                    <select id="industry" name="industry" className="border border-gray-400 py-1 px-1 w-full mt-5 text-sm" >
                       <option value="" disabled selected hidden>Job Industry</option>
-                      <option value="designer">Designer</option>
+                      <option value="designer">Interior Designer</option>
                       <option value="educator">Educator</option>
                       <option value="whs">WHS</option>
                       <option value="supportworker">Support Worker</option>
+                      <option value="supportworker">Parents</option>
+                      <option value="supportworker">Others</option>
                     </select>
                   </div>
 
