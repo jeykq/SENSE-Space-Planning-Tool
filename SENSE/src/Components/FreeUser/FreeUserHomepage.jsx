@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import Swiper from "swiper";
-// import "C:/PERSONAL/SCHOOL/SIM/COURSE DOCS/FYP/CODES/SENSE-Space-Planning-Tool/SENSE/node_modules/swiper/swiper.min.css";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
+import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
 
 const FreeUserHomepage = () => {
   const swiperContainer1 = useRef(null);
@@ -106,6 +106,9 @@ const FreeUserHomepage = () => {
               {[...Array(5)].map((_, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
+                  <div style={{ position: 'absolute', top: '10px', left: '10px' }}> {/* Pencil Icon */}
+                    <FaPencilAlt style={{ cursor: 'pointer' }} />
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', width: '100%', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>

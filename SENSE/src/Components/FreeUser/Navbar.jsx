@@ -18,11 +18,9 @@ const Navbar = () => {
     })
   },[]);
 
-<<<<<<< HEAD
-  const handleLogout = () => {
-    setShowPopup(true);
-=======
   const handleLogOut = async (e) => {
+    setShowPopup(true);
+
     const headers = { 
       'Content-Type': 'application/json',
       'sense-token': 'db6cddf1-f555-4c17-964a-cde528cc6b2b' // This needs to come from login request tokenb1d8bc94-0656-40a4-8ad3-9a83a1a08bda
@@ -35,7 +33,6 @@ const Navbar = () => {
     );
     console.log("logging out");
     navigate("/");
->>>>>>> ea18943e43aee6d0915f674656d5066c9bd2532c
   };
 
   return (
@@ -56,12 +53,11 @@ const Navbar = () => {
             </button>
           </li>
           <li className="flex items-center ml-auto">
-            <ProfileDropdown onLogout={handleLogout} />
+            <ProfileDropdown onLogout={handleLogOut} />
           </li>
         </ul>
       </div>
       {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => navigate("/")} onClose={()=>setShowPopup(false)}/>}
-      {/* {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => handleLogOut()} onClose={() => setShowPopup(false)} />} */}
     </nav>
   );
 }
