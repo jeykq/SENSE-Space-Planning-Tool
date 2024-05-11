@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import signup from '../../assets/signup.jpg';
+import { useNavigate } from 'react-router-dom';
 
 
 const SignUpForm = () => {
@@ -12,6 +13,8 @@ const SignUpForm = () => {
   const [industry, setIndustry] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const errors = {};
@@ -29,10 +32,36 @@ const SignUpForm = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      
+      try {
+        const response = await fetch('https://api.sensespacesplanningtool.com/signup/free', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            firstName,
+            lastName,
+            dateOfBirth,
+          }),
+        });
+        
+        if (response.ok) {
+          // Handle successful sign up
+          console.log('Sign up successful!');
+          navigate("/login");
+        } else {
+          // Handle sign up errors
+          const errorData = await response.json();
+          console.error('Sign up failed:', errorData);
+        }
+      } catch (error) {
+        console.error('Error during sign up:', error);
+      }
     }
   };
 

@@ -15,6 +15,21 @@ const Navbar = () => {
     })
   },[]);
 
+  const handleLogOut = async (e) => {
+    const headers = { 
+      'Content-Type': 'application/json',
+      'sense-token': 'fe5484ca-8746-46da-bc0e-25fe087878b1' // This needs to come from login request token
+    };
+    console.log(headers);
+    const response = await axios.post(
+      'https://api.sensespacesplanningtool.com/logout',
+      {},
+      { headers: headers }
+    );
+    console.log("logging out");
+    navigate("/");
+  };
+
   return (
     <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between max-h-20 z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
       <img src={logo} alt="" className='logo w-20 mx-2' />
@@ -35,6 +50,7 @@ const Navbar = () => {
         </ul>
       </div>
       {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => navigate("/")} onClose={()=>setShowPopup(false)}/>}
+      {/* {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => handleLogOut()} onClose={() => setShowPopup(false)} />} */}
     </nav>
     
   );
