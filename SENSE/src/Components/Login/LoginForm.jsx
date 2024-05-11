@@ -40,21 +40,6 @@ const LoginForm = () => {
         }
     };
 
-    const handleLogOut = async (e) => {
-      const headers = { 
-        'Content-Type': 'application/json',
-        'sense-token': 'b1d8bc94-0656-40a4-8ad3-9a83a1a08bda' // This needs to come from login request token
-      };
-      console.log(headers);
-      const response = await axios.post(
-        'https://api.sensespacesplanningtool.com/logout',
-        {},
-        { headers: headers }
-      );
-      console.log("logging out");
-      navigate("/");
-    };
-
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-300">
             <div className="container mx-auto">
@@ -81,12 +66,7 @@ const LoginForm = () => {
                                     <a href={"#"} className="hover:underline">Help</a>
                                     <a href={"#"} className="ml-4 hover:underline">Terms & Conditions</a>
                                 </div>
-                                <div>
-                                    <button onClick={() => setShowPopup(true)} className="border p-2 mt-4">
-                                        test popup button (for logout)
-                                    </button>
-                                    {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => handleLogOut()} onClose={() => setShowPopup(false)} />}
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
