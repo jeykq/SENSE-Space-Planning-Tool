@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import Swiper from "swiper";
-import "C:/PERSONAL/SCHOOL/SIM/COURSE DOCS/FYP/CODES/SENSE-Space-Planning-Tool/SENSE/node_modules/swiper/swiper.min.css";
+// import "C:/PERSONAL/SCHOOL/SIM/COURSE DOCS/FYP/CODES/SENSE-Space-Planning-Tool/SENSE/node_modules/swiper/swiper.min.css";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 
