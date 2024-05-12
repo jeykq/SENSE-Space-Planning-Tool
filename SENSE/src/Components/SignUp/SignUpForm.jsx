@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import signup from '../../assets/signup.jpg';
+import AlertPopup from '../UI/AlertPopup';
 import { useNavigate } from 'react-router-dom';
 
-
 const SignUpForm = () => {
+  const [showAlert, setShowAlert] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,7 +14,6 @@ const SignUpForm = () => {
   const [industry, setIndustry] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState({});
-
   const navigate = useNavigate();
 
   const validateForm = () => {
@@ -34,7 +34,8 @@ const SignUpForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
+    const isValid = validateForm();
+    if (isValid) {
       try {
         const response = await fetch('https://api.sensespacesplanningtool.com/signup/free', {
           method: 'POST',
@@ -52,8 +53,9 @@ const SignUpForm = () => {
         
         if (response.ok) {
           // Handle successful sign up
+          setShowAlert(true); // Show the alert
           console.log('Sign up successful!');
-          navigate("/login");
+          //navigate("/login");
         } else {
           // Handle sign up errors
           const errorData = await response.json();
@@ -64,6 +66,12 @@ const SignUpForm = () => {
       }
     }
   };
+
+  // Close the alert popup when click OK, and navigate to login
+  const handleOK = () => {
+    navigate("/login");
+  };
+  
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-300">
@@ -118,6 +126,16 @@ const SignUpForm = () => {
           </div>
         </div>
       </div>
+      {/* Show the AlertPopup if showAlert is true */}
+      {showAlert && (
+        <AlertPopup
+          title="Sign up successful!"
+          text="Your account has been created successfully."
+          onClose={() => setShowAlert(false)}
+          // Redirect to login page when click OK
+          onOK={handleOK}
+        />
+      )}
     </div>
   );
 }

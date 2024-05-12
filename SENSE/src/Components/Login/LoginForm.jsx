@@ -1,43 +1,43 @@
 import React, { useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import signup from '../../assets/signup.jpg';
-import ConfirmDialogPopup from '../UI/ConfirmDialog';
 import { useNavigate } from 'react-router-dom';
+import signup from '../../assets/signup.jpg';
+import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
 
 const LoginForm = () => {
     const navigate = useNavigate();
-    const [showPopup, setShowPopup] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    let token;
+    const [showAlert, setShowAlert] = useState(false);
 
     const handleSignIn = async (e) => {
-      
         e.preventDefault();
         try {
-          console.log("handling sign in");
             const response = await axios.post('https://api.sensespacesplanningtool.com/login', {
                 email: email,
                 password: password
             });
             // Handle successful login response
             console.log(response.data);
-            token = response.data.token;
             const role = response.data.role;
 
             // Redirect or do something else upon successful login
             if (role === 'FREE_USER') {
-              navigate('/FreeUserHomepage'); // Redirect to free user homepage
+                navigate('/FreeUserHomepage'); // Redirect to free user homepage
             } else if (role === 'PREMIUM_USER') {
-              navigate('/PremiumUserHomepage'); // Redirect to premium user homepage
+                navigate('/PremiumUserHomepage'); // Redirect to premium user homepage
             }
         } catch (error) {
             // Handle login error
             console.error('Login failed:', error);
-            // Show error message to the user or perform other error handling
+            // Show the alert popup for login errors
+            setShowAlert(true);
         }
+    };
+
+    // Close the alert popup
+    const handleAlertClose = () => {
+        setShowAlert(false);
     };
 
     return (
@@ -66,12 +66,19 @@ const LoginForm = () => {
                                     <a href={"#"} className="hover:underline">Help</a>
                                     <a href={"#"} className="ml-4 hover:underline">Terms & Conditions</a>
                                 </div>
-                                
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {/* Show the AlertPopup for login errors */}
+            {showAlert && (
+                <AlertPopup
+                    title="Login failed!"
+                    text="Please check your email and password."
+                    onClose={handleAlertClose}
+                />
+            )}
         </div>
     );
 }
