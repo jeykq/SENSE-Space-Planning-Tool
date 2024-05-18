@@ -1,11 +1,13 @@
 import React, { useRef, useEffect, useState } from "react";
-
+import { useNavigate } from 'react-router-dom';
 import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
 
 const BusinessUserHomepage = () => {
+  const navigate = useNavigate();
+  const handleClickCreateRoom = () => navigate('/CreateRoom');
   const swiperContainer1 = useRef(null);
   const swiperContainer2 = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -61,7 +63,7 @@ const BusinessUserHomepage = () => {
       <div style={{ paddingTop: "20px", paddingLeft: "100px" }} className="justify-center">
         <div className="flex items-center" style={{ width: "90%" }}>
           <div style={{ width: '80px', height: '70px', borderRadius: '50%', backgroundColor: '#D1D5DB', display: 'flex', justifyContent: 'center', marginRight: '20px' }} className={"bg-slate-700"}>
-            <button style={{ border: 'none', backgroundColor: 'transparent', fontSize: '30px', fontWeight: 'bold' }}>+</button>
+            <button onClick={handleClickCreateRoom} style={{ border: 'none', backgroundColor: 'transparent', fontSize: '30px', fontWeight: 'bold' }}>+</button>
           </div>
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
