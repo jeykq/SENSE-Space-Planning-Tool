@@ -8,7 +8,7 @@ import BusinessUserHomepage from './Components/BusinessUser/BusinessUserHomepage
 import FreeUserHomepage from './Components/FreeUser/FreeUserHomepage';
 import PremiumUserHomepage from './Components/PremiumUser/PremiumUserHomepage';
 import SystemAdminHomepage from './Components/SystemAdmin/SystemAdminHomepage';
-
+import CreateRoom from './3D/3DRoom/createRoom';
 
 const App = () => {
   return (
@@ -22,6 +22,7 @@ const App = () => {
           <Route path="/FreeUserHomepage" element={<FreeUserHomepage/>} />
           <Route path="/PremiumUserHomepage" element={<PremiumUserHomepage/>} />
           <Route path="/SystemAdminHomepage" element={<SystemAdminHomepage/>} />
+          <Route path="/CreateRoom" element={<CreateRoom/>} />
       </Routes>
     </Router>
       
