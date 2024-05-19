@@ -8,7 +8,7 @@ import BusinessUserHomepage from './Components/BusinessUser/BusinessUserHomepage
 import FreeUserHomepage from './Components/FreeUser/FreeUserHomepage';
 import PremiumUserHomepage from './Components/PremiumUser/PremiumUserHomepage';
 import SystemAdminHomepage from './Components/SystemAdmin/SystemAdminHomepage';
-import CreateRoom from './3D/3DRoom/createRoom';
+import CreateRoom from './Components/BusinessUser/CreateRoom';
 
 const App = () => {
   return (
