@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import AddObjDropdown from './AddObjDropdown';
 
 const CreateRoom = () => {
   const mountRef = useRef(null);
@@ -215,24 +216,16 @@ const CreateRoom = () => {
           Export Room
         </button>
       </div>
-      <div className="absolute top-4 right-4">
+      <div className="flex flex-col mb-2 absolute top-4 right-4">
         <button 
           onClick={toggleDropdown} 
-          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="max-w-min text-nowrap ml-auto bg-yellow-500 text-white py-2 px-4 mb-1 rounded-full shadow-lg"
         >
           Add Objects
         </button>
         {showDropdown && (
-          <div className="mt-2 bg-white p-4 rounded shadow-lg">
-            <h3 className="underline mb-2">Objects</h3>
-            <div
-              draggable
-              onDragStart={(event) => handleDragStart(event, 'sofa.obj', 'sofa.mtl')}
-              className="mb-2 cursor-pointer"
-            >
-              Sofa
-            </div>
-            {/* Add more objects here */}
+          <div className="w-[300px]">
+            <AddObjDropdown />
           </div>
         )}
       </div>
