@@ -3,11 +3,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
+import ConfirmDialog from '../UI/ConfirmDialog';
 
 const CreateRoom = () => {
   const mountRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -182,11 +185,14 @@ const CreateRoom = () => {
   };
 
   const handleImportRoom = () => {
+    navigate("/ImportRoom");
     // Logic to import a room
   };
 
+  const [showConfirmExport, setShowConfirmExport] = useState(false);
   const handleExportRoom = () => {
     // Logic to export the current room
+    setShowConfirmExport(true)
   };
 
   const toggleDropdown = () => {
@@ -215,6 +221,9 @@ const CreateRoom = () => {
         >
           Export Room
         </button>
+        {showConfirmExport && 
+          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={()=> setShowConfirmExport(false)} />
+        }
       </div>
       <div className="flex flex-col mb-2 absolute top-4 right-4">
         <button 
