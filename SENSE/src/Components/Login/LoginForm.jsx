@@ -17,24 +17,40 @@ const LoginForm = () => {
                 email: email,
                 password: password
             });
-            // Handle successful login response
-            console.log(response.data);
-            const role = response.data.role;
-
-            // Redirect or do something else upon successful login
-            if (role === 'FREE_USER') {
-                navigate('/FreeUserHomepage'); // Redirect to free user homepage
-            } else if (role === 'PREMIUM_USER') {
-                navigate('/PremiumUserHomepage'); // Redirect to premium user homepage
+    
+            if (response.status === 200) {
+                // Handle successful login response
+                console.log('Login successful:', response.data);
+                const { role, token } = response.data;
+    
+                // Save the login token to local storage
+                localStorage.setItem('authToken', token);
+    
+                // Redirect based on user role
+                if (role === 'FREE_USER') {
+                    navigate('/FreeUserHomepage'); // Redirect to free user homepage
+                } else if (role === 'PREMIUM_USER') {
+                    navigate('/PremiumUserHomepage'); // Redirect to premium user homepage
+                }
+            } else {
+                console.error('Unexpected response status:', response.status);
+                setShowAlert(true);
             }
         } catch (error) {
-            // Handle login error
-            console.error('Login failed:', error);
-            // Show the alert popup for login errors
+            if (error.response) {
+                // Server responded with a status other than 200 range
+                console.error('Login failed:', error.response.data);
+            } else if (error.request) {
+                // Request was made but no response was received
+                console.error('No response received:', error.request);
+            } else {
+                // Something else happened in making the request
+                console.error('Error in request:', error.message);
+            }
             setShowAlert(true);
         }
     };
-
+    
     // Close the alert popup
     const handleAlertClose = () => {
         setShowAlert(false);
