@@ -16,7 +16,7 @@ const Navbar = () => {
   useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
-      navigate('/login');
+      navigate('/');
     }
     
     const handleScroll = () => {
@@ -55,7 +55,7 @@ const Navbar = () => {
 
       if (response.status === 200) {
         localStorage.removeItem('authToken');
-        navigate('/login');
+        navigate('/');
       }
       
     } catch (error) {
