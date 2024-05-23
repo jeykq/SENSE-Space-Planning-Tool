@@ -7,7 +7,7 @@ import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
 
 const BusinessUserHomepage = () => {
   const navigate = useNavigate();
-  const handleClickCreateRoom = () => navigate('/CreateRoom');
+  const handleClickCreateRoom = () => navigate('/Room3D');
   const swiperContainer1 = useRef(null);
   const swiperContainer2 = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);

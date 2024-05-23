@@ -8,7 +8,8 @@ import BusinessUserHomepage from './Components/BusinessUser/BusinessUserHomepage
 import FreeUserHomepage from './Components/FreeUser/FreeUserHomepage';
 import PremiumUserHomepage from './Components/PremiumUser/PremiumUserHomepage';
 import SystemAdminHomepage from './Components/SystemAdmin/SystemAdminHomepage';
-import CreateRoom from './Components/BusinessUser/CreateRoom';
+import CreateTemplate from './Components/BusinessUser/CreateTemplate';
+import Room3D from './Components/BusinessUser/Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
 
 const App = () => {
@@ -23,7 +24,8 @@ const App = () => {
           <Route path="/FreeUserHomepage" element={<FreeUserHomepage/>} />
           <Route path="/PremiumUserHomepage" element={<PremiumUserHomepage/>} />
           <Route path="/SystemAdminHomepage" element={<SystemAdminHomepage/>} />
-          <Route path="/CreateRoom" element={<CreateRoom/>} />
+          <Route path="/CreateTemplate" element={<CreateTemplate/>} />
+          <Route path="/Room3D" element={<Room3D/>} />
           <Route path="/ImportRoom" element={<ImportRoom/>} />
       </Routes>
     </Router>

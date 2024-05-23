@@ -56,7 +56,7 @@ const ImportRoom = () => {
   return (
     <div>
         <div>
-            <Topbar title={"Import Objects"} onClick={() => navigate("/CreateRoom")}/>
+            <Topbar title={"Import Objects"} onClick={() => navigate("/Room3D")}/>
         </div>
         <div className="px-40 py-14">
             <ImportRoomForm submit={() => handleSubmit()}/>

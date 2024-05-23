@@ -8,9 +8,11 @@ import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 
-const CreateRoom = () => {
+const Room3D = () => {
   const mountRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showTransformControls, setShowTransformControls] = useState(false);
+  const [showDoneButton, setShowDoneButton] = useState(false);
   const navigate = useNavigate();
   const transformControlsRef = useRef(null);
   const selectedObjectRef = useRef(null);
@@ -125,7 +127,7 @@ const CreateRoom = () => {
           // Clamp the object's position within the room bounds
           object.position.set(
             Math.max(-roomWidth / 2, Math.min(roomWidth / 2, position.x)),
-            Math.max(0, Math.min(roomHeight, position.y)),
+            0,
             Math.max(-roomDepth / 2, Math.min(roomDepth / 2, position.z))
           );
           object.scale.set(1, 1, 1);
@@ -135,6 +137,7 @@ const CreateRoom = () => {
           // Attach transform controls to the object
           transformControls.attach(object);
           selectedObjectRef.current = object;
+          setShowTransformControls(true);
           setShowDoneButton(true);
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
@@ -213,11 +216,12 @@ const CreateRoom = () => {
       // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
         Math.max(-roomWidth / 2, Math.min(roomWidth / 2, pos.x)),
-        Math.max(0, Math.min(roomHeight, pos.y)),
+        0,
         Math.max(-roomDepth / 2, Math.min(roomDepth / 2, pos.z))
       );
 
       loadModel(modelPath, materialPath, pos);
+      setShowDropdown(false);
     };
 
     const handleDragOver = (event) => {
@@ -271,6 +275,7 @@ const CreateRoom = () => {
     if (selectedObjectRef.current) {
       transformControlsRef.current.detach(selectedObjectRef.current);
       selectedObjectRef.current = null;
+      setShowTransformControls(false);
       setShowDoneButton(false);
     }
   };
@@ -313,33 +318,39 @@ const CreateRoom = () => {
             <AddObjDropdown handleDragStart={handleDragStart} />
           </div>
         )}
-        <button 
-          onClick={() => setMode('translate')} 
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
-        >
-          Move
-        </button>
-        <button 
-          onClick={() => setMode('rotate')} 
-          className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg"
-        >
-          Rotate
-        </button>
-        <button 
-          onClick={() => setMode('scale')} 
-          className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
-        >
-          Scale
-        </button>
-        <button 
-            onClick={handleDone} 
-            className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg"
+        {showTransformControls && (
+          <>
+          <button 
+            onClick={() => setMode('translate')} 
+            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
           >
-            Done
-        </button>
+            Move
+          </button>
+          <button 
+            onClick={() => setMode('rotate')} 
+            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg"
+          >
+            Rotate
+          </button>
+          <button 
+            onClick={() => setMode('scale')} 
+            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
+          >
+            Scale
+          </button>
+          </>
+        )}
+        {showDoneButton && (
+          <button 
+              onClick={handleDone} 
+              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg"
+            >
+              Done
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
-export default CreateRoom;
+export default Room3D;
