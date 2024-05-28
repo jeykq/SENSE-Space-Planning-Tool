@@ -11,6 +11,7 @@ import SystemAdminHomepage from './Components/SystemAdmin/SystemAdminHomepage';
 import CreateTemplate from './Components/BusinessUser/CreateTemplate';
 import Room3D from './Components/BusinessUser/Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
+import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
           <Route path="/CreateTemplate" element={<CreateTemplate/>} />
           <Route path="/Room3D" element={<Room3D/>} />
           <Route path="/ImportRoom" element={<ImportRoom/>} />
+          <Route path="/BU_ViewObjects" element={<BU_ViewObjects/>} />
       </Routes>
     </Router>
       
