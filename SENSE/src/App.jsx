@@ -12,6 +12,7 @@ import CreateTemplate from './Components/BusinessUser/CreateTemplate';
 import Room3D from './Components/BusinessUser/Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
+import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
           <Route path="/Room3D" element={<Room3D/>} />
           <Route path="/ImportRoom" element={<ImportRoom/>} />
           <Route path="/BU_ViewObjects" element={<BU_ViewObjects/>} />
+          <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo/>} />
       </Routes>
     </Router>
       
