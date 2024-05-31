@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-scroll";
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-import SearchBar from "./SearchBar";
+import SearchBar from './SearchBar';
 import logo from '../../assets/logo.png';
 import ConfirmDialogPopup from '../UI/ConfirmDialog';
 import ProfileDropdown from './ProfileDropdown';
@@ -13,14 +14,54 @@ const Navbar = ({ handleSearch }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
+  
   useEffect(()=>{
-    window.addEventListener('scroll', ()=>{
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/');
+    }
+    const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
-    })
-  },[]);
+    };
 
-  const handleLogout = () => {
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [navigate]);
+
+  const handleLogOut = () => {
     setShowPopup(true);
+  };
+
+  const confirmLogout = async () => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    const headers = { 
+      'Content-Type': 'application/json',
+      'sense-token': token
+    };
+    
+    try {
+      const response = await axios.post(
+        'https://api.sensespacesplanningtool.com/logout',
+        {},
+        { headers: headers }
+      );
+
+      if (response.status === 200) {
+        localStorage.removeItem('authToken');
+        navigate('/');
+      }
+      
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   return (
@@ -39,11 +80,18 @@ const Navbar = ({ handleSearch }) => {
             <SearchBar handleSearch={handleSearch} />
           </li>
           <li className="flex items-center ml-auto">
-            <ProfileDropdown onLogout={handleLogout} />
+            <ProfileDropdown onLogout={handleLogOut} />
           </li>
         </ul>
       </div>
-      {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => navigate("/")} onClose={()=>setShowPopup(false)}/>}
+      {showPopup && <ConfirmDialogPopup 
+        title={"Confirm Logout"} 
+        text={"Are you sure you want to log out?"} 
+        onConfirm={() => {
+          setShowPopup(false);
+          confirmLogout();
+        }} 
+        onClose={()=>setShowPopup(false)}/>}
     </nav>
   );
 }
