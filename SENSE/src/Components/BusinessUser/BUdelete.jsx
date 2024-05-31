@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
 
-const BusinessUserHomepage = () => {
+const BUdelete = () => {
   const navigate = useNavigate();
   const handleClickCreateRoom = () => navigate('/Room3D');
   const swiperContainer1 = useRef(null);
@@ -14,6 +14,7 @@ const BusinessUserHomepage = () => {
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [templates, setTemplates] = useState([...Array(5)]); // Placeholder data
 
   useEffect(() => {
     if (swiperContainer1.current) {
@@ -56,12 +57,9 @@ const BusinessUserHomepage = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Perform delete action here, using deleteIndex to identify the item
-    // After deletion, close the confirmation pop-up
     const updatedTemplates = templates.filter((_, index) => index !== deleteIndex);
     setTemplates(updatedTemplates);
     setShowDeleteConfirmation(false);
-    // Perform delete action...
   };
 
   const handleCancelDelete = () => {
@@ -88,7 +86,7 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {[...Array(5)].map((_, index) => (
+              {templates.map((_, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
                   <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
@@ -111,11 +109,18 @@ const BusinessUserHomepage = () => {
       {/* Dropdown list for Room Templates */}
       {showDropdown && (
         <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
-          <ul>
-            <li>View</li>
-            <li>Update</li>
-            <li onClick={() => handleDelete(index)}>Delete</li>
-          </ul>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">View</button>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Update</button>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" onClick={() => handleDelete(deleteIndex)}>Delete</button>
+        </div>
+      )}
+
+      {/* Delete confirmation popup */}
+      {showDeleteConfirmation && (
+        <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '20px', borderRadius: '5px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)' }}>
+          <p>Are you sure you want to delete this template?</p>
+          <button onClick={handleConfirmDelete} style={{ marginRight: '10px' }}>Yes</button>
+          <button onClick={handleCancelDelete}>No</button>
         </div>
       )}
 
@@ -128,7 +133,7 @@ const BusinessUserHomepage = () => {
       </div>
 
       <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "100px" }} className="justify-center">
-        <div className="flex items-center" style={{ width: "90%"}}>
+        <div className="flex items-center" style={{ width: "90%" }}>
           {/* "+" button for Object Categories */}
           <div style={{ width: '80px', height: '70px', borderRadius: '50%', backgroundColor: '#D1D5DB', display: 'flex', justifyContent: 'center', marginRight: '20px' }} className={"bg-slate-700"}>
             <button style={{ border: 'none', backgroundColor: 'transparent', fontSize: '30px', fontWeight: 'bold' }}>+</button>
@@ -140,17 +145,18 @@ const BusinessUserHomepage = () => {
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
                   <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
-                    <div className="bg-gray-300" style={{ borderRadius: '20px', width: '100%', height: '200px', marginBottom: '10px' }}></div>
+                    <div className="bg-gray-300" style={{ borderRadius: '20px', width: '100%', height: '200px', marginBottom: '10px'
+                        }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
                       <p> [Placeholder for Category Name] </p>
                     </div>
                     <div style={{ textAlign: 'center' }}>
                       <p> [Placeholder for Category] </p>
-                    </div>
+                   </div>
                   </div>
-                </div>
+                </div> 
               ))}
-            </div>
+            </div> */
           </div>
         </div>
       </div>
@@ -158,11 +164,10 @@ const BusinessUserHomepage = () => {
       {/* Dropdown list for Object Categories */}
       {showDropdown && (
         <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
-          <ul>
-            <li>View</li>
-            <li>Update</li>
-            <li>Delete</li>
-          </ul>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">View</button>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Update</button>
+          <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"onClick={() => handleDelete(index)}>Delete</button>
+          
         </div>
       )}
 
@@ -173,4 +178,4 @@ const BusinessUserHomepage = () => {
   );
 };
 
-export default BusinessUserHomepage;
+export default BUdelete;
