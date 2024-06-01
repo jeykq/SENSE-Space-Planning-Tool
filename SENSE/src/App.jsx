@@ -13,7 +13,7 @@ import Room3D from './Components/BusinessUser/Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
-
+import BUdelete from './Components/BusinessUser/BUdelete';
 const App = () => {
   return (
     <Router>
@@ -31,6 +31,8 @@ const App = () => {
           <Route path="/ImportRoom" element={<ImportRoom/>} />
           <Route path="/BU_ViewObjects" element={<BU_ViewObjects/>} />
           <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo/>} />
+          <Route path="/BUdelete" element={<BUdelete/>} />
+          
       </Routes>
     </Router>
       
