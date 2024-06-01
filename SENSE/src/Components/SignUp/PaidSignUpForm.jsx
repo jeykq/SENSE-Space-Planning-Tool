@@ -38,7 +38,7 @@ const PaidSignUpForm = () => {
     const isValid = validateForm();
     if (isValid) {
       try {
-        const response = await fetch('https://api.sensespacesplanningtool.com/signup/free', {
+        const response = await fetch('https://api.sensespacesplanningtool.com/signup/premium', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ const PaidSignUpForm = () => {
           // Handle successful sign up
           setShowAlert(true); // Show the alert
           console.log('Sign up successful!');
-          //navigate("/login");
+          // navigate("/login");
         } else {
           // Handle sign up errors
           const errorData = await response.json();
@@ -70,6 +70,7 @@ const PaidSignUpForm = () => {
 
   // Close the alert popup when click OK, and navigate to login
   const handleOK = () => {
+    setShowAlert(false);
     navigate("/login");
   }
 
@@ -141,7 +142,7 @@ const PaidSignUpForm = () => {
           text="Your account has been created successfully."
           onClose={() => setShowAlert(false)}
           // Redirect to login page when click OK
-          onOK={handleOK}
+          onOk={handleOK}
         />
       )}
     </div>

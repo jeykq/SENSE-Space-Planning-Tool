@@ -4,9 +4,10 @@ interface AlertPopupProps {
     title: string;
     text: string;
     onClose: () => void;
+    onOk: () => void;
 }
 
-const AlertPopup = ({ title, text, onClose }: AlertPopupProps) => {
+const AlertPopup = ({ title, text, onClose, onOk }: AlertPopupProps) => {
     return (
         <div className="fixed inset-0 z-50 overflow-auto bg-black/30 flex">
             <div className="relative p-8 bg-white w-[90%] max-w-md m-auto flex-col flex rounded-lg items-center">
@@ -21,7 +22,9 @@ const AlertPopup = ({ title, text, onClose }: AlertPopupProps) => {
                 </span>
                 <div className="flex flex-row py-2 mt-2">
                     <div className="mx-auto">
-                        <button onClick={() => onClose()} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2">
+                        <button 
+                            onClick={() => onOk()} 
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2">
                             OK
                         </button>
                     </div>

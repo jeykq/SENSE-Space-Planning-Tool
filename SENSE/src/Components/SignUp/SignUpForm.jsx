@@ -55,7 +55,7 @@ const SignUpForm = () => {
           // Handle successful sign up
           setShowAlert(true); // Show the alert
           console.log('Sign up successful!');
-          //navigate("/login");
+          // navigate("/login");
         } else {
           // Handle sign up errors
           const errorData = await response.json();
@@ -69,6 +69,7 @@ const SignUpForm = () => {
 
   // Close the alert popup when click OK, and navigate to login
   const handleOK = () => {
+    setShowAlert(false);
     navigate("/login");
   };
   
@@ -133,7 +134,7 @@ const SignUpForm = () => {
           text="Your account has been created successfully."
           onClose={() => setShowAlert(false)}
           // Redirect to login page when click OK
-          onOK={handleOK}
+          onOk={handleOK}
         />
       )}
     </div>
