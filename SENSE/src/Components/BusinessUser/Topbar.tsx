@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from "react-scroll";
-import logo from "../../assets/logo.png";
+import logo from '../../assets/logo.png';
 
 interface TopbarProps {
   title: string;
@@ -13,11 +13,11 @@ const Topbar = ({ title, onClick }: TopbarProps) => {
       <div className="flex items-center">
         <img src={logo} alt="" className='logo w-20 mx-2' />
       </div>
-      <div className="flex-grow flex justify-center">
+      <div className="flex-grow text-center text-xl font-medium">
         {title}
       </div>
-      <div onClick={() => onClick()} className="flex items-center cursor-pointer">
-        x
+      <div onClick={() => onClick()} className="flex items-center cursor-pointer mr-4">
+        x  
       </div>
     </div>
   );

@@ -13,7 +13,7 @@ const Navbar = ({ handleSearch }) => {
   const [sticky, setSticky] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-
+  
   
   useEffect(()=>{
     const token = localStorage.getItem('authToken');

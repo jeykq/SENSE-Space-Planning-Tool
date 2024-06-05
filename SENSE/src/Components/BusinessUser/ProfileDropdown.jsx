@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ProfileDropdown = ({ onLogout }) => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
+
+  const handleViewAccount = () => navigate('/viewaccount');
 
   const handleLogout = () => {
     setIsOpen(false);
@@ -16,11 +20,10 @@ const ProfileDropdown = ({ onLogout }) => {
         </svg>
       </div>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 text-black bg-white rounded-md shadow-lg">
+        <div className="absolute right-0 w-48 text-black bg-white rounded-md shadow-lg">
           <div className="py-1">
-            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Option 1</button>
-            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left">Option 2</button>
-            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left" onClick={handleLogout}>Log Out</button>
+            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center " onClick={handleViewAccount}>View Account</button>
+            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-solid border-0 border-t border-blue-900" onClick={handleLogout}>Log Out</button>
           </div>
         </div>
       )}
