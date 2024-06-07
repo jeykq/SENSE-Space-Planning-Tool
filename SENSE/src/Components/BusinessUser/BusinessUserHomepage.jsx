@@ -123,7 +123,7 @@ const BusinessUserHomepage = () => {
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
         <div className={"ml-5"}>
-          <p>Object Categories</p>
+          <p>Room Objects</p>
         </div>
       </div>
 
