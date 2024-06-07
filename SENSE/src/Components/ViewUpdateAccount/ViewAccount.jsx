@@ -31,7 +31,7 @@ const ViewAccount = () => {
   return (
     <div>
       <Topbar title="My Profile" onClick={handleGoBack} />
-      <div className="min-h-screen flex flex-col items-center mt-20">
+      <div className="flex flex-col items-center mt-20">
         <div className="flex-grow flex items-center justify-center p-4">
           <table className="min-w-full rounded-lg overflow-auto" style={{ backgroundColor: bgColor, border: `1px solid ${borderColor}` }}>
             <thead style={{ backgroundColor: headerBgColor }}>
