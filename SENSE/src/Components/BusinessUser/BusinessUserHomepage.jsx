@@ -127,12 +127,9 @@ const BusinessUserHomepage = () => {
         </div>
       </div>
 
-      <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "100px" }} className="justify-center">
+      <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "0px" }} className="justify-center">
         <div className="flex items-center" style={{ width: "90%"}}>
-          {/* "+" button for Object Categories */}
-          <div style={{ width: '80px', height: '70px', borderRadius: '50%', backgroundColor: '#D1D5DB', display: 'flex', justifyContent: 'center', marginRight: '20px' }} className={"bg-slate-700"}>
-            <button style={{ border: 'none', backgroundColor: 'transparent', fontSize: '30px', fontWeight: 'bold' }}>+</button>
-          </div>
+         
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
               {[...Array(5)].map((_, index) => (
