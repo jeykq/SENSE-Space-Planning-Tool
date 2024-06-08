@@ -3,15 +3,16 @@ import { useNavigate } from 'react-router-dom';
 
 const BU_ImportObjects = ({ submit }) => {
     const [objectName, setObjectName] = useState('');
-    const [roomType, setRoomType] = useState('');
+    const [objectCat, setObjectCat] = useState(''); // Changed to handle selected category
     const [tags, setTags] = useState({
-        tag1: false,
-        tag2: false,
-        tag3: false,
-        tag4: false,
+        'Autism Friendly': false,
+        'Safe for Kids': false,
+        'Colour-blind': false,
+        'Therapeutic': false,
     });
-    const [showTags, setShowTags] = useState(false); // State for checklist visibility
-    const fileInputRef = useRef(null); // Reference to the hidden file input
+    const [productDescription, setProductDescription] = useState('');
+    const [showTags, setShowTags] = useState(false);
+    const fileInputRef = useRef(null);
     const navigate = useNavigate();
 
     const handleTagChange = (event) => {
@@ -26,32 +27,32 @@ const BU_ImportObjects = ({ submit }) => {
         event.preventDefault();
         submit({
             objectName,
-            roomType,
+            objectCatj,
             tags: Object.keys(tags).filter((tag) => tags[tag]),
+            productDescription,
         });
     };
 
     const handleImportClick = () => {
-        fileInputRef.current.click(); // Trigger click on hidden file input
+        fileInputRef.current.click();
     };
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            // Check file extension
             const fileExtension = file.name.split('.').pop().toLowerCase();
             if (fileExtension !== 'obj') {
                 alert('Only .obj files are allowed');
-                fileInputRef.current.value = ''; // Reset the file input
+                fileInputRef.current.value = '';
                 return;
             }
             console.log('Selected file:', file.name);
-            // Handle file upload logic here
         }
     };
 
-    // Generate a string of selected tags
     const selectedTags = Object.keys(tags).filter(tag => tags[tag]).join(', ');
+
+    const isObjectNameFilled = objectName.trim() !== '';
 
     return (
         <form onSubmit={handleSubmit}>
@@ -70,17 +71,23 @@ const BU_ImportObjects = ({ submit }) => {
                     />
                 </div>
                 <div className="col-span-1 text-center self-center">
-                    <label htmlFor="room_type">Room Type:</label>
+                    <label htmlFor="obj_cat">Category:</label>
                 </div>
                 <div className="col-span-3">
-                    <input
-                        type="text"
-                        placeholder="Enter Room type..."
+                    <select
                         className="border border-gray-400 w-full py-1 px-2"
-                        value={roomType}
-                        onChange={(e) => setRoomType(e.target.value)}
+                        value={objectCat}
+                        onChange={(e) => setObjectCat(e.target.value)}
+                        disabled={!isObjectNameFilled}
                         required
-                    />
+                    >
+                        <option value="">Select a category</option>
+                        <option value="Chair">Chair</option>
+                        <option value="Table">Table</option>
+                        <option value="Decorations">Decorations</option>
+                        <option value="Lights">Lights</option>
+                        <option value="Sofa">Sofa</option>
+                    </select>
                 </div>
                 <div className="col-span-1 text-center self-center">
                     <label htmlFor="tags">Tags:</label>
@@ -90,6 +97,7 @@ const BU_ImportObjects = ({ submit }) => {
                         type="button"
                         onClick={() => setShowTags(!showTags)}
                         className="flex items-center"
+                        disabled={!isObjectNameFilled}
                     >
                         <span className="mr-2">Select Tags</span>
                         <span className={`transform ${showTags ? 'rotate-90' : ''}`}>▶</span>
@@ -105,6 +113,7 @@ const BU_ImportObjects = ({ submit }) => {
                                         checked={tags[tag]}
                                         onChange={handleTagChange}
                                         className="mr-2"
+                                        disabled={!isObjectNameFilled}
                                     />
                                     {tag}
                                 </li>
@@ -119,11 +128,13 @@ const BU_ImportObjects = ({ submit }) => {
                         style={{ display: 'none' }}
                         onChange={handleFileChange}
                         accept=".obj"
+                        disabled={!isObjectNameFilled}
                     />
                     <button
                         type="button"
                         className="max-w-min text-nowrap bg-orange-500 px-8 py-1 text-white mt-5 uppercase"
                         onClick={handleImportClick}
+                        disabled={!isObjectNameFilled}
                     >
                         Import Object
                     </button>
@@ -138,14 +149,25 @@ const BU_ImportObjects = ({ submit }) => {
                     </div>
                 </div>
                 <div className="col-span-2 mx-8 -translate-y-2">
-                    <div className="bg-white h-40 rounded-md p-4">[prod description]</div>
+                    <textarea
+                        className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
+                        value={productDescription}
+                        onChange={(e) => setProductDescription(e.target.value)}
+                        placeholder="Enter product description..."
+                        disabled={!isObjectNameFilled}
+                    />
                 </div>
                 <div className="col-span-2 mx-8 -translate-y-2">
-                    <div className="bg-white h-40 rounded-md p-4">[obj preview]</div>
+                    <div className="bg-white h-40 rounded-md p-4">
+                        [obj preview]
+                    </div>
                 </div>
             </div>
             <div className="col-span-4 flex items-center justify-center">
-                <button className="w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase">
+                <button
+                    className="w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
+                    disabled={!isObjectNameFilled}
+                >
                     Save
                 </button>
             </div>
