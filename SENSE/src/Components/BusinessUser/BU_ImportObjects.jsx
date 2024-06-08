@@ -1,18 +1,16 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const ImportRoomForm = ({ submit }) => {
+const BU_ImportObjects = ({ submit }) => {
     const [objectName, setObjectName] = useState('');
     const [roomType, setRoomType] = useState('');
     const [tags, setTags] = useState({
-        Depression: false,
+        tag1: false,
         tag2: false,
         tag3: false,
         tag4: false,
     });
-    const [productDescription, setProductDescription] = useState(''); // State for product description
     const [showTags, setShowTags] = useState(false); // State for checklist visibility
-    const [selectedFile, setSelectedFile] = useState(null); // State to store the selected file
     const fileInputRef = useRef(null); // Reference to the hidden file input
     const navigate = useNavigate();
 
@@ -30,8 +28,6 @@ const ImportRoomForm = ({ submit }) => {
             objectName,
             roomType,
             tags: Object.keys(tags).filter((tag) => tags[tag]),
-            productDescription, // Include product description in the submit data
-            file: selectedFile, // Include the selected file in the submit data
         });
     };
 
@@ -49,8 +45,8 @@ const ImportRoomForm = ({ submit }) => {
                 fileInputRef.current.value = ''; // Reset the file input
                 return;
             }
-            setSelectedFile(file); // Store the selected file
             console.log('Selected file:', file.name);
+            // Handle file upload logic here
         }
     };
 
@@ -132,7 +128,6 @@ const ImportRoomForm = ({ submit }) => {
                         Import Object
                     </button>
                     <span className="text-xs">*Only file format *.obj is accepted</span>
-                    {selectedFile && <span className="mt-2 text-sm">{selectedFile.name}</span>}
                 </div>
                 <div className="flex col-span-2 mx-8">
                     <span className="self-end">Product Description</span>
@@ -143,17 +138,10 @@ const ImportRoomForm = ({ submit }) => {
                     </div>
                 </div>
                 <div className="col-span-2 mx-8 -translate-y-2">
-                    <textarea
-                        className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
-                        value={productDescription}
-                        onChange={(e) => setProductDescription(e.target.value)}
-                        placeholder="Enter product description..."
-                    />
+                    <div className="bg-white h-40 rounded-md p-4">[prod description]</div>
                 </div>
                 <div className="col-span-2 mx-8 -translate-y-2">
-                    <div className="bg-white h-40 rounded-md p-4">
-                        {selectedFile ? selectedFile.name : '[obj preview]'}
-                    </div>
+                    <div className="bg-white h-40 rounded-md p-4">[obj preview]</div>
                 </div>
             </div>
             <div className="col-span-4 flex items-center justify-center">
@@ -165,4 +153,4 @@ const ImportRoomForm = ({ submit }) => {
     );
 };
 
-export default ImportRoomForm;
+export default BU_ImportObjects;
