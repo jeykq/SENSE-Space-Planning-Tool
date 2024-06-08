@@ -1,9 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ThreeDPreview from './ThreeDPreview';
 
 const BU_ImportObjects = ({ submit }) => {
     const [objectName, setObjectName] = useState('');
-    const [objectCat, setObjectCat] = useState(''); // Changed to handle selected category
+    const [objectCat, setObjectCat] = useState('');
     const [tags, setTags] = useState({
         'Autism Friendly': false,
         'Safe for Kids': false,
@@ -12,6 +13,7 @@ const BU_ImportObjects = ({ submit }) => {
     });
     const [productDescription, setProductDescription] = useState('');
     const [showTags, setShowTags] = useState(false);
+    const [objFile, setObjFile] = useState(null); // State to store the uploaded OBJ file
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
 
@@ -27,7 +29,7 @@ const BU_ImportObjects = ({ submit }) => {
         event.preventDefault();
         submit({
             objectName,
-            objectCatj,
+            objectCat,
             tags: Object.keys(tags).filter((tag) => tags[tag]),
             productDescription,
         });
@@ -46,7 +48,7 @@ const BU_ImportObjects = ({ submit }) => {
                 fileInputRef.current.value = '';
                 return;
             }
-            console.log('Selected file:', file.name);
+            setObjFile(URL.createObjectURL(file)); // Create a URL for the uploaded file
         }
     };
 
@@ -157,10 +159,8 @@ const BU_ImportObjects = ({ submit }) => {
                         disabled={!isObjectNameFilled}
                     />
                 </div>
-                <div className="col-span-2 mx-8 -translate-y-2">
-                    <div className="bg-white h-40 rounded-md p-4">
-                        [obj preview]
-                    </div>
+                <div className="col-span-2 mx-8 -translate-y-2" style={{ width: '100%' }}>
+                    <ThreeDPreview objFile={objFile} />
                 </div>
             </div>
             <div className="col-span-4 flex items-center justify-center">
