@@ -16,6 +16,9 @@ import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
 import BUdelete from './Components/BusinessUser/BUdelete';
 import ViewAccount from './Components/ViewUpdateAccount/ViewAccount';
 import UpdateAccount from './Components/ViewUpdateAccount/UpdateAccount';
+import BU_ImportObjects from './Components/BusinessUser/BU_ImportObjects';
+import ThreeDPreview from './Components/BusinessUser/ThreeDPreview';
+
 const App = () => {
   return (
     <Router>
@@ -34,8 +37,11 @@ const App = () => {
           <Route path="/BU_ViewObjects" element={<BU_ViewObjects/>} />
           <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo/>} />
           <Route path="/BUdelete" element={<BUdelete/>} />
+          <Route path="/BU_ImportObjects" element={<BU_ImportObjects/>} />
           <Route path="/viewaccount" element={<ViewAccount/>} />
           <Route path="/updateaccount" element={<UpdateAccount/>} />
+          <Route path="/ThreeDPreview" element={<ThreeDPreview/>} />
+
           
       </Routes>
     </Router>

@@ -7,21 +7,31 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
+import SaveDialogPopup from '../UI/SaveDialogPopup';
 
 const Room3D = () => {
   const mountRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTransformControls, setShowTransformControls] = useState(false);
   const [showDoneButton, setShowDoneButton] = useState(false);
+  const [showRemoveButton, setShowRemoveButton] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [objects, setObjects] = useState([]);
+  const [selectedObjectIndex, setSelectedObjectIndex] = useState(0);
+  const [showEditButton, setShowEditButton] = useState(false);
+  const [showConfirmSave, setShowConfirmSave] = useState(false);
   const navigate = useNavigate();
   const transformControlsRef = useRef(null);
   const selectedObjectRef = useRef(null);
+  const controlsRef = useRef(null);
+  const sceneRef = useRef(null);
 
   useEffect(() => {
     const mount = mountRef.current;
 
     // Scene
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
 
     // Camera
     const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
@@ -111,8 +121,16 @@ const Room3D = () => {
     });
 
     transformControls.addEventListener('dragging-changed', (event) => {
-      controls.enabled = !event.value;
+      controlsRef.current.enabled = !event.value;
     });
+
+    // Orbit Controls
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.25;
+    controls.screenSpacePanning = false;
+    controls.maxPolarAngle = Math.PI / 2;
+    controlsRef.current = controls;
 
     // Load 3D Model
     const loadModel = (modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
@@ -134,11 +152,16 @@ const Room3D = () => {
           object.userData.selectable = true;
           scene.add(object);
 
+          // Add object to the list
+          setObjects((prevObjects) => [...prevObjects, object]);
+
           // Attach transform controls to the object
           transformControls.attach(object);
           selectedObjectRef.current = object;
           setShowTransformControls(true);
           setShowDoneButton(true);
+          setShowRemoveButton(true);
+          setShowEditButton(false);
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
           console.error('Error loading model:', error);
@@ -164,24 +187,12 @@ const Room3D = () => {
       if (intersects.length > 0) {
         const firstIntersected = intersects[0].object;
         if (firstIntersected.userData.selectable) {
-          if (selectedObjectRef.current) {
-            transformControls.detach(selectedObjectRef.current);
-          }
-          transformControls.attach(firstIntersected);
-          selectedObjectRef.current = firstIntersected;
-          setShowDoneButton(true);
+          selectObject(firstIntersected);
         }
       }
     };
 
     mount.addEventListener('click', onMouseClick);
-
-    // Orbit Controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.25;
-    controls.screenSpacePanning = false;
-    controls.maxPolarAngle = Math.PI / 2;
 
     // Render Loop
     const animate = () => {
@@ -247,7 +258,7 @@ const Room3D = () => {
   };
 
   const handleSaveAsTemplate = () => {
-    // Logic to save the current room as a template
+    setShowConfirmSave(true);
   };
 
   const handleImportRoom = () => {
@@ -275,9 +286,63 @@ const Room3D = () => {
     if (selectedObjectRef.current) {
       transformControlsRef.current.detach(selectedObjectRef.current);
       selectedObjectRef.current = null;
+      setSelectedObjectIndex(0);
       setShowTransformControls(false);
       setShowDoneButton(false);
+      setShowRemoveButton(false);
+      setShowEditButton(true);
     }
+  };
+
+  const handleRemove = () => {
+    if (selectedObjectRef.current) {
+      sceneRef.current.remove(selectedObjectRef.current);
+      transformControlsRef.current.detach(selectedObjectRef.current);
+      setObjects(objects.filter(obj => obj !== selectedObjectRef.current));
+      selectedObjectRef.current = null;
+      setSelectedObjectIndex(0);
+      setShowTransformControls(false);
+      setShowDoneButton(false);
+      setShowRemoveButton(false);
+      setShowEditButton(objects.length > 1);
+    }
+  };
+
+  const selectObject = (object) => {
+    if (selectedObjectRef.current) {
+      transformControlsRef.current.detach(selectedObjectRef.current);
+    }
+    transformControlsRef.current.attach(object);
+    selectedObjectRef.current = object;
+    setShowTransformControls(true);
+    setShowDoneButton(true);
+    setShowRemoveButton(true);
+  };
+
+  const handleNextObject = () => {
+    if (objects.length > 0) {
+      const newIndex = (selectedObjectIndex + 1) % objects.length;
+      setSelectedObjectIndex(newIndex);
+      selectObject(objects[newIndex]);
+    }
+  };
+
+  const handlePreviousObject = () => {
+    if (objects.length > 0) {
+      const newIndex = (selectedObjectIndex - 1 + objects.length) % objects.length;
+      setSelectedObjectIndex(newIndex);
+      selectObject(objects[newIndex]);
+    }
+  };
+
+  const handleSaveAsDraft = () => {
+    // Logic to save as draft
+    setShowConfirmSave(false);
+  };
+
+  const handlePublishTemplate = () => {
+    // Logic to publish template
+    setShowConfirmSave(false);
   };
 
   return (
@@ -318,6 +383,30 @@ const Room3D = () => {
             <AddObjDropdown handleDragStart={handleDragStart} />
           </div>
         )}
+        {showEditButton && (
+          <button 
+            onClick={() => setIsEditMode(!isEditMode)} 
+            className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg"
+          >
+            {isEditMode ? 'Exit Edit Mode' : 'Edit Objects'}
+          </button>
+        )}
+        {isEditMode && objects.length > 0 && (
+          <div className="flex flex-col space-y-2 mt-1">
+            <button 
+              onClick={handlePreviousObject} 
+              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-1"
+            >
+              Previous Object
+            </button>
+            <button 
+              onClick={handleNextObject} 
+              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-2"
+            >
+              Next Object
+            </button>
+          </div>
+        )}
         {showTransformControls && (
           <>
           <button 
@@ -338,6 +427,12 @@ const Room3D = () => {
           >
             Scale
           </button>
+          <button 
+            onClick={handleRemove} 
+            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg"
+          >
+            Remove
+          </button>
           </>
         )}
         {showDoneButton && (
@@ -349,6 +444,13 @@ const Room3D = () => {
           </button>
         )}
       </div>
+      {showConfirmSave && (
+        <SaveDialogPopup
+          onClose={() => setShowConfirmSave(false)}
+          onSaveAsDraft={handleSaveAsDraft}
+          onPublishTemplate={handlePublishTemplate}
+        />
+      )}
     </div>
   );
 };
