@@ -51,6 +51,19 @@ const ViewAccount = () => {
     fetchAccountDetails();
   }, []);
 
+  const jobIndustryMapping = {
+    1: "Educator",
+    2: "Interior Designer",
+    3: "WHS",
+    4: "Support Worker",
+    5: "Parents",
+    0: "Others"
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toISOString().split('T')[0];
+  };
+
   const bgColor = "#e4e0e0"; // Custom background color
   const borderColor = "#666"; // Light black color
   const headerBgColor = "#ccc5c5"; // Background color for table header
@@ -84,8 +97,8 @@ const ViewAccount = () => {
                 <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.first_name}</td>
                 <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.last_name}</td>
                 <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.email}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.dob}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.job_industry_id}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{formatDate(accountDetails.dob)}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{jobIndustryMapping[accountDetails.job_industry_id]}</td>
                 <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.role}</td>
               </tr>
             </tbody>

@@ -1,39 +1,117 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils';
+import AlertPopup from '../UI/AlertPopup'; // Adjust the import path according to your project structure
 
 const UpdateAccount = () => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [industry, setIndustry] = useState('');
-  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
 
   const handleGoBack = () => {
-    navigate(-1); // This navigates to the previous page
+    navigate(-1);
   };
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    const headers = getHeaders();
+
+    if (!headers) {
+      setError('Token not found');
+      setLoading(false);
+      return;
+    }
+
+    const fetchAccountDetails = async () => {
+      try {
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/user/get', 
+          {}, 
+          { headers }
+        );
+
+        if (!response.data) {
+          throw new Error('No data returned');
+        }
+
+        const accountDetails = response.data.body;
+        setFirstName(accountDetails.first_name);
+        setLastName(accountDetails.last_name);
+        setEmail(accountDetails.email);
+        setDateOfBirth(accountDetails.dob.split('T')[0]); // Format date to YYYY-MM-DD
+        setIndustry(accountDetails.job_industry_id);
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccountDetails();
+  }, []);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validation and save logic
-    // Example:
-    if (password !== confirmPassword) {
-      setErrors({ confirmPassword: 'Passwords do not match' });
-    } else {
-      // Clear errors and proceed with form submission
-      setErrors({});
-      // Add logic to save/update account details
+
+    const headers = getHeaders();
+    const payload = {
+      first_name: firstName,
+      last_name: lastName,
+      dob: dateOfBirth,
+      job_industry_id: industry,
+    };
+
+    try {
+      await axios.post(
+        'https://api.sensespacesplanningtool.com/user/update',
+        payload,
+        { headers }
+      );
+      setIsAlertVisible(true);
+    } catch (error) {
+      console.error('Error updating account:', error);
+      setError(error.message);
     }
   };
+
+  const handleAlertClose = () => {
+    setIsAlertVisible(false);
+  };
+
+  const handleAlertOk = () => {
+    setIsAlertVisible(false);
+    navigate('/viewaccount');
+  };
+
+  const jobIndustryOptions = [
+    { value: '1', label: 'Educator' },
+    { value: '2', label: 'Interior Designer' },
+    { value: '3', label: 'WHS' },
+    { value: '4', label: 'Support Worker' },
+    { value: '5', label: 'Parents' },
+    { value: '0', label: 'Others' },
+  ];
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
       <Topbar title="Update Account Details" onClick={handleGoBack} />
-      <div className=" flex flex-col items-center justify-center mt-5">
+      <div className="flex flex-col items-center justify-center mt-5">
         <h2 className="text-3xl text-center mb-4">Account Information</h2>
         <div className="flex-grow flex items-center justify-center p-4">
           <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -51,16 +129,6 @@ const UpdateAccount = () => {
               <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
               <input type="text" id="email" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200" placeholder="Email" value={email} readOnly />
             </div>
-            <div className="mb-4">
-              <label htmlFor="password" className="block text-gray-700 text-sm font-bold mb-2">Old Password</label>
-              <input type="password" id="password" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.password ? 'border-red-500' : ''}`} placeholder="Old Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-              {errors.password && <p className="text-red-500 text-xs italic">{errors.password}</p>}
-            </div>
-            <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">New Password</label>
-              <input type="password" id="confirmPassword" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.confirmPassword ? 'border-red-500' : ''}`} placeholder="New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
-              {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
-            </div>
             <div className="mb-4 flex">
               <div className="w-1/2 mr-2">
                 <label htmlFor="dateOfBirth" className="block text-gray-700 text-sm font-bold mb-2">Date of Birth</label>
@@ -68,25 +136,30 @@ const UpdateAccount = () => {
               </div>
               <div className="w-1/2 ml-2">
                 <label htmlFor="industry" className="block text-gray-700 text-sm font-bold mb-2">Job Industry</label>
-                <select id="industry" name="industry" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={industry} onChange={(e) => setIndustry(e.target.value)} required >
+                <select id="industry" name="industry" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={industry} onChange={(e) => setIndustry(e.target.value)} required>
                   <option value="" disabled hidden>-</option>
-                  <option value="designer">Interior Designer</option>
-                  <option value="educator">Educator</option>
-                  <option value="whs">WHS</option>
-                  <option value="supportworker">Support Worker</option>
-                  <option value="parents">Parents</option>
-                  <option value="others">Others</option>
+                  {jobIndustryOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
             </div>
             <div className="flex items-center justify-center">
-            <button className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded" style={{ backgroundColor: '#ccc5c5', color: '#333', ':hover': { backgroundColor: '#900', color: '#fff' } }}>
-            Save
-            </button>
-                </div>
+              <button className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded" style={{ backgroundColor: '#ccc5c5', color: '#333' }}>
+                Save
+              </button>
+            </div>
           </form>
         </div>
       </div>
+      {isAlertVisible && (
+        <AlertPopup
+          title="Success"
+          text="Account Updated Successfully"
+          onClose={handleAlertClose}
+          onOk={handleAlertOk}
+        />
+      )}
     </div>
   );
 };
