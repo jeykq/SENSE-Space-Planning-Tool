@@ -95,6 +95,7 @@ const LoginForm = () => {
                     title="Login failed!"
                     text="Please check your email and password."
                     onClose={handleAlertClose}
+                    onOk={handleAlertClose}
                 />
             )}
         </div>
