@@ -22,8 +22,12 @@ const ProfileDropdown = ({ onLogout }) => {
       {isOpen && (
         <div className="absolute right-0 w-48 text-black bg-white rounded-md shadow-lg">
           <div className="py-1">
-            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center " onClick={handleViewAccount}>View Account</button>
-            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-solid border-0 border-t border-blue-900" onClick={handleLogout}>Log Out</button>
+            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center " 
+            onClick={handleViewAccount}>View Account</button>
+
+            <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-solid border-0 border-t border-gray-300" 
+            onClick={handleLogout}>Log Out</button>
+
           </div>
         </div>
       )}

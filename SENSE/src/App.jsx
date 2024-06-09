@@ -14,8 +14,9 @@ import ImportRoom from './Components/BusinessUser/ImportRoom';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
 import BUdelete from './Components/BusinessUser/BUdelete';
-import ViewAccount from './Components/ViewUpdateAccount/ViewAccount';
-import UpdateAccount from './Components/ViewUpdateAccount/UpdateAccount';
+import ViewAccount from './Components/ManageAccount/ViewAccount';
+import UpdateAccount from './Components/ManageAccount/UpdateAccount';
+import ChangePassword from './Components/ManageAccount/ChangePassword';
 import BU_ImportObjects from './Components/BusinessUser/BU_ImportObjects';
 import ThreeDPreview from './Components/BusinessUser/ThreeDPreview';
 
@@ -40,6 +41,7 @@ const App = () => {
           <Route path="/BU_ImportObjects" element={<BU_ImportObjects/>} />
           <Route path="/viewaccount" element={<ViewAccount/>} />
           <Route path="/updateaccount" element={<UpdateAccount/>} />
+          <Route path="/ChangePassword" element={<ChangePassword/>} />
           <Route path="/ThreeDPreview" element={<ThreeDPreview/>} />
 
           
