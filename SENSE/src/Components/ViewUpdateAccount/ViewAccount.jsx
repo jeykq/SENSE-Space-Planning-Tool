@@ -1,32 +1,67 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 
 const ViewAccount = () => {
   const navigate = useNavigate();
+  const [accountDetails, setAccountDetails] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const handleGoBack = () => {
     navigate(-1); // This navigates to the previous page
   };
 
   const handleEditClick = () => {
-    // Handle the click event for the Edit button
-    // For example, navigate to the edit page
     navigate('/updateaccount');
   };
 
-  // Example data, replace with actual data from props or state
-  const accountDetails = {
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'johndoe@gmail.com',
-    dateOfBirth: '1990-01-01',
-    jobIndustry: 'Interior Designer',
-    subscription: 'Premium',
-  };
+  useEffect(() => {
+    const headers = getHeaders(); // Get headers using the function
+
+    if (!headers) {
+      setError('Token not found');
+      setLoading(false);
+      return;
+    }
+
+    // Fetch user data from API using Axios
+    const fetchAccountDetails = async () => {
+      try {
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/user/get', 
+          {}, 
+          { headers });
+
+        if (!response.data) {
+          throw new Error('No data returned');
+        }
+
+        setAccountDetails(response.data.body);
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccountDetails();
+  }, []);
 
   const bgColor = "#e4e0e0"; // Custom background color
   const borderColor = "#666"; // Light black color
   const headerBgColor = "#ccc5c5"; // Background color for table header
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   return (
     <div>
@@ -46,12 +81,12 @@ const ViewAccount = () => {
             </thead>
             <tbody>
               <tr>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.firstName}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.lastName}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.first_name}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.last_name}</td>
                 <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.email}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.dateOfBirth}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.jobIndustry}</td>
-                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.subscription}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.dob}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.job_industry_id}</td>
+                <td className="py-2 px-4 border" style={{ borderColor }}>{accountDetails.role}</td>
               </tr>
             </tbody>
           </table>
@@ -59,10 +94,6 @@ const ViewAccount = () => {
         <button onClick={handleEditClick} className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded" style={{ backgroundColor: '#ccc5c5', color: '#333', ':hover': { backgroundColor: '#900', color: '#fff' } }}>
           Edit
         </button>
-
-
-
-
       </div>
     </div>
   );
