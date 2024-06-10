@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Topbar from '../BusinessUser/Topbar';
 
 const ImportRoomForm = ({ submit }) => {
     const [objectName, setObjectName] = useState('');
@@ -35,6 +36,10 @@ const ImportRoomForm = ({ submit }) => {
         });
     };
 
+    const handleGoBack = () => {
+        navigate('/Room3D'); 
+    };
+
     const handleImportClick = () => {
         fileInputRef.current.click(); // Trigger click on hidden file input
     };
@@ -58,8 +63,10 @@ const ImportRoomForm = ({ submit }) => {
     const selectedTags = Object.keys(tags).filter(tag => tags[tag]).join(', ');
 
     return (
+      <div>
+        <Topbar title="Import Room" onClick={handleGoBack} />
         <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-4 mt-4">
                 <div className="col-span-1 text-center self-center">
                     <label htmlFor="obj_name">Object Name:</label>
                 </div>
@@ -162,6 +169,7 @@ const ImportRoomForm = ({ submit }) => {
                 </button>
             </div>
         </form>
+      </div>
     );
 };
 
