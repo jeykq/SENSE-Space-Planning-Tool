@@ -7,6 +7,7 @@ import { getHeaders } from '../../../apiUtils'; // Import the getHeaders functio
 const ViewAccount = () => {
   const navigate = useNavigate();
   const [accountDetails, setAccountDetails] = useState(null);
+  const [jobIndustryMapping, setJobIndustryMapping] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -31,13 +32,13 @@ const ViewAccount = () => {
       return;
     }
 
-    // Fetch user data from API using Axios
     const fetchAccountDetails = async () => {
       try {
         const response = await axios.post(
           'https://api.sensespacesplanningtool.com/user/get', 
           {}, 
-          { headers });
+          { headers }
+        );
 
         if (!response.data) {
           throw new Error('No data returned');
@@ -47,22 +48,52 @@ const ViewAccount = () => {
       } catch (error) {
         console.error('Error fetching account details:', error);
         setError(error.message);
+      }
+    };
+
+    const fetchJobIndustries = async () => {
+      try {
+        const storedJobIndustries = localStorage.getItem('jobIndustries');
+        if (storedJobIndustries) {
+          setJobIndustryMapping(JSON.parse(storedJobIndustries));
+        } else {
+          const response = await axios.post(
+            'https://api.sensespacesplanningtool.com/job_industry/list', 
+            {}, 
+            { headers }
+          );
+
+          if (!response.data || !response.data.body) {
+            throw new Error('No job industries data returned');
+          }
+
+          const jobIndustryMap = {};
+          response.data.body.forEach(job => {
+            jobIndustryMap[job.id] = job.name;
+          });
+
+          localStorage.setItem('jobIndustries', JSON.stringify(jobIndustryMap));
+          setJobIndustryMapping(jobIndustryMap);
+        }
+      } catch (error) {
+        console.error('Error fetching job industries:', error);
+        setError(error.message);
+      }
+    };
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([fetchAccountDetails(), fetchJobIndustries()]);
+      } catch (error) {
+        setError('Network Error');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchAccountDetails();
+    fetchData();
   }, []);
-
-  const jobIndustryMapping = {
-    1: "Educator",
-    2: "Interior Designer",
-    3: "WHS",
-    4: "Support Worker",
-    5: "Parents",
-    0: "Others"
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toISOString().split('T')[0];
@@ -106,16 +137,17 @@ const ViewAccount = () => {
     margin: '0 5px',
     transition: 'background-color 0.3s, color 0.3s', // Add transition for smooth color change
   };
+
   // Function to handle mouse enter event
   const handleMouseEnter = (event) => {
-  event.target.style.backgroundColor = '#a39d9d'; // Change background color on hover
-  event.target.style.color = '#fff'; // Change text color on hover
+    event.target.style.backgroundColor = '#a39d9d'; // Change background color on hover
+    event.target.style.color = '#fff'; // Change text color on hover
   };
 
-// Function to handle mouse leave event
+  // Function to handle mouse leave event
   const handleMouseLeave = (event) => {
-  event.target.style.backgroundColor = '#ccc5c5'; // Restore background color on mouse leave
-  event.target.style.color = '#333'; // Restore text color on mouse leave
+    event.target.style.backgroundColor = '#ccc5c5'; // Restore background color on mouse leave
+    event.target.style.color = '#333'; // Restore text color on mouse leave
   };
 
   const hrStyle = {
