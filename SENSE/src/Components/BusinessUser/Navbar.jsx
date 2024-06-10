@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-scroll";
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -14,8 +14,7 @@ const Navbar = ({ handleSearch }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   
-  
-  useEffect(()=>{
+  useEffect(() => {
     const token = localStorage.getItem('authToken');
     if (!token) {
       navigate('/');
@@ -74,8 +73,12 @@ const Navbar = ({ handleSearch }) => {
       </button>
       <div className={`h-screen w-52 lg:w-auto lg:max-h-20 bg-black bg-opacity-100 lg:bg-opacity-100 translate-y-[375px] lg:translate-y-0 ${sidebarOpen ? 'translate-x-4 sticky right-0 top-0' : 'translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100'} duration-100 lg:translate-x-0 px-4`}>
         <ul className="flex flex-col lg:flex-row mb-4 mt-20 lg:mt-1">
-          <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='Templates' smooth={true} offset={0} duration={500}>Templates</Link></li>
-          <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='Categories' smooth={true} offset={0} duration={500}>Categories</Link></li>
+          <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap">
+            <Link onClick={() => setSidebarOpen(false)} to='/ViewTemplates'>Templates</Link>
+          </li>
+          <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap">
+            <Link onClick={() => setSidebarOpen(false)} to='/categories'>Categories</Link>
+          </li>
           <li className="flex items-center px-2 ml-1 my-1.5 mx-1 lg:mx-1 text-base text-nowrap text-black">
             <SearchBar handleSearch={handleSearch} />
           </li>
