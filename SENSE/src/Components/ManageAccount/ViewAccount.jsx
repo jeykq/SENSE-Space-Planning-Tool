@@ -12,7 +12,7 @@ const ViewAccount = () => {
   const [error, setError] = useState(null);
 
   const handleGoBack = () => {
-    navigate('/BusinessUserHomepage'); 
+    navigate(-1); 
   };
 
   const handleEditClick = () => {
