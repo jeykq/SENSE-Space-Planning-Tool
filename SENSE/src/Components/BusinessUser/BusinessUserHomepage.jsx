@@ -68,6 +68,10 @@ const BusinessUserHomepage = () => {
     setShowDeleteConfirmation(false);
   };
 
+  const handleCategoryClick = (category) => {
+    navigate('/BU_ImportObjects', { state: { category } });
+  };
+
   return (
     <div>
       <div>

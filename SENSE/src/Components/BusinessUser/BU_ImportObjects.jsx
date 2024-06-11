@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThreeDPreview from './ThreeDPreview';
+import Topbar from '../BusinessUser/Topbar';
 
 const BU_ImportObjects = ({ submit }) => {
     const [objectName, setObjectName] = useState('');
@@ -57,6 +58,9 @@ const BU_ImportObjects = ({ submit }) => {
     const isObjectNameFilled = objectName.trim() !== '';
 
     return (
+        <div>
+        <Topbar title="Import Objects" />
+        <div style={{ marginTop: '20px' }}></div>
         <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-4 gap-4">
                 <div className="col-span-1 text-center self-center">
@@ -140,7 +144,7 @@ const BU_ImportObjects = ({ submit }) => {
                     >
                         Import Object
                     </button>
-                    <span className="text-xs">*Only file format *.obj is accepted</span>
+                    <span className="text-xs">*Only file format *.obj and *.mtl is accepted</span>
                 </div>
                 <div className="flex col-span-2 mx-8">
                     <span className="self-end">Product Description</span>
@@ -172,6 +176,7 @@ const BU_ImportObjects = ({ submit }) => {
                 </button>
             </div>
         </form>
+        </div>
     );
 };
 
