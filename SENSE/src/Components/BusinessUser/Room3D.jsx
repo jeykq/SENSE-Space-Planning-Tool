@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
+import axios from 'axios';
 
 const Room3D = () => {
   const mountRef = useRef(null);
@@ -25,6 +26,82 @@ const Room3D = () => {
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
+
+  const [categoryData, setCategoryData] = useState(null);
+  const [objectListData, setObjectListData] = useState(null);
+  const [objListError, setObjListError] = useState(null);
+  const [catError, setCatError] = useState(null);
+  const [catLoading, setCatLoading] = useState(false);
+  const [objListLoading, setObjListLoading] = useState(false);
+
+  // get list of all categories
+  useEffect(() => {
+      const token = localStorage.getItem('authToken');
+
+      if (!token) {
+          navigate('/login');
+          return;
+      }
+
+      const headers = {
+          'Content-Type': 'application/json',
+          'sense-token': token
+      };
+      setCatLoading(true);
+
+      axios.post(
+          'https://api.sensespacesplanningtool.com/category/list',
+          {},
+          { headers: headers }
+      )
+          .then(response => {
+              setCategoryData(response.data);
+              setCatError(null); // Reset error state if the request is successful
+          })
+          .catch(err => {
+              setCatError(err.message || 'Something went wrong');
+              setCategoryData(err.message); // Reset response state if the request fails
+          })
+          .finally(() => {
+              setCatLoading(false);
+          });
+  }, []);
+
+  // get list of all objects
+  useEffect(() => {
+    const fetchObjData = async () => {
+        const token = localStorage.getItem('authToken');
+
+        if (!token) {
+            navigate('/login');
+            return;
+        }
+
+        const headers = { 
+            'Content-Type': 'application/json',
+            'sense-token': token
+        };
+        setObjListLoading(true);
+
+        try {
+            const response = await axios.post(
+                'https://api.sensespacesplanningtool.com/object/list', 
+                {},
+                { headers: headers }
+            );
+            setObjectListData(response.data);
+            setObjListError(null);
+        } catch (err) {
+            setObjListError(err.message || 'Something went wrong');
+            setObjectListData(null); // Clear object list data if the request fails
+            console.error('API Error for ' + name, err); // Log the error for debugging
+        } finally {
+          setObjListLoading(false);
+        }
+    };
+
+    fetchObjData();
+}, []);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -380,7 +457,7 @@ const Room3D = () => {
         </button>
         {showDropdown && (
           <div className="w-[300px]">
-            <AddObjDropdown handleDragStart={handleDragStart} />
+            <AddObjDropdown handleDragStart={handleDragStart} categoryData={categoryData} objectListData={objectListData} />
           </div>
         )}
         {showEditButton && (
