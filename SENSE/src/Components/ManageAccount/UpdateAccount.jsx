@@ -149,8 +149,14 @@ const UpdateAccount = () => {
               <button 
                 className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-300 transition-colors duration-300"
                 style={{ backgroundColor: '#b7b1b1' }}
-                onMouseEnter={(e) => { e.target.style.backgroundColor = '#a39d9d'; }}
-                onMouseLeave={(e) => { e.target.style.backgroundColor = '#b7b1b1'; }}
+                onMouseEnter={(e) => { 
+                  e.target.style.backgroundColor = '#a39d9d';
+                  e.target.style.color = '#fff';
+                 }}
+                onMouseLeave={(e) => { 
+                  e.target.style.backgroundColor = '#b7b1b1';
+                  e.target.style.color = '#333';
+                }}
               >
                 Save
               </button>

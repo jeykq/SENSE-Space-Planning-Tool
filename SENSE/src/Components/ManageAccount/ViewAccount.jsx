@@ -12,15 +12,43 @@ const ViewAccount = () => {
   const [error, setError] = useState(null);
 
   const handleGoBack = () => {
-    navigate(-1); 
+    if (accountDetails.role.includes("BUSINESS_USER")) {
+      navigate('/BusinessUserHomePage');
+    } else if (accountDetails.role === "FREE_USER") {
+      navigate('/FreeUserHomePage');
+    } else if (accountDetails.role === "PREMIUM_USER") {
+      navigate('/PremiumUserHomePage');
+    } else {
+      navigate(-1);
+    }
   };
 
   const handleEditClick = () => {
     navigate('/updateaccount');
   };
 
+  const handleBuySubscription = () => {
+    navigate('/buysubscription');
+  };
+
+  const handleApplyForBusinessUser = () => {
+    navigate('/applybusinessuser');
+  };
+
+  const handleGiveRatingAndReview = () => {
+    navigate('/giveratingreview');
+  };
+
   const handleChangePassword = () => {
     navigate('/ChangePassword');
+  };
+
+  const handleViewSubscription = () => {
+    navigate('/viewsubscription');
+  };
+
+  const handleEditPreferences = () => {
+    navigate('/editpreferences');
   };
 
   useEffect(() => {
@@ -100,7 +128,7 @@ const ViewAccount = () => {
   };
 
   const fieldContainerStyle = {
-    marginBottom: "10px",
+    marginBottom: "5px",
     display: "flex",
     alignItems: "center"
   };
@@ -121,10 +149,11 @@ const ViewAccount = () => {
 
   const buttonContainerStyle = {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     width: "100%",
     maxWidth: "600px", // Set a max width to align buttons properly
-    marginTop: "20px"
+    marginTop: "0px"
   };
 
   const buttonStyle = {
@@ -133,8 +162,8 @@ const ViewAccount = () => {
     fontWeight: 'bold',
     padding: '10px 20px',
     borderRadius: '5px',
-    flex: 1, // Ensure buttons take equal space
-    margin: '0 5px',
+    flex: '1 1 48%', // Ensure buttons take equal space and allow wrapping
+    margin: '5px', // Add space between buttons
     transition: 'background-color 0.3s, color 0.3s', // Add transition for smooth color change
   };
 
@@ -204,13 +233,74 @@ const ViewAccount = () => {
             onMouseLeave={handleMouseLeave}>
             Edit Account
           </button>
-          <button 
-            onClick={handleEditClick}
-            style={buttonStyle}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}>
-            Change to Normal User
-          </button>
+          {accountDetails.role.includes("BUSINESS_USER") && (
+            <>
+              <button 
+                onClick={handleEditClick}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Change to Normal User
+              </button>
+            </>
+          )}
+          {accountDetails.role === "FREE_USER" && (
+            <>
+              <button 
+                onClick={handleBuySubscription}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Buy Subscription
+              </button>
+              <button 
+                onClick={handleApplyForBusinessUser}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Apply for Business User
+              </button>
+              <button 
+                onClick={handleGiveRatingAndReview}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Give rating and review
+              </button>
+            </>
+          )}
+          {accountDetails.role === "PREMIUM_USER" && (
+            <>
+              <button 
+                onClick={handleViewSubscription}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                View Subscription
+              </button>
+              <button 
+                onClick={handleApplyForBusinessUser}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Apply for Business User
+              </button>
+              <button 
+                onClick={handleGiveRatingAndReview}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Give rating and review
+              </button>
+              <button 
+                onClick={handleEditPreferences}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Edit Preferences
+              </button>
+            </>
+          )}
           <button 
             onClick={handleChangePassword}
             style={buttonStyle}
