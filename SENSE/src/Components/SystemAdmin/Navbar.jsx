@@ -46,12 +46,21 @@ const Navbar = () => {
       <img src={logo} alt="logo" className='logo w-20 mx-2' />
       <div className="flex items-center space-x-4 ml-auto">
         <div className="relative inline-block" ref={dropdownRef}>
-          <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="cursor-pointer bg-white text-black rounded px-4 py-2"
-        >
-          Manage
-        </button>
+        <button
+  onClick={() => setDropdownOpen(!dropdownOpen)}
+  className="cursor-pointer text-white rounded px-4 py-2"
+  style={{
+    backgroundColor: 'teal',
+    transition: 'background-color 0.3s ease',
+    ':hover': { backgroundColor: '#C7C1C1' },
+    ':focus': { backgroundColor: '#C7C1C1' }
+  }}
+>
+  Manage
+</button>
+
+
+
         {dropdownOpen && (
           <div className="absolute mt-2 w-48 text-black bg-white rounded-md shadow-lg z-20 right-0">
             <div className="py-1">

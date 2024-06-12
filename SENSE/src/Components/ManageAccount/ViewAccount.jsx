@@ -220,7 +220,7 @@ const ViewAccount = () => {
             <span style={valueStyle}>{jobIndustryMapping[accountDetails.job_industry_id]}</span>
           </div>
           <div style={fieldContainerStyle}>
-            <span style={labelStyle}>Subscription</span>
+            <span style={labelStyle}>Role</span>
             <span style={valueStyle}>{accountDetails.role}</span>
           </div>
           <hr style={hrStyle} />

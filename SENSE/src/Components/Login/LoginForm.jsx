@@ -31,8 +31,10 @@ const LoginForm = () => {
                     navigate('/FreeUserHomepage'); // Redirect to free user homepage
                 } else if (role === 'PREMIUM_USER') {
                     navigate('/PremiumUserHomepage'); // Redirect to premium user homepage
-                } else if (role.includes('BUSINESS_USER')){
-                    navigate('/BusinessUserHomePage');
+                } else if (role === 'BUSINESS_USER') {
+                    navigate('/BusinessUserHomepage');
+                } else if (role === 'SYS_ADMIN') {
+                    navigate('/SystemAdminHomepage');
                 }
             } else {
                 console.error('Unexpected response status:', response.status);
