@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
@@ -12,6 +12,13 @@ import axios from 'axios';
 
 const Room3D = () => {
   const mountRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { templateName, roomType, roomLength, roomWidth, roomHeight } = location.state || {};
+
+  // Debug: log the received state
+  console.log("Received state from CreateTemplate:", location.state);
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTransformControls, setShowTransformControls] = useState(false);
   const [showDoneButton, setShowDoneButton] = useState(false);
@@ -21,7 +28,6 @@ const Room3D = () => {
   const [selectedObjectIndex, setSelectedObjectIndex] = useState(0);
   const [showEditButton, setShowEditButton] = useState(false);
   const [showConfirmSave, setShowConfirmSave] = useState(false);
-  const navigate = useNavigate();
   const transformControlsRef = useRef(null);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
@@ -65,7 +71,7 @@ const Room3D = () => {
           .finally(() => {
               setCatLoading(false);
           });
-  }, []);
+  }, [navigate]);
 
   // get list of all objects
   useEffect(() => {
@@ -101,10 +107,15 @@ const Room3D = () => {
     };
 
     fetchObjData();
-}, []);
+  }, [navigate]);
 
   useEffect(() => {
     const mount = mountRef.current;
+
+    if (!mount) {
+      console.error("Mount ref not found");
+      return;
+    }
 
     // Scene
     const scene = new THREE.Scene();
@@ -137,46 +148,49 @@ const Room3D = () => {
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
+    // Debug: log the room dimensions
+    console.log("Room dimensions:", roomLength, roomWidth, roomHeight);
+
     // Room Dimensions
-    const roomWidth = 12;
-    const roomHeight = 5;
-    const roomDepth = 12;
+    const roomW = roomWidth || 12; // Default to 12 if roomWidth is not provided
+    const roomH = roomHeight || 5; // Default to 5 if roomHeight is not provided
+    const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
     const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
     const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xAAAAAA });
 
     // Floor
-    const floorGeometry = new THREE.PlaneGeometry(roomWidth, roomDepth);
+    const floorGeometry = new THREE.PlaneGeometry(roomW, roomD);
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
 
     // Walls
-    const wallGeometry = new THREE.PlaneGeometry(roomWidth, roomHeight);
+    const wallGeometry = new THREE.PlaneGeometry(roomW, roomH);
 
     const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    backWall.position.z = -roomDepth / 2;
-    backWall.position.y = roomHeight / 2;
+    backWall.position.z = -roomD / 2;
+    backWall.position.y = roomH / 2;
     scene.add(backWall);
 
     const frontWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    frontWall.position.z = roomDepth / 2;
-    frontWall.position.y = roomHeight / 2;
+    frontWall.position.z = roomD / 2;
+    frontWall.position.y = roomH / 2;
     frontWall.rotation.y = Math.PI;
     scene.add(frontWall);
 
-    const sideWallGeometry = new THREE.PlaneGeometry(roomDepth, roomHeight);
+    const sideWallGeometry = new THREE.PlaneGeometry(roomD, roomH);
 
     const leftWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
-    leftWall.position.x = -roomWidth / 2;
-    leftWall.position.y = roomHeight / 2;
+    leftWall.position.x = -roomW / 2;
+    leftWall.position.y = roomH / 2;
     leftWall.rotation.y = Math.PI / 2;
     scene.add(leftWall);
 
     const rightWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
-    rightWall.position.x = roomWidth / 2;
-    rightWall.position.y = roomHeight / 2;
+    rightWall.position.x = roomW / 2;
+    rightWall.position.y = roomH / 2;
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
@@ -185,10 +199,10 @@ const Room3D = () => {
     scene.add(axesHelper);
 
     // Grid Helper
-    const gridHelper = new THREE.GridHelper(roomWidth, 10);
+    const gridHelper = new THREE.GridHelper(roomW, 10);
     scene.add(gridHelper);
 
-    // TransformControls, it allows to move around and scale the objects interactively
+    // TransformControls
     const transformControls = new TransformControls(camera, renderer.domElement);
     transformControlsRef.current = transformControls;
     scene.add(transformControls);
@@ -221,9 +235,9 @@ const Room3D = () => {
         objLoader.load(modelPath, (object) => {
           // Clamp the object's position within the room bounds
           object.position.set(
-            Math.max(-roomWidth / 2, Math.min(roomWidth / 2, position.x)),
+            Math.max(-roomW / 2, Math.min(roomW / 2, position.x)),
             0,
-            Math.max(-roomDepth / 2, Math.min(roomDepth / 2, position.z))
+            Math.max(-roomD / 2, Math.min(roomD / 2, position.z))
           );
           object.scale.set(1, 1, 1);
           object.userData.selectable = true;
@@ -303,9 +317,9 @@ const Room3D = () => {
 
       // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
-        Math.max(-roomWidth / 2, Math.min(roomWidth / 2, pos.x)),
+        Math.max(-roomW / 2, Math.min(roomW / 2, pos.x)),
         0,
-        Math.max(-roomDepth / 2, Math.min(roomDepth / 2, pos.z))
+        Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
 
       loadModel(modelPath, materialPath, pos);
@@ -326,7 +340,7 @@ const Room3D = () => {
       mount.removeEventListener('drop', handleDrop);
       mount.removeEventListener('click', onMouseClick);
     };
-  }, []);
+  }, [roomLength, roomWidth, roomHeight]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
