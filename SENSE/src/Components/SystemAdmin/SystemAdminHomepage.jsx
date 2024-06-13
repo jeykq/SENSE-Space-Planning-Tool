@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import Navbar from "./Navbar";
 import SearchBar from "./SearchBar";
@@ -12,7 +12,7 @@ const SystemAdminHomepage = () => {
   const [filteredAccounts, setFilteredAccounts] = useState([]);
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [accountsPerPage] = useState(9); // Number of accounts per page
+  const [accountsPerPage] = useState(7); // Number of accounts per page
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -49,19 +49,6 @@ const SystemAdminHomepage = () => {
     fetchUsers();
   }, []);
 
-  const buttonStyle = {
-    padding: "8px 16px",
-    margin: "0 5px",
-    fontSize: "14px",
-    fontWeight: "bold",
-    borderRadius: "5px",
-    backgroundColor: "#007bff",
-    color: "#fff",
-    border: "none",
-    cursor: "pointer",
-    outline: "none",
-  };
-
   // Get current accounts
   const indexOfLastAccount = currentPage * accountsPerPage;
   const indexOfFirstAccount = indexOfLastAccount - accountsPerPage;
@@ -91,82 +78,57 @@ const SystemAdminHomepage = () => {
     }
     setCurrentPage(1); // Reset to first page after filtering
   };
-  
-
 
   return (
-    <div style={{ height: "100%", overflowY: "auto" }}>
+    <div className=" overflow-y-auto" >
       <Navbar />
-      <div className="mt-20" style={{ paddingTop: "30px", paddingLeft: "20px" }}>
-        {/* <p style={{ fontSize: "20px", fontWeight: "500" }}>Search Users</p> */}
-        <div style={{ display: "flex", alignItems: "center" }}>
+      <div className="mt-20 mx-5 flex items-center pt-8 pl-5">
+        <p className="text-lg font-medium">Search Users</p>
+        <div className="ml-4">
           <SearchBar />
         </div>
       </div>
 
-      <div style={{ marginTop: "20px", paddingLeft: "20px" }}>
+      <div className="mt-5 ml-5 pl-5">
         {/* Filter buttons */}
-        <div style={{ marginBottom: "10px" }}>
-          <button style={buttonStyle} onClick={() => filterByRole('All')}>All</button>
-          <button style={buttonStyle} onClick={() => filterByRole('FREE_USER')}>Free User</button>
-          <button style={buttonStyle} onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
-          <button style={buttonStyle} onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
-          <button style={buttonStyle} onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
-        </div>
+        <div className="mb-2">
+  <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('All')}>All</button>
+  <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('FREE_USER')}>Free User</button>
+  <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
+  <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
+  <button className="px-4 py-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
+</div>
+
         
-        <table style={{ borderCollapse: "collapse", width: "100%" }}>
+        <table className="w-full mt-3 border-collapse">
           <thead>
             <tr>
-              <th style={{ borderBottom: "1px solid black" }}>Username</th>
-              <th style={{ borderBottom: "1px solid black" }}>Email</th>
-              <th style={{ borderBottom: "1px solid black" }}>Role</th>
-              <th style={{ borderBottom: "1px solid black" }}>Actions</th>
+              <th className="text-left border-b border-t border-gray-300 p-2">Username</th>
+              <th className="text-left border-b border-t border-gray-300 p-2">Email</th>
+              <th className="text-left border-b border-t border-gray-300 p-2">Role</th>
+              <th className="text-left border-b border-t border-gray-300 p-2">Actions</th>
             </tr>
           </thead>
           <tbody>
             {currentAccounts.map((user, index) => (
-              <tr key={index}>
-                <td style={{ border: "1px solid black", padding: "8px" }}>
-                  {user.first_name} {user.last_name}
-                </td>
-                <td style={{ border: "1px solid black", padding: "8px" }}>{user.email}</td>
-                <td style={{ border: "1px solid black", padding: "8px" }}>{user.role}</td>
-                <td style={{ border: "1px solid black", padding: "8px" }}>
-                <button style={{ 
-                  marginRight: "5px",
-                  padding: "8px 16px",
-                  backgroundColor: "#007bff",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  outline: "none",
-                  textDecoration: "none", // Remove underline on hover
-                  transition: "background-color 0.3s", // Smooth transition on hover
-                }} onClick={() => handleView(user)}>View</button>
-
-                <button style={{ 
-                  padding: "8px 16px",
-                  backgroundColor: "#dc3545",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                  outline: "none",
-                  textDecoration: "none", // Remove underline on hover
-                  transition: "background-color 0.3s", // Smooth transition on hover
-                }} onClick={() => handleSuspend(user)}>Suspend</button>
-
+              <tr key={index} className="text-left border-t border-gray-300">
+                <td className="p-2">{user.first_name} {user.last_name}</td>
+                <td className="p-2">{user.email}</td>
+                <td className="p-2">{user.role}</td>
+                <td className="p-2">
+                  <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600" onClick={() => handleView(user)}>View</button>
+                  <button className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-red-600" onClick={() => handleSuspend(user)}>Suspend</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        
         {/* Pagination */}
-        <ul style={{ listStyle: 'none', display: 'flex', justifyContent: 'center', marginTop: '20px' }}>
+        <ul className="flex justify-center mt-5 list-none">
           {Array.from({ length: Math.ceil(filteredAccounts.length / accountsPerPage) }, (_, index) => (
-            <li key={index} style={{ margin: '0 5px', cursor: 'pointer' }}>
-              <a onClick={() => paginate(index + 1)} style={{ textDecoration: 'none' }}>{index + 1}</a>
+            <li key={index} className="mx-1 cursor-pointer">
+              <a onClick={() => paginate(index + 1)} className="no-underline">{index + 1}</a>
             </li>
           ))}
         </ul>
