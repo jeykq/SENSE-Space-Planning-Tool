@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import ConfirmDialogPopup from '../UI/ConfirmDialog';
 import ProfileDropdown from './ProfileDropdown';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils';
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -15,6 +17,10 @@ const Navbar = () => {
   const dropdownRef = useRef(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/');
+    }
     const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
     };
@@ -37,7 +43,35 @@ const Navbar = () => {
   const handleLogout = () => {
     setShowPopup(true);
   };
+  const confirmLogout = async () => {
+    const token = localStorage.getItem('authToken');
+    
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
+    const headers = { 
+      'Content-Type': 'application/json',
+      'sense-token': token
+    };
+    
+    try {
+      const response = await axios.post(
+        'https://api.sensespacesplanningtool.com/logout',
+        {},
+        { headers: headers }
+      );
+
+      if (response.status === 200) {
+        localStorage.removeItem('authToken');
+        navigate('/');
+      }
+      
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
   const handleNavigate = (path) => {
     navigate(path);
     setDropdownOpen(false);
@@ -84,8 +118,15 @@ const Navbar = () => {
         </svg>
       </button>
       
-      {showPopup && <ConfirmDialogPopup title={"Confirm Logout"} text={"Are you sure you want to log out?"} onConfirm={() => navigate("/")} onClose={() => setShowPopup(false)} />}
-    </nav>
+      {showPopup && <ConfirmDialogPopup 
+      title={"Confirm Logout"} 
+      text={"Are you sure you want to log out?"} 
+      onConfirm={ () => {
+        setShowPopup(false);
+        confirmLogout();
+      }} 
+      onClose={()=>setShowPopup(false)}/>}    
+      </nav>
   );
 }
 

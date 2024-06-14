@@ -1,4 +1,5 @@
-import * as React from 'react'
+// App.js
+import * as React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUpForm from './Components/SignUp/SignUpForm';
 import PaidSignUpForm from './Components/SignUp/PaidSignUpForm';
@@ -25,41 +26,43 @@ import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
 import SA_ManageObjCategoriesPage from './Components/SystemAdmin/SA_ManageObjCategories';
 import SA_ManageTagsPage from './Components/SystemAdmin/SA_ManageTags';
 import SA_ManageRoomTypesPage from './Components/SystemAdmin/SA_ManageRoomTypes';
+import { AuthProvider } from './AuthContext';
+import ProtectedRoute from './ProtectedRoute'; 
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
+    <AuthProvider>
+      <Router>
+        <Routes>
           <Route path="/" exact element={<Landing />} />
           <Route path="/signup" element={<SignUpForm />} /> 
-          <Route path="/paid-signup" element={<PaidSignUpForm/>} />
-          <Route path="/login" element={<LoginForm/>} />
-          <Route path="/BusinessUserHomepage" element={<BusinessUserHomepage/>} />
-          <Route path="/FreeUserHomepage" element={<FreeUserHomepage/>} />
-          <Route path="/PremiumUserHomepage" element={<PremiumUserHomepage/>} />
-          <Route path="/SystemAdminHomepage" element={<SystemAdminHomepage/>} />
-          <Route path="/CreateTemplate" element={<CreateTemplate/>} />
-          <Route path="/ViewTemplates" element={<ViewTemplates />} />
-          <Route path="/Room3D" element={<Room3D/>} />
-          <Route path="/ImportRoom" element={<ImportRoom/>} />
-          <Route path="/BU_ViewObjects" element={<BU_ViewObjects/>} />
-          <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo/>} />
-          <Route path="/BUdelete" element={<BUdelete/>} />
-          <Route path="/BU_ImportObjects" element={<BU_ImportObjects/>} />
-          <Route path="/viewaccount" element={<ViewAccount/>} />
-          <Route path="/updateaccount" element={<UpdateAccount/>} />
-          <Route path="/ChangePassword" element={<ChangePassword/>} />
-          <Route path="/ThreeDPreview" element={<ThreeDPreview/>} />
-          <Route path="/viewuser/:id" element={<SA_ViewUserAccount />} />
-          <Route path="/manageSingUpPage" element={<SA_ManageSignUpPage/>} />
-          <Route path="/manageObjectCategories" element={<SA_ManageObjCategoriesPage/>} />
-          <Route path="/manageTags" element={<SA_ManageTagsPage/>} />
-          <Route path="/manageRoomTypes" element={<SA_ManageRoomTypesPage/>} />
-          
-      </Routes>
-    </Router>
-      
+          <Route path="/paid-signup" element={<PaidSignUpForm />} />
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/BusinessUserHomepage" element={<ProtectedRoute><BusinessUserHomepage /></ProtectedRoute>} />
+          <Route path="/FreeUserHomepage" element={<ProtectedRoute><FreeUserHomepage /></ProtectedRoute>} />
+          <Route path="/PremiumUserHomepage" element={<ProtectedRoute><PremiumUserHomepage /></ProtectedRoute>} />
+          <Route path="/SystemAdminHomepage" element={<ProtectedRoute><SystemAdminHomepage /></ProtectedRoute>} />
+          <Route path="/CreateTemplate" element={<ProtectedRoute><CreateTemplate /></ProtectedRoute>} />
+          <Route path="/ViewTemplates" element={<ProtectedRoute><ViewTemplates /></ProtectedRoute>} />
+          <Route path="/Room3D" element={<ProtectedRoute><Room3D /></ProtectedRoute>} />
+          <Route path="/ImportRoom" element={<ProtectedRoute><ImportRoom /></ProtectedRoute>} />
+          <Route path="/BU_ViewObjects" element={<ProtectedRoute><BU_ViewObjects /></ProtectedRoute>} />
+          <Route path="/BU_ViewObjectsInfo" element={<ProtectedRoute><BU_ViewObjectsInfo /></ProtectedRoute>} />
+          <Route path="/BUdelete" element={<ProtectedRoute><BUdelete /></ProtectedRoute>} />
+          <Route path="/BU_ImportObjects" element={<ProtectedRoute><BU_ImportObjects /></ProtectedRoute>} />
+          <Route path="/viewaccount" element={<ProtectedRoute><ViewAccount /></ProtectedRoute>} />
+          <Route path="/updateaccount" element={<ProtectedRoute><UpdateAccount /></ProtectedRoute>} />
+          <Route path="/ChangePassword" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
+          <Route path="/ThreeDPreview" element={<ProtectedRoute><ThreeDPreview /></ProtectedRoute>} />
+          <Route path="/viewuser/:id" element={<ProtectedRoute><SA_ViewUserAccount /></ProtectedRoute>} />
+          <Route path="/manageSignUpPage" element={<ProtectedRoute><SA_ManageSignUpPage /></ProtectedRoute>} />
+          <Route path="/manageObjectCategories" element={<ProtectedRoute><SA_ManageObjCategoriesPage /></ProtectedRoute>} />
+          <Route path="/manageTags" element={<ProtectedRoute><SA_ManageTagsPage /></ProtectedRoute>} />
+          <Route path="/manageRoomTypes" element={<ProtectedRoute><SA_ManageRoomTypesPage /></ProtectedRoute>} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   )
 }
 
-export default App
+export default App;
