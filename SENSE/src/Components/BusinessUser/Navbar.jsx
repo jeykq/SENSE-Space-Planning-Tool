@@ -15,10 +15,6 @@ const Navbar = ({ handleSearch }) => {
   const [showPopup, setShowPopup] = useState(false);
   
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/');
-    }
     const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
     };

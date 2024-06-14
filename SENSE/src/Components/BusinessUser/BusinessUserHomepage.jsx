@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
-import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
+import { FaPencilAlt } from "react-icons/fa";
+import "./BusinessUserHomepage.css";
 
 const BusinessUserHomepage = () => {
   const navigate = useNavigate();
@@ -16,6 +17,11 @@ const BusinessUserHomepage = () => {
   const [deleteIndex, setDeleteIndex] = useState(null);
 
   useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      navigate('/');
+    }
+    
     if (swiperContainer1.current) {
       new Swiper(swiperContainer1.current, {
         slidesPerView: 3,
@@ -56,12 +62,8 @@ const BusinessUserHomepage = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Perform delete action here, using deleteIndex to identify the item
-    // After deletion, close the confirmation pop-up
-    const updatedTemplates = templates.filter((_, index) => index !== deleteIndex);
-    setTemplates(updatedTemplates);
+    // Implement deletion logic here
     setShowDeleteConfirmation(false);
-    // Perform delete action...
   };
 
   const handleCancelDelete = () => {
@@ -69,14 +71,16 @@ const BusinessUserHomepage = () => {
   };
 
   const handleCategoryClick = (category) => {
-    navigate('/BU_ImportObjects', { state: { category } });
+    if (category === 'view') {
+      navigate('/BU_ViewObjects');
+    } else if (category === 'import') {
+      navigate('/BU_ImportObjects');
+    }
   };
 
   return (
     <div>
-      <div>
-        <Navbar />
-      </div>
+      <Navbar />
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
         <div className={"mt-20 ml-5"}>
@@ -118,7 +122,7 @@ const BusinessUserHomepage = () => {
           <ul>
             <li>View</li>
             <li>Update</li>
-            <li onClick={() => handleDelete(index)}>Delete</li>
+            <li onClick={() => handleDelete(deleteIndex)}>Delete</li>
           </ul>
         </div>
       )}
@@ -132,12 +136,15 @@ const BusinessUserHomepage = () => {
       </div>
 
       <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "0px" }} className="justify-center">
-        <div className="flex items-center" style={{ width: "90%"}}>
-         
+        <div className="flex items-center" style={{ width: "90%" }}>
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
               {[...Array(5)].map((_, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
+                  <div className="overlay">
+                    <div className="option" onClick={() => handleCategoryClick('view')}>View Objects</div>
+                    <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
+                  </div>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
                   <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
@@ -156,7 +163,7 @@ const BusinessUserHomepage = () => {
         </div>
       </div>
 
-      {/* Dropdown list for Object Categories */}
+      {/* Dropdown list for Room Objects */}
       {showDropdown && (
         <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
           <ul>
@@ -168,7 +175,7 @@ const BusinessUserHomepage = () => {
       )}
 
       <div>
-        <Footer />
+        <Footer/>
       </div>
     </div>
   );
