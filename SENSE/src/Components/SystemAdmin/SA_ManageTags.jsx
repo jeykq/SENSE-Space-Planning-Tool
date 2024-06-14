@@ -5,119 +5,119 @@ import axios from 'axios';
 import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 import AlertPopup from '../UI/AlertPopup'; // Assuming this is correctly imported
 
-const SA_ManageObjCategoriesPage = () => {
+const SA_ManageTagsPage = () => {
   const navigate = useNavigate();
-  const [ObjCategories, setObjCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [error, setError] = useState(null);
   const [showAddInput, setShowAddInput] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [newTagName, setNewTagName] = useState('');
   const [isAlertVisible, setIsAlertVisible] = useState(false);
-  const [editingCategoryId, setEditingCategoryId] = useState(null);
-  const [editedCategoryName, setEditedCategoryName] = useState('');
+  const [editingTagId, setEditingTagId] = useState(null);
+  const [editedTagName, setEditedTagName] = useState('');
 
   useEffect(() => {
-    fetchObjCategories();
+    fetchTags();
   }, []);
 
-  const fetchObjCategories = async () => {
+  const fetchTags = async () => {
     try {
       const headers = getHeaders(); // Assuming getHeaders provides necessary headers
       const response = await axios.post(
-        'https://api.sensespacesplanningtool.com/category/list',
+        'https://api.sensespacesplanningtool.com/tag/list',
         {},
         { headers }
       );
 
       if (!response.data || !response.data.body) {
-        throw new Error('No Obj Categories data returned');
+        throw new Error('No tags data returned');
       }
 
-      setObjCategories(response.data.body);
+      setTags(response.data.body);
     } catch (error) {
-      console.error('Error fetching Obj Categories:', error);
+      console.error('Error fetching tags:', error);
       setError(error.message);
     }
   };
 
   const handleEdit = (id) => {
-    setEditingCategoryId(id); // Set editing mode for this Category
-    const categoryToEdit = ObjCategories.find(category => category.id === id);
-    setEditedCategoryName(categoryToEdit.name); // Initialize edited name with current name
+    setEditingTagId(id); // Set editing mode for this tag
+    const tagToEdit = tags.find(tag => tag.id === id);
+    setEditedTagName(tagToEdit.name); // Initialize edited name with current name
   };
 
   const handleUpdate = async () => {
     try {
       const headers = getHeaders(); // Assuming getHeaders provides necessary headers
       const response = await axios.post(
-        'https://api.sensespacesplanningtool.com/category/update',
-        { id: editingCategoryId, name: editedCategoryName },
+        'https://api.sensespacesplanningtool.com/tag/update',
+        { id: editingTagId, name: editedTagName },
         { headers }
       );
 
       if (!response.data || !response.data.body) {
-        throw new Error('Failed to update Obj Category');
+        throw new Error('Failed to update tag');
       }
 
-      fetchObjCategories(); // Refresh Obj Categories after updating
-      setEditingCategoryId(null); // Exit editing mode
-      setEditedCategoryName(''); // Clear edited name
+      fetchTags(); // Refresh tags after updating
+      setEditingTagId(null); // Exit editing mode
+      setEditedTagName(''); // Clear edited name
       setIsAlertVisible(true); // Show success alert
 
     } catch (error) {
-      console.error('Error updating Obj Category:', error);
-      setError('Failed to update Obj Category.');
+      console.error('Error updating tag:', error);
+      setError('Failed to update tag.');
     }
   };
 
   const handleCancelEdit = () => {
-    setEditingCategoryId(null); // Exit editing mode
-    setEditedCategoryName(''); // Clear edited name
+    setEditingTagId(null); // Exit editing mode
+    setEditedTagName(''); // Clear edited name
   };
 
   const handleDelete = async (id) => {
     try {
       const headers = getHeaders(); // Assuming getHeaders provides necessary headers
       await axios.post(
-        `https://api.sensespacesplanningtool.com/category/delete/${id}`,
+        `https://api.sensespacesplanningtool.com/tag/delete/${id}`,
         {},
         { headers }
       );
-      fetchObjCategories(); // Refresh Obj Categories after deletion
+      fetchTags(); // Refresh tags after deletion
     } catch (error) {
-      console.error('Error deleting Obj Category:', error);
-      setError('Failed to delete Obj Category.');
+      console.error('Error deleting tag:', error);
+      setError('Failed to delete tag.');
     }
   };
 
   const handleChange = (e) => {
-    setEditedCategoryName(e.target.value);
+    setEditedTagName(e.target.value);
   };
 
   const handleAdd = () => {
-    setShowAddInput(true); // Show the input field for adding a new Obj Category
+    setShowAddInput(true); // Show the input field for adding a new tag
   };
 
   const confirmAdd = async () => {
     try {
       const headers = getHeaders(); // Assuming getHeaders provides necessary headers
       const response = await axios.post(
-        'https://api.sensespacesplanningtool.com/category/create',
-        { name: newCategoryName },
+        'https://api.sensespacesplanningtool.com/tag/create',
+        { name: newTagName },
         { headers }
       );
 
       if (!response.data || !response.data.body) {
-        throw new Error('Failed to add new Obj Category');
+        throw new Error('Failed to add new tag');
       }
 
-      fetchObjCategories(); // Refresh Obj Categories after adding
+      fetchTags(); // Refresh tags after adding
       setShowAddInput(false); // Hide the input field after successful addition
-      setNewCategoryName(''); // Clear the new Category name input field
+      setNewTagName(''); // Clear the new tag name input field
       setIsAlertVisible(true); // Show success alert
 
     } catch (error) {
-      console.error('Error adding Obj Category:', error);
-      setError('Failed to add new Obj Category.');
+      console.error('Error adding tag:', error);
+      setError('Failed to add new tag.');
     }
   };
 
@@ -133,7 +133,7 @@ const SA_ManageObjCategoriesPage = () => {
 
   const handleCancelAdd = () => {
     setShowAddInput(false); // Hide the input field without adding
-    setNewCategoryName(''); // Clear the new Category name input field
+    setNewTagName(''); // Clear the new tag name input field
   };
 
   const handleGoBack = () => {
@@ -142,11 +142,11 @@ const SA_ManageObjCategoriesPage = () => {
 
   return (
     <div>
-      <Topbar title="Manage Object Categories" onClick={handleGoBack} />
+      <Topbar title="Manage Tags" onClick={handleGoBack} />
       <div className="flex flex-col items-center justify-center mt-5">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-3xl text-center">Obj Category List</h2>
+            <h2 className="text-3xl text-center">Tag List</h2>
             {!showAddInput && (
               <button
                 onClick={handleAdd}
@@ -159,7 +159,7 @@ const SA_ManageObjCategoriesPage = () => {
           {isAlertVisible && (
             <AlertPopup
               title="Success"
-              text="Operation Successfully!"
+              text="Operation Successful!"
               onClose={handleAlertClose}
               onOk={handleAlertOk}
             />
@@ -169,22 +169,22 @@ const SA_ManageObjCategoriesPage = () => {
               
             </thead>
             <tbody>
-              {ObjCategories.map(category => (
-                <tr key={category.id}>
+              {tags.map(tag => (
+                <tr key={tag.id}>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    {editingCategoryId === category.id ? (
+                    {editingTagId === tag.id ? (
                       <input
                         type="text"
-                        value={editedCategoryName}
+                        value={editedTagName}
                         onChange={handleChange}
                         className="px-3 py-1 border border-gray-300 rounded"
                       />
                     ) : (
-                        category.name
+                      tag.name
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center">
-                    {editingCategoryId === category.id ? (
+                    {editingTagId === tag.id ? (
                       <>
                         <button
                           onClick={handleUpdate}
@@ -202,13 +202,13 @@ const SA_ManageObjCategoriesPage = () => {
                     ) : (
                       <>
                         <button
-                          onClick={() => handleEdit(category.id)}
+                          onClick={() => handleEdit(tag.id)}
                           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleDelete(category.id)}
+                          onClick={() => handleDelete(tag.id)}
                           className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
                         >
                           Delete
@@ -223,9 +223,9 @@ const SA_ManageObjCategoriesPage = () => {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <input
                       type="text"
-                      value={newCategoryName}
-                      onChange={(e) => setNewCategoryName(e.target.value)}
-                      placeholder="Enter new category name"
+                      value={newTagName}
+                      onChange={(e) => setNewTagName(e.target.value)}
+                      placeholder="Enter new tag name"
                       className="px-3 py-1 border border-gray-300 rounded"
                     />
                   </td>
@@ -254,4 +254,4 @@ const SA_ManageObjCategoriesPage = () => {
   );
 };
 
-export default SA_ManageObjCategoriesPage
+export default SA_ManageTagsPage;

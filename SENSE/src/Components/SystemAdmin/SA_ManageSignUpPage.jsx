@@ -159,7 +159,7 @@ const SA_ManageSignUpPage = () => {
           {isAlertVisible && (
             <AlertPopup
               title="Success"
-              text="Job Industry Updated Successfully!"
+              text="Operation Successfully!"
               onClose={handleAlertClose}
               onOk={handleAlertOk}
             />

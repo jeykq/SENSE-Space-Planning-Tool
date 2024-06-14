@@ -23,6 +23,7 @@ import ThreeDPreview from './Components/BusinessUser/ThreeDPreview';
 import SA_ViewUserAccount from './Components/SystemAdmin/SA_ViewUserAcc';
 import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
 import SA_ManageObjCategoriesPage from './Components/SystemAdmin/SA_ManageObjCategories';
+import SA_ManageTagsPage from './Components/SystemAdmin/SA_ManageTags';
 
 const App = () => {
   return (
@@ -51,6 +52,7 @@ const App = () => {
           <Route path="/viewuser/:id" element={<SA_ViewUserAccount />} />
           <Route path="/manageSingUpPage" element={<SA_ManageSignUpPage/>} />
           <Route path="/manageObjectCategories" element={<SA_ManageObjCategoriesPage/>} />
+          <Route path="/manageTags" element={<SA_ManageTagsPage/>} />
           
       </Routes>
     </Router>
