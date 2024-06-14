@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
+import ObjPreview from './ObjPreview';
 
 const ObjCategory = ({ name, catId, objectListData }) => {
+    const handleDragStart = (event, modelPath, materialPath) => {
+        event.dataTransfer.setData('modelPath', modelPath);
+        event.dataTransfer.setData('materialPath', materialPath);
+    };
     const [expand, setIsExpand] = useState(false);
-
     const matchingObj = objectListData?.body?.filter(obj => obj.category_ids?.includes(catId));
 
     return (
@@ -21,17 +25,17 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                                 <>
                                     {matchingObj.map((obj) => (
                                         <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center" key={obj.id} >
-                                            {/* {console.log(Object.keys(obj.object_files))} */}
-                                            {/* <div
+                                            {console.log(Object.keys(obj.object_files)[1])}
+                                            <div
                                                 draggable
                                                 onDragStart={(event) => handleDragStart(event, Object.keys(obj.object_files)[1], Object.keys(obj.object_files)[0])}
                                                 className="mb-2 cursor-pointer"
-                                            > */}
-                                            <div
-                                                draggable
-                                                onDragStart={(event) => handleDragStart(event, sofa.obj, sofa.mtl)}
-                                                className="mb-2 cursor-pointer"
                                             >
+                                            {/* <div
+                                                draggable
+                                                onDragStart={(event) => handleDragStart(event, 'table.obj', 'table.mtl')}
+                                                className="mb-2 cursor-pointer"
+                                            > */}
                                                 {obj.id}
                                                 {/* <ObjPreview objUrl={`/3Dmodels/${Object.keys(obj.object_files)[1]}`} mtlUrl={`/3Dmodels/${Object.keys(obj.object_files)[0]}`}/> */}
                                             </div>

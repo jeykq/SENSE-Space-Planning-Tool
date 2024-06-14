@@ -9,7 +9,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
     };
 
     return (
-        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg">
+        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg overflow-y-scroll max-h-[85vh]">
             <div className="flex pb-1 mb-2 border-b border-black">
                 <h3 className="text-lg font-semibold uppercase">Object catalogue</h3>
                 {/* <div className="flex items-center space-x-2">
