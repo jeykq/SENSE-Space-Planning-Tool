@@ -68,7 +68,7 @@ const Navbar = () => {
               <div className="py-1">
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center" onClick={() => handleNavigate('/landing-page')}>Landing Page</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageSingUpPage')}>Signup Page</button>
-                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/object-categories')}>Object Categories</button>
+                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageObjectCategories')}>Object Categories</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/tags')}>Tags</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/business-applications')}>Business Applications</button>
               </div>
