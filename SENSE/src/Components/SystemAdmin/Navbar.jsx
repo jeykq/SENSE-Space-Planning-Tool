@@ -44,13 +44,22 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
+    <nav className={`navbar bg-black w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
       <img src={logo} alt="logo" className='logo w-20 mx-2' />
       <div className="flex items-center space-x-4 ml-auto">
         <div className="relative inline-block" ref={dropdownRef}>
           <button
             onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="cursor-pointer text-white rounded px-4 py-2 bg-teal-500 hover:bg-teal-600 focus:bg-teal-500 transition-colors duration-300"
+            className="cursor-pointer rounded px-4 py-2"
+            style={{ backgroundColor: '#cfe5fd' }}
+                onMouseEnter={(e) => { 
+                  e.target.style.backgroundColor = '#bcd7ff';
+                  e.target.style.color = '#0034c3';
+                 }}
+                onMouseLeave={(e) => { 
+                  e.target.style.backgroundColor = '#cfe5fd';
+                  e.target.style.color = '#333';
+                }}
           >
             Manage
           </button>
