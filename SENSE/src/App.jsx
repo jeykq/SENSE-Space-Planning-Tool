@@ -21,6 +21,7 @@ import ChangePassword from './Components/ManageAccount/ChangePassword';
 import BU_ImportObjects from './Components/BusinessUser/BU_ImportObjects';
 import ThreeDPreview from './Components/BusinessUser/ThreeDPreview';
 import SA_ViewUserAccount from './Components/SystemAdmin/SA_ViewUserAcc';
+import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
 
 const App = () => {
   return (
@@ -47,6 +48,7 @@ const App = () => {
           <Route path="/ChangePassword" element={<ChangePassword/>} />
           <Route path="/ThreeDPreview" element={<ThreeDPreview/>} />
           <Route path="/viewuser/:id" element={<SA_ViewUserAccount />} />
+          <Route path="/manageSingUpPage" element={<SA_ManageSignUpPage/>} />
 
           
       </Routes>
