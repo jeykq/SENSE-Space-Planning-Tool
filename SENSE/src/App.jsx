@@ -24,6 +24,7 @@ import SA_ViewUserAccount from './Components/SystemAdmin/SA_ViewUserAcc';
 import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
 import SA_ManageObjCategoriesPage from './Components/SystemAdmin/SA_ManageObjCategories';
 import SA_ManageTagsPage from './Components/SystemAdmin/SA_ManageTags';
+import SA_ManageRoomTypesPage from './Components/SystemAdmin/SA_ManageRoomTypes';
 
 const App = () => {
   return (
@@ -53,6 +54,7 @@ const App = () => {
           <Route path="/manageSingUpPage" element={<SA_ManageSignUpPage/>} />
           <Route path="/manageObjectCategories" element={<SA_ManageObjCategoriesPage/>} />
           <Route path="/manageTags" element={<SA_ManageTagsPage/>} />
+          <Route path="/manageRoomTypes" element={<SA_ManageRoomTypesPage/>} />
           
       </Routes>
     </Router>
