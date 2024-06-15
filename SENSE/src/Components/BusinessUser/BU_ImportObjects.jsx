@@ -32,21 +32,37 @@ const BU_ImportObjects = ({ submit }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (objFile) {
-            const formData = new FormData();
-            formData.append('file', objFile);
-            
             try {
-                // get this url from import object api (now i hardcoded for obj 46)
-                const response = await axios.put('https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/46/sofa_new.obj', formData, {
+                // Request a pre-signed URL from the backend
+                const { data: presignedData } = await axios.get('https://api.sensespacesplanningtool.com/object/presigned-url', {
+                    params: {
+                        filename: objFile.name,
+                        filetype: objFile.type
+                    }
+                });
+
+                // Upload the file to S3 using the pre-signed URL
+                const formData = new FormData();
+                Object.keys(presignedData.fields).forEach(key => {
+                    formData.append(key, presignedData.fields[key]);
+                });
+                formData.append('file', objFile);
+
+                const response = await axios.post(presignedData.url, formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
                 });
+
                 console.log(response.data);
                 console.log("Upload complete");
+
+                // Optionally, you can handle the submission success here
+                // and navigate or perform additional actions.
+
             } catch (error) {
-                console.error(error);
-                // Handle the error as needed
+                console.error('Error uploading file:', error);
+                alert('Failed to upload file');
             }
         } else {
             alert('Please select a file to upload.');
@@ -74,7 +90,6 @@ const BU_ImportObjects = ({ submit }) => {
             const reader = new FileReader();
             reader.onload = (e) => {
                 const content = e.target.result;
-                // Optionally, you can add additional checks for content validity here
                 setFileContent(content); // Store the file content
                 setObjFile(file); // Store the file itself
                 setObjFileName(file.name); // Store the file name
