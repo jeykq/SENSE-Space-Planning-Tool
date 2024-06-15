@@ -35,7 +35,6 @@ const SystemAdminHomepage = () => {
         }
 
         const sortedAccounts = response.data.body.sort((a, b) => {
-          // Sort alphabetically based on username
           return a.first_name.localeCompare(b.first_name);
         });
 

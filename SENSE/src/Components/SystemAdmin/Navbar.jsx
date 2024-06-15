@@ -21,6 +21,7 @@ const Navbar = () => {
     if (!token) {
       navigate('/');
     }
+
     const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
     };
@@ -101,7 +102,7 @@ const Navbar = () => {
             <div className="absolute mt-2 w-48 text-black bg-white rounded-md shadow-lg z-20 right-0">
               <div className="py-1">
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center" onClick={() => handleNavigate('/landing-page')}>Landing Page</button>
-                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageSingUpPage')}>Signup Page</button>
+                <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageSignUpPage')}>Signup Page</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageObjectCategories')}>Object Categories</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageTags')}>Tags</button>
                 <button className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-center border-t border-gray-300" onClick={() => handleNavigate('/manageRoomTypes')}>Room Types</button>

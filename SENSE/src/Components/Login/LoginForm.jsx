@@ -65,7 +65,7 @@ const LoginForm = () => {
                             <input type="text" placeholder="Email" className="border border-gray-400 py-1 px-2 w-full mt-5 max-w-[400px]" value={email} onChange={(e) => setEmail(e.target.value)} />
                             <input type="password" placeholder="Password" className="border border-gray-400 py-1 px-2 w-full mt-5 max-w-[400px]" value={password} onChange={(e) => setPassword(e.target.value)} />
                             <div className="mt-3">
-                                <a href="#" className="text-sm text-slate-500 hover:underline">Forget Password?</a>
+                                <a href="/ChangePassword" className="text-sm text-slate-500 hover:underline">Forget Password?</a>
                             </div>
                             {loginLoading ? (
                                 <button type="submit" className="w-full bg-slate-300 py-3 text-white mt-5 max-w-[400px]" disabled>Logging in...</button>
