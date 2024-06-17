@@ -4,6 +4,8 @@ import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 import { FaPencilAlt } from "react-icons/fa";
+import axios from 'axios'; 
+import { getHeaders } from '../../../apiUtils';
 import "./BusinessUserHomepage.css";
 
 const BusinessUserHomepage = () => {
@@ -15,25 +17,73 @@ const BusinessUserHomepage = () => {
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState(null);
+  const [roomTypes, setRoomTypes] = useState([]);
+  const [templateNames, setTemplateNames] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-      navigate('/');
-    }
-    
-    if (swiperContainer1.current) {
-      new Swiper(swiperContainer1.current, {
-        slidesPerView: 3,
-        spaceBetween: 20,
-      });
-    }
+    const fetchRoomTypes = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/room_type/list',
+          {},
+          { headers }
+        );
 
-    if (swiperContainer2.current) {
-      new Swiper(swiperContainer2.current, {
-        slidesPerView: 3,
-        spaceBetween: 20,
-      });
+        if (!response.data || !response.data.body) {
+          throw new Error('No room types data returned');
+        }
+
+        const sortedRoomTypes = response.data.body.sort((a, b) => a.id - b.id);
+        setRoomTypes(sortedRoomTypes);
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+        setError(error.message);
+      }
+    };
+
+    const fetchTemplateNames = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/template/list',
+          {},
+          { headers }
+        );
+
+        if (!response.data || !response.data.body) {
+          throw new Error('No template names data returned');
+        }
+
+        const sortedTemplates = response.data.body.sort((a, b) => a.id - b.id);
+        setTemplateNames(sortedTemplates);
+      } catch (error) {
+        console.error('Error fetching template names:', error);
+        setError(error.message);
+      }
+    };
+
+    fetchRoomTypes();
+    fetchTemplateNames();
+
+    const initializeSwiper = () => {
+      if (swiperContainer2.current) {
+        new Swiper(swiperContainer2.current, {
+          slidesPerView: 'auto',
+          spaceBetween: 20,
+        });
+      }
+      if (swiperContainer1.current) {
+        new Swiper(swiperContainer1.current, {
+          slidesPerView: 'auto',
+          spaceBetween: 20,
+        });
+      }
+    };
+
+    if (roomTypes.length > 0 && swiperContainer2.current) {
+      initializeSwiper();
     }
 
     const handleScroll = () => {
@@ -48,7 +98,7 @@ const BusinessUserHomepage = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showDropdown]);
+  }, [showDropdown, navigate, roomTypes]);
 
   const toggleDropdown = (event) => {
     setShowDropdown(!showDropdown);
@@ -96,17 +146,17 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {[...Array(5)].map((_, index) => (
+              {templateNames.map((template, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
                   <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', width: '100%', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p> [Placeholder for Template Name] </p>
+                      <p>Template Name</p>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <p> [Placeholder for Category] </p>
+                      <p>{template.name}</p>
                     </div>
                   </div>
                 </div>
@@ -139,7 +189,7 @@ const BusinessUserHomepage = () => {
         <div className="flex items-center" style={{ width: "90%" }}>
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {[...Array(5)].map((_, index) => (
+              {roomTypes.map((roomType, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div className="overlay">
                     <div className="option" onClick={() => handleCategoryClick('view')}>View Objects</div>
@@ -150,10 +200,7 @@ const BusinessUserHomepage = () => {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', width: '100%', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p> [Placeholder for Category Name] </p>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <p> [Placeholder for Category] </p>
+                      <p> {roomType.name} </p>
                     </div>
                   </div>
                 </div>
