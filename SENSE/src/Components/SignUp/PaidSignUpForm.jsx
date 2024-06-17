@@ -80,17 +80,16 @@ const PaidSignUpForm = () => {
         });
         
         if (response.ok) {
-          // Handle successful sign up
           setShowAlert(true); // Show the alert
           console.log('Sign up successful!');
-          // navigate("/login");
         } else {
-          // Handle sign up errors
           const errorData = await response.json();
           console.error('Sign up failed:', errorData);
+          setErrors({ general: 'Sign up failed. This account already exists.' });
         }
       } catch (error) {
         console.error('Error during sign up:', error);
+        setErrors({ general: 'Sign up failed. This account already exists.' });
       }
     }
   };
@@ -101,8 +100,19 @@ const PaidSignUpForm = () => {
     navigate("/login");
   };
 
+  // Handle click on close button to navigate back to landing page
+  const handleClose = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen relative">
+      <button 
+        onClick={handleClose} 
+        style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '20px', cursor: 'pointer' }}
+      >
+        &times;
+      </button>
       <div className="w-1/2 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center" style={{ backgroundImage: `url(${signup})` }}>
         <h1 className="text-3xl mb-3">Welcome to Sense Spaces Planning Tool</h1>
       </div>
@@ -159,6 +169,7 @@ const PaidSignUpForm = () => {
             </div>
 
             <button className="w-full bg-blue-500 py-3 text-white mt-5 rounded">Sign Up</button>
+            {errors.general && <p style={{ color: 'red' }} className="text-sm mt-3">{errors.general}</p>}
           </form>
         </div>
       </div>

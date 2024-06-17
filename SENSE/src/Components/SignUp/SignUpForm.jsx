@@ -25,7 +25,7 @@ const SignUpForm = () => {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({}), // Empty body or any parameters needed by your API
+          body: JSON.stringify({}),
         });
 
         if (!response.ok) {
@@ -64,7 +64,6 @@ const SignUpForm = () => {
     if (isValid) {
       try {
         const selectedIndustry = industryList.find(item => item.id === parseInt(industry, 10));
-        console.log('Selected Industry:', selectedIndustry); // Ensure this shows correct industry object
   
         const response = await fetch('https://api.sensespacesplanningtool.com/signup/free', {
           method: 'POST',
@@ -77,32 +76,43 @@ const SignUpForm = () => {
             firstName,
             lastName,
             dateOfBirth,
-            jobIndustryId: selectedIndustry.id, // Ensure only ID is sent
+            jobIndustryId: selectedIndustry.id,
           }),
         });
   
         if (response.ok) {
-          setShowAlert(true); // Show the alert
+          setShowAlert(true);
           console.log('Sign up successful!');
-          // navigate("/login");
         } else {
           const errorData = await response.json();
           console.error('Sign up failed:', errorData);
+          setErrors({ general: 'Sign up failed. This account already exists.' });
         }
       } catch (error) {
         console.error('Error during sign up:', error);
+        setErrors({ general: 'Sign up failed. This account already exists.' });
       }
     }
   };
-  
 
   const handleOK = () => {
     setShowAlert(false);
     navigate("/login");
   };
 
+  // Close button click handler to navigate back to landing page
+  const handleClose = () => {
+    navigate("/");
+  };
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen relative">
+      <button 
+        onClick={handleClose} 
+        style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '20px', cursor: 'pointer' }}
+      >
+        &times;
+      </button>
       <div className="w-1/2 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center" style={{ backgroundImage: `url(${signup})` }}>
         <h1 className="text-3xl mb-3">Welcome to Sense Spaces Planning Tool</h1>
       </div>
@@ -111,18 +121,62 @@ const SignUpForm = () => {
           <h2 className="text-3xl mb-4 text-center">Sign Up Free</h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-5">
-              <input type="text" placeholder="First Name" className="border border-gray-400 py-1 px-2 rounded" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
-              <input type="text" placeholder="Last Name" className="border border-gray-400 py-1 px-2 rounded" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
+              <input
+                type="text"
+                placeholder="First Name"
+                className="border border-gray-400 py-1 px-2 rounded"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                required
+              />
+              <input
+                type="text"
+                placeholder="Last Name"
+                className="border border-gray-400 py-1 px-2 rounded"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                required
+              />
             </div>
-            <input type="text" placeholder="Email" className="border border-gray-400 py-1 px-2 w-full mt-5 rounded" value={email} onChange={(e) => setEmail(e.target.value)} required />
-            <input type="password" placeholder="Password" style={{ borderColor: errors.password ? 'red' : 'gray' }} className="border py-1 px-2 w-full mt-5 rounded" value={password} onChange={(e) => setPassword(e.target.value)} required />
+            <input
+              type="text"
+              placeholder="Email"
+              className={`border border-gray-400 py-1 px-2 w-full mt-5 rounded ${errors.email ? 'border-red-500' : ''}`}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            {errors.email && <p style={{ color: 'red' }} className="text-sm">{errors.email}</p>}
+            <input
+              type="password"
+              placeholder="Password"
+              style={{ borderColor: errors.password ? 'red' : 'gray' }}
+              className="border py-1 px-2 w-full mt-5 rounded"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
             {errors.password && <p style={{ color: 'red' }} className="text-sm">{errors.password}</p>}
-            <input type="password" placeholder="Confirm Password" style={{ borderColor: errors.confirmPassword ? 'red' : 'gray' }} className="border py-1 px-2 w-full mt-5 rounded" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              style={{ borderColor: errors.confirmPassword ? 'red' : 'gray' }}
+              className="border py-1 px-2 w-full mt-5 rounded"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
             {errors.confirmPassword && <p style={{ color: 'red' }} className="text-sm">{errors.confirmPassword}</p>}
             <div className="grid grid-cols-2 gap-5">
               <div style={{ position: 'relative' }}>
                 <label className="absolute top-0 left-0 py-1 px-1 mt-2 rounded" style={{ pointerEvents: 'none', zIndex: 1, fontSize: '0.75rem' }}>Date of Birth</label>
-                <input type="date" className="border border-gray-400 py-1 px-2 w-full mt-8 text-sm rounded" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
+                <input
+                  type="date"
+                  className="border border-gray-400 py-1 px-2 w-full mt-8 text-sm rounded"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  required
+                />
               </div>
               <div style={{ position: 'relative' }}>
                 <label className="absolute top-0 left-0 py-1 px-1 mt-2 rounded" style={{ pointerEvents: 'none', zIndex: 1, fontSize: '0.75rem' }}>Job Industry</label>
@@ -143,14 +197,20 @@ const SignUpForm = () => {
                 </select>
               </div>
             </div>
-
             <div className="flex items-center mt-5">
-              <input type="checkbox" className="border border-gray-400 mr-2" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} required />
+              <input
+                type="checkbox"
+                className="border border-gray-400 mr-2"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                required
+              />
               <span>
                 Accept <a href="#" className="text-blue-500">Terms & Conditions</a>
               </span>
             </div>
             <button className="w-full bg-blue-500 py-3 text-white mt-5 rounded">Sign Up</button>
+            {errors.general && <p style={{ color: 'red' }} className="text-sm mt-3">{errors.general}</p>}
           </form>
         </div>
       </div>
