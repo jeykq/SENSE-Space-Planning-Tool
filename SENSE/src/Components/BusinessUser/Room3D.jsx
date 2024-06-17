@@ -195,11 +195,11 @@ const Room3D = () => {
     scene.add(rightWall);
 
     // Axes Helper
-    const axesHelper = new THREE.AxesHelper(5);
+    const axesHelper = new THREE.AxesHelper(roomH);
     scene.add(axesHelper);
 
     // Grid Helper
-    const gridHelper = new THREE.GridHelper(roomW, 10);
+    const gridHelper = new THREE.GridHelper(Math.max(roomW, roomD), Math.max(roomW, roomD) / 2);
     scene.add(gridHelper);
 
     // TransformControls
@@ -352,11 +352,6 @@ const Room3D = () => {
     setShowConfirmSave(true);
   };
 
-  const handleImportRoom = () => {
-    navigate("/ImportRoom");
-    // Logic to import a room
-  };
-
   const [showConfirmExport, setShowConfirmExport] = useState(false);
   const handleExportRoom = () => {
     // Logic to export the current room
@@ -445,12 +440,6 @@ const Room3D = () => {
           className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
         >
           Save as Template
-        </button>
-        <button 
-          onClick={handleImportRoom} 
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
-        >
-          Import Room
         </button>
         <button 
           onClick={handleExportRoom} 
