@@ -40,6 +40,8 @@ const Room3D = () => {
   const [catLoading, setCatLoading] = useState(false);
   const [objListLoading, setObjListLoading] = useState(false);
 
+  const token = localStorage.getItem('authToken');
+
   // get list of all categories
   useEffect(() => {
       const token = localStorage.getItem('authToken');
@@ -242,10 +244,10 @@ const Room3D = () => {
           object.scale.set(1, 1, 1);
           object.userData.selectable = true;
           scene.add(object);
-
+    
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-
+    
           // Attach transform controls to the object
           transformControls.attach(object);
           selectedObjectRef.current = object;
@@ -309,19 +311,19 @@ const Room3D = () => {
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+    
       const vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
       const dir = vector.sub(camera.position).normalize();
       const distance = -camera.position.z / dir.z;
       let pos = camera.position.clone().add(dir.multiplyScalar(distance));
-
+    
       // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
         Math.max(-roomW / 2, Math.min(roomW / 2, pos.x)),
         0,
         Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
-
+    
       loadModel(modelPath, materialPath, pos);
       setShowDropdown(false);
     };
@@ -350,6 +352,11 @@ const Room3D = () => {
 
   const handleSaveAsTemplate = () => {
     setShowConfirmSave(true);
+  };
+
+  const handleImportRoom = () => {
+    navigate("/ImportRoom");
+    // Logic to import a room
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
@@ -426,9 +433,56 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
-  const handlePublishTemplate = () => {
-    // Logic to publish template
-    setShowConfirmSave(false);
+  const handlePublishTemplate = async (e) => {
+    e.preventDefault();
+    
+
+    const currentTimestamp = Date.now() / 1000;
+
+      try {
+        const objectsData = objects.map(obj => ({
+          model: obj.modelPath,
+          position: {
+            x: obj.position.x,
+            y: obj.position.y,
+            z: obj.position.z
+          },
+        }));
+
+        const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'sense-token': token
+          },
+          body: JSON.stringify({
+            "name": templateName,
+            "dimension": {
+                "width": roomWidth,
+                "height": roomHeight,
+                "length": roomLength
+            },
+            "room_layout": {
+                "room_layout": objectsData
+            },
+            "last_modified_timestamp": currentTimestamp,
+            "room_type_id": roomType
+          }),
+        });
+  
+        if (response.ok) {
+          setShowAlert(true);
+          console.log('Template successfully published!');
+        } else {
+          const errorData = await response.json();
+          console.error('Template publishing failed:', errorData);
+        }
+      } catch (error) {
+        console.error('Error during upload:', error);
+        setShowConfirmSave(false);
+      }
+
+      setShowConfirmSave(false);
   };
 
   return (
@@ -440,6 +494,12 @@ const Room3D = () => {
           className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
         >
           Save as Template
+        </button>
+        <button 
+          onClick={handleImportRoom} 
+          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
+        >
+          Import Room
         </button>
         <button 
           onClick={handleExportRoom} 

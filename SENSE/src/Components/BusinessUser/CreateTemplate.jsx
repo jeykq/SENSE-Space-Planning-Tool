@@ -57,11 +57,11 @@ const CreateTemplate = () => {
             required
           >
             <option value="" disabled>Select Room Type</option>
-            <option value="Living Room">Living Room</option>
-            <option value="Bedroom">Bedroom</option>
-            <option value="Study Room">Study Room</option>
-            <option value="Kitchen">Kitchen</option>
-            <option value="Kid's Room">Kid's Room</option>
+            <option value="1">Living Room</option>
+            <option value="2">Bedroom</option>
+            <option value="3">Study Room</option>
+            <option value="4">Kitchen</option>
+            <option value="5">Kid's Room</option>
           </select>
         </div>
         <div className="text-2xl mb-3">
