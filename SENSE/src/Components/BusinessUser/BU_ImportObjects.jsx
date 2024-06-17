@@ -21,6 +21,13 @@ const BU_ImportObjects = ({ submit }) => {
     const fileInputRef = useRef(null);
     const navigate = useNavigate();
 
+    const token = localStorage.getItem('authToken');
+
+    if (!token) {
+        navigate('/login');
+        return null; // Return null if not authenticated
+    }
+
     const handleTagChange = (event) => {
         const { name, checked } = event.target;
         setTags((prevTags) => ({
@@ -32,37 +39,28 @@ const BU_ImportObjects = ({ submit }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
         if (objFile) {
+            const formData = new FormData();
+            formData.append('file', objFile);
+            formData.append('objectName', objectName);
+            formData.append('objectCat', objectCat);
+            formData.append('tags', JSON.stringify(tags));
+            formData.append('productDescription', productDescription);
+
             try {
-                // Request a pre-signed URL from the backend
-                const { data: presignedData } = await axios.get('https://api.sensespacesplanningtool.com/object/presigned-url', {
-                    params: {
-                        filename: objFile.name,
-                        filetype: objFile.type
+                const response = await axios.post(
+                    'https://api.sensespacesplanningtool.com/object/import',
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'sense-token': token
+                        },
                     }
-                });
-
-                // Upload the file to S3 using the pre-signed URL
-                const formData = new FormData();
-                Object.keys(presignedData.fields).forEach(key => {
-                    formData.append(key, presignedData.fields[key]);
-                });
-                formData.append('file', objFile);
-
-                const response = await axios.post(presignedData.url, formData, {
-                    headers: {
-                        'Content-Type': 'multipart/form-data',
-                    },
-                });
-
+                );
                 console.log(response.data);
-                console.log("Upload complete");
-
-                // Optionally, you can handle the submission success here
-                // and navigate or perform additional actions.
-
+                console.log('Upload complete');
             } catch (error) {
                 console.error('Error uploading file:', error);
-                alert('Failed to upload file');
             }
         } else {
             alert('Please select a file to upload.');
@@ -98,7 +96,7 @@ const BU_ImportObjects = ({ submit }) => {
         }
     };
 
-    const selectedTags = Object.keys(tags).filter(tag => tags[tag]).join(', ');
+    const selectedTags = Object.keys(tags).filter((tag) => tags[tag]).join(', ');
 
     const isObjectNameFilled = objectName.trim() !== '';
 
@@ -214,6 +212,7 @@ const BU_ImportObjects = ({ submit }) => {
                 </div>
                 <div className="col-span-4 flex items-center justify-center">
                     <button
+                        type="submit" // Changed to type submit to trigger handleSubmit
                         className="w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
                         disabled={!isObjectNameFilled}
                     >
