@@ -2,13 +2,15 @@ import React, { useRef, useEffect, useState } from "react";
 import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
-import { FaPencilAlt } from "react-icons/fa"; // Import the pencil icon
+import { FaPencilAlt, FaSearch } from "react-icons/fa"; // Import the search icon
 
 const FreeUserHomepage = () => {
   const swiperContainer1 = useRef(null);
   const swiperContainer2 = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
+  const [activeSearchField, setActiveSearchField] = useState(null); // State for tracking active search field
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
 
   useEffect(() => {
     if (swiperContainer1.current) {
@@ -45,21 +47,43 @@ const FreeUserHomepage = () => {
     setDropdownPosition({ x: rect.left + window.scrollX, y: rect.bottom + window.scrollY });
   };
 
+  const toggleSearchField = (field) => {
+    setActiveSearchField(activeSearchField === field ? null : field);
+  };
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div>
       <div>
         <Navbar />
       </div>
 
-      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
+      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
         <div className={"mt-20 ml-5"}>
-          <p>Room Templates</p>
+          <p style={{ marginRight: '10px' }}>Room Templates</p>
         </div>
+        <div className={"mt-20 ml-10"} style={{ border: '1px solid black', borderRadius: '20px', padding: '10px 40px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => toggleSearchField('roomTemplates')}>
+          <FaSearch />
+        </div>
+        {activeSearchField === 'roomTemplates' && (
+          <div className={"mt-20 ml-10"} style={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search..."
+              style={{ padding: '10px', borderRadius: '20px', border: '1px solid black', width: '300px' }}
+            />
+          </div>
+        )}
       </div>
 
       <div style={{ paddingTop: "20px", paddingLeft: "100px" }} className="justify-center">
-        <div className="flex items-center" style={{ width: "90%" }}>
-          <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
+        <div className="flex items-center" style={{ width: "100%" }}>
+          <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "50px", paddingBottom: "50px", width: "90%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
               {[...Array(5)].map((_, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
@@ -93,20 +117,34 @@ const FreeUserHomepage = () => {
 
       <hr style={{ border: "1px solid black" }} />
 
-      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
+      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
         <div className={"ml-5"}>
-          <p>Recent Designs</p>
+          <p style={{ marginRight: '10px' }}>Recent Designs</p>
         </div>
+        <div className={"mt-1 ml-10"} style={{ border: '1px solid black', borderRadius: '20px', padding: '10px 40px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => toggleSearchField('recentDesigns')}>
+          <FaSearch />
+        </div>
+        {activeSearchField === 'recentDesigns' && (
+          <div style={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={handleSearchChange}
+              placeholder="Search..."
+              style={{ padding: '10px', borderRadius: '20px', border: '1px solid black', width: '300px' }}
+            />
+          </div>
+        )}
       </div>
 
       <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "100px" }} className="justify-center">
-        <div className="flex items-center" style={{ width: "90%"}}>
-          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", width: "100%", height: "350px", overflow: "hidden" }}>
+        <div className="flex items-center" style={{ width: "90%" }}>
+          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
               {[...Array(5)].map((_, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
-                  <div style={{ position: 'absolute', top: '10px', left: '10px' }}> {/* Pencil Icon */}
+                  <div style={{ position: 'absolute', top: '10px', left: '10px', paddingTop: "8px", paddingLeft: "10px" }}> {/* Pencil Icon */}
                     <FaPencilAlt style={{ cursor: 'pointer' }} />
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>

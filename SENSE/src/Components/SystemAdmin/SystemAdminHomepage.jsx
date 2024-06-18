@@ -107,10 +107,10 @@ const SystemAdminHomepage = () => {
         {/* Filter buttons */}
         <div className="mb-2">
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('All')}>All</button>
-          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('FREE_USER')}>Free User</button>
-          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
-          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
-          <button className="px-4 py-2 text-sm font-bold text-white bg-blue-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
+          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-purple-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('FREE_USER')}>Free User</button>
+          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-orange-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
+          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-indigo-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
+          <button className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
         </div>
 
         {searchResults.length === 0 && searchTerm.length > 0 ? (
