@@ -1,70 +1,140 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThreeDPreview from './ThreeDPreview';
 import Topbar from '../BusinessUser/Topbar';
+import { getHeaders } from '../../../apiUtils';
+import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
 
 const BU_ImportObjects = ({ submit }) => {
+    const [showAlert, setShowAlert] = useState(false);
     const [objectName, setObjectName] = useState('');
     const [objectCat, setObjectCat] = useState('');
-    const [tags, setTags] = useState({
-        'Autism Friendly': false,
-        'Safe for Kids': false,
-        'Colour-blind': false,
-        'Therapeutic': false,
-    });
+    const [categories, setCategories] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [selectedTags, setSelectedTags] = useState([]);
     const [productDescription, setProductDescription] = useState('');
     const [showTags, setShowTags] = useState(false);
-    const [objFile, setObjFile] = useState(null); // State to store the uploaded OBJ file
-    const [objFileName, setObjFileName] = useState(''); // State to store the uploaded OBJ file name
-    const [fileContent, setFileContent] = useState(null); // State to store file content
+    const [objFile, setObjFile] = useState(null);
+    const [objFileName, setObjFileName] = useState('');
+    const [mtlFile, setMtlFile] = useState(null);
+    const [mtlFileName, setMtlFileName] = useState('');
     const fileInputRef = useRef(null);
+    const [objUrl, setObjUrl] = useState('');
+    const [mtlUrl, setMtlUrl] = useState('');
+    const [fileContent, setFileContent] = useState(null);
+
     const navigate = useNavigate();
+    const handleGoBack = () => {
+        navigate(-1);
+    };
 
-    const token = localStorage.getItem('authToken');
+    useEffect(() => {
+        fetchCategoriesAndTags();
+    }, []);
 
-    if (!token) {
-        navigate('/login');
-        return null; // Return null if not authenticated
-    }
+    const fetchCategoriesAndTags = async () => {
+        try {
+            const headers = getHeaders();
+            const categoriesResponse = await axios.post('https://api.sensespacesplanningtool.com/category/list', {}, { headers });
+            const tagsResponse = await axios.post('https://api.sensespacesplanningtool.com/tag/list', {}, { headers });
+
+            setCategories(categoriesResponse.data.body);
+            setTags(tagsResponse.data.body);
+            console.log('Categories:', categoriesResponse.data.body);
+            console.log('Tags:', tagsResponse.data.body);
+
+        } catch (error) {
+            console.error('Error fetching categories and tags:', error);
+        }
+    };
 
     const handleTagChange = (event) => {
-        const { name, checked } = event.target;
-        setTags((prevTags) => ({
-            ...prevTags,
-            [name]: checked,
-        }));
+        const { value, checked } = event.target;
+        setSelectedTags((prevSelectedTags) => {
+            if (checked) {
+                return [...prevSelectedTags, value];
+            } else {
+                return prevSelectedTags.filter((tagId) => tagId !== value);
+            }
+        });
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (objFile) {
-            const formData = new FormData();
-            formData.append('file', objFile);
-            formData.append('objectName', objectName);
-            formData.append('objectCat', objectCat);
-            formData.append('tags', JSON.stringify(tags));
-            formData.append('productDescription', productDescription);
 
+        if (objFile && mtlFile && isObjectNameFilled) {
             try {
-                const response = await axios.post(
+                const headers = getHeaders(); // Ensure this function correctly retrieves headers with authentication tokens or other necessary data
+
+                // Prepare the data object to be sent
+                const data = {
+                    name: objectName,
+                    product_description: { "description.a": productDescription },
+                    category_ids: [objectCat], // Assuming objectCat is a single category ID
+                    tag_ids: selectedTags, // Assuming selectedTags is an array of tag IDs
+                    filenames: [objFileName, mtlFileName] // Assuming objFileName and mtlFileName are the filenames
+                };
+
+                // Step 1: Import object metadata and get object_id
+                const importResponse = await axios.post(
                     'https://api.sensespacesplanningtool.com/object/import',
-                    formData,
+                    data,
+                    { headers }
+                );
+
+                const objectId = importResponse.data.body.id; // Extract object ID from response
+                console.log('Object ID:', objectId);
+
+                // Step 2: Upload .obj file to S3 with dynamic folder path
+                const objUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${objFileName}`;
+                
+                await axios.put(
+                    objUpdateUrl,
+                    objFile,
                     {
                         headers: {
                             'Content-Type': 'multipart/form-data',
-                            'sense-token': token
+                            ...headers // Include all headers required for this request
                         },
                     }
                 );
-                console.log(response.data);
-                console.log('Upload complete');
+
+                console.log("Uploaded .obj file successfully");
+
+                // Step 3: Upload .mtl file to S3 with dynamic folder path
+                const mtlUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${mtlFileName}`;
+
+                await axios.put(
+                    mtlUpdateUrl,
+                    mtlFile,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            ...headers // Include all headers required for this request
+                        },
+                    }
+                );
+
+                console.log("Uploaded .mtl file successfully");
+
+                setObjUrl(objUpdateUrl);
+                setMtlUrl(mtlUpdateUrl);
+
+                console.log("Upload complete", importResponse.data);
+                setShowAlert(true);
+
             } catch (error) {
-                console.error('Error uploading file:', error);
+                console.error('Error uploading files:', error);
             }
         } else {
-            alert('Please select a file to upload.');
+            alert('Please select both .obj and .mtl files to upload.');
         }
+    };
+
+    const handleOK = () => {
+        setShowAlert(false);
+        navigate("/BusinessUserHomepage");
     };
 
     const handleImportClick = () => {
@@ -76,34 +146,64 @@ const BU_ImportObjects = ({ submit }) => {
     };
 
     const handleFileChange = (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const fileExtension = file.name.split('.').pop().toLowerCase();
-            if (fileExtension !== 'obj') {
-                alert('Only .obj files are allowed');
-                fileInputRef.current.value = '';
-                return;
-            }
+        const files = event.target.files;
+        let objFile = null;
+        let mtlFile = null;
+        let objFileName = '';
+        let mtlFileName = '';
 
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const fileExtension = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
+            
             reader.onload = (e) => {
                 const content = e.target.result;
-                setFileContent(content); // Store the file content
-                setObjFile(file); // Store the file itself
-                setObjFileName(file.name); // Store the file name
+                if (fileExtension === 'obj') {
+                    objFile = file;
+                    objFileName = file.name;
+                    setObjFile(objFile);
+                    setObjFileName(objFileName);
+                    setFileContent(content);
+                    setObjUrl(content); // For preview
+                } else if (fileExtension === 'mtl') {
+                    mtlFile = file;
+                    mtlFileName = file.name;
+                    setMtlFile(mtlFile);
+                    setMtlFileName(mtlFileName);
+                    setMtlUrl(content); // For preview
+                } else {
+                    alert('Only .obj and .mtl files are allowed');
+                    fileInputRef.current.value = '';
+                    return;
+                }
             };
+
             reader.readAsDataURL(file); // Read the file as a data URL
         }
-    };
 
-    const selectedTags = Object.keys(tags).filter((tag) => tags[tag]).join(', ');
+        if (objFile && mtlFile) {
+            setObjFile(objFile);
+            setObjFileName(objFileName);
+            setMtlFile(mtlFile);
+            setMtlFileName(mtlFileName);
+            // Set objUrl and mtlUrl immediately upon file selection
+            const objUrl = URL.createObjectURL(objFile);
+            const mtlUrl = URL.createObjectURL(mtlFile);
+            setObjUrl(objUrl);
+            setMtlUrl(mtlUrl);
+        } else {
+            alert('Please select both .obj and .mtl files.');
+            fileInputRef.current.value = '';
+        }
+    };
 
     const isObjectNameFilled = objectName.trim() !== '';
 
     return (
         <div>
-            <Topbar title="Import Objects" />
-            <div style={{ marginTop: '20px' }}></div>
+            <Topbar title="Import Objects" onClick={handleGoBack} />
+            <div className='mt-10'></div>
             <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-4 gap-4">
                     <div className="col-span-1 text-center self-center">
@@ -113,7 +213,7 @@ const BU_ImportObjects = ({ submit }) => {
                         <input
                             type="text"
                             placeholder="Enter Object name..."
-                            className="border border-gray-400 w-full py-1 px-2"
+                            className="border border-gray-400 w-3/4 py-1 px-2 rounded"
                             value={objectName}
                             onChange={(e) => setObjectName(e.target.value)}
                             required
@@ -124,18 +224,18 @@ const BU_ImportObjects = ({ submit }) => {
                     </div>
                     <div className="col-span-3">
                         <select
-                            className="border border-gray-400 w-full py-1 px-2"
+                            className="border border-gray-400 w-3/4 py-1 px-2 rounded"
                             value={objectCat}
                             onChange={(e) => setObjectCat(e.target.value)}
                             disabled={!isObjectNameFilled}
                             required
                         >
                             <option value="">Select a category</option>
-                            <option value="Chair">Chair</option>
-                            <option value="Table">Table</option>
-                            <option value="Decorations">Decorations</option>
-                            <option value="Lights">Lights</option>
-                            <option value="Sofa">Sofa</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.id}>
+                                    {category.name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className="col-span-1 text-center self-center">
@@ -151,20 +251,20 @@ const BU_ImportObjects = ({ submit }) => {
                             <span className="mr-2">Select Tags</span>
                             <span className={`transform ${showTags ? 'rotate-90' : ''}`}>▶</span>
                         </button>
-                        {selectedTags && <span className="ml-2">({selectedTags})</span>}
+                        {selectedTags && <span className="ml-2">({selectedTags.join(', ')})</span>}
                         {showTags && (
-                            <ul className="list-none mt-2 border border-gray-400 p-2 rounded">
-                                {Object.keys(tags).map((tag) => (
-                                    <li key={tag} className="flex items-center mb-2">
+                            <ul className="list-none mt-2 border border-gray-400 p-2 rounded w-3/4">
+                                {tags.map((tag) => (
+                                    <li key={tag.id} className="flex items-center mb-2">
                                         <input
                                             type="checkbox"
-                                            name={tag}
-                                            checked={tags[tag]}
+                                            value={tag.id}
+                                            checked={selectedTags.includes(tag.id.toString())}
                                             onChange={handleTagChange}
                                             className="mr-2"
                                             disabled={!isObjectNameFilled}
                                         />
-                                        {tag}
+                                        {tag.name}
                                     </li>
                                 ))}
                             </ul>
@@ -176,18 +276,21 @@ const BU_ImportObjects = ({ submit }) => {
                             ref={fileInputRef}
                             style={{ display: 'none' }}
                             onChange={handleFileChange}
-                            accept=".obj"
+                            accept=".obj,.mtl"
+                            multiple
                             disabled={!isObjectNameFilled}
                         />
                         <button
                             type="button"
-                            className="max-w-min text-nowrap bg-orange-500 px-8 py-1 text-white mt-5 uppercase"
+                            className="max-w-min text-nowrap bg-orange-500 px-8 py-1 text-white mt-5 uppercase rounded"
                             onClick={handleImportClick}
                         >
                             Import Object
                         </button>
+                        <p>Please select both *.obj and *.mtl files to import object.</p>
                         <span className="text-xs">*Only file format *.obj and *.mtl is accepted</span>
-                        {objFileName && <p className="mt-2 text-sm">Selected file: {objFileName}</p>}
+                        {objFileName && <p className="mt-2 text-sm">Selected OBJ file: {objFileName}</p>}
+                        {mtlFileName && <p className="mt-2 text-sm">Selected MTL file: {mtlFileName}</p>}
                     </div>
                     <div className="flex col-span-2 mx-8">
                         <span className="self-end">Product Description</span>
@@ -206,20 +309,34 @@ const BU_ImportObjects = ({ submit }) => {
                             disabled={!isObjectNameFilled}
                         />
                     </div>
-                    <div className="col-span-2 mx-8 -translate-y-2" style={{ width: '100%' }}>
-                        <ThreeDPreview objFile={objFile} />
+                    <div className="col-span-2 mx-8 -translate-y-2 rounded-md border border-gray-400" style={{ height: '300px', width: '400px' }}>
+                        {/* Render 3D Preview here */}
+                        {objUrl && mtlUrl ? (
+                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} />
+                        ) : (
+                            <p>Select .obj and .mtl files to see the preview.</p>
+                        )}
                     </div>
                 </div>
-                <div className="col-span-4 flex items-center justify-center">
+
+                <div className="col-span-4 flex justify-center">
                     <button
-                        type="submit" // Changed to type submit to trigger handleSubmit
-                        className="w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
-                        disabled={!isObjectNameFilled}
+                        type="submit"
+                        className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
+                        disabled={!isObjectNameFilled || !objFile || !mtlFile}
                     >
-                        Save
+                        Submit
                     </button>
                 </div>
             </form>
+            {showAlert && (
+                <AlertPopup
+                    title="New Object imported successfully!"
+                    text="New Object has been imported successfully."
+                    onClose={() => setShowAlert(false)}
+                    onOk={handleOK}
+                />
+            )}
         </div>
     );
 };
