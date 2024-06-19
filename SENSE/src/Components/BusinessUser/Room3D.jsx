@@ -121,6 +121,7 @@ const Room3D = () => {
 
     // Scene
     const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xdfefff);
     sceneRef.current = scene;
 
     // Camera
@@ -131,24 +132,43 @@ const Room3D = () => {
     // Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
-    renderer.setClearColor(0xccccff);
+    renderer.setClearColor(0xdfefff);
     mount.appendChild(renderer.domElement);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Ambient Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.6);
+    // Hemisphere Light
+    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.7);
     hemisphereLight.position.set(0, 1, 0);
     scene.add(hemisphereLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffeedd, 0.6);
-    directionalLight.position.set(0, 1, 0).normalize();
+    // Directional Light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(0, 10, 10);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.near = 0.5;
+    directionalLight.shadow.camera.far = 500;
     scene.add(directionalLight);
 
+    // Point Light
     const pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
+
+    // Spot Light
+    const spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.position.set(15, 20, 10);
+    spotLight.angle = Math.PI / 6;
+    spotLight.penumbra = 0.1;
+    spotLight.decay = 2;
+    spotLight.distance = 200;
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
     // Debug: log the room dimensions
     console.log("Room dimensions:", roomLength, roomWidth, roomHeight);
@@ -159,8 +179,10 @@ const Room3D = () => {
     const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
-    const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
-    const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xAAAAAA });
+    const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
+    const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+    const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
+    const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
 
     // Floor
     const floorGeometry = new THREE.PlaneGeometry(roomW, roomD);
@@ -196,14 +218,6 @@ const Room3D = () => {
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
-    // Axes Helper
-    const axesHelper = new THREE.AxesHelper(roomH);
-    scene.add(axesHelper);
-
-    // Grid Helper
-    const gridHelper = new THREE.GridHelper(Math.max(roomW, roomD), Math.max(roomW, roomD) / 2);
-    scene.add(gridHelper);
-
     // TransformControls
     const transformControls = new TransformControls(camera, renderer.domElement);
     transformControlsRef.current = transformControls;
@@ -231,6 +245,14 @@ const Room3D = () => {
       mtlLoader.setPath('/3Dmodels/');
       mtlLoader.load(materialPath, (materials) => {
         materials.preload();
+
+        // Ensure that materials are not transparent and have full opacity
+        for (let materialName in materials.materials) {
+          const material = materials.materials[materialName];
+          material.transparent = false;
+          material.opacity = 1.0;
+        }
+
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
         objLoader.setPath('/3Dmodels/');

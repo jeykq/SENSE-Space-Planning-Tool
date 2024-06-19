@@ -12,35 +12,51 @@ const ThreeDPreview = ({ objUrl, mtlUrl }) => {
         if (objUrl && mtlUrl) {
             // Scene setup
             const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xdfefff); // Match background color
             sceneRef.current = scene;
 
             // Camera setup
-            const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            camera.position.set(5, 5, 15); // Adjust camera position
+            const aspectRatio = containerRef.current.clientWidth / containerRef.current.clientHeight;
+            const camera = new THREE.PerspectiveCamera(75, aspectRatio, 0.1, 1000);
+            camera.position.set(0, 5, 10); // Adjust camera position to be higher and further back
             camera.lookAt(new THREE.Vector3(0, 0, 0)); // Point camera at origin (0, 0, 0)
 
             // Renderer setup
             const renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(300, 400); // Set fixed size
-            renderer.setClearColor(0xffffff); // Set background color (white)
+            renderer.setSize(containerRef.current.clientWidth, containerRef.current.clientHeight);
+            renderer.setClearColor(0xdfefff); // Set background color
             containerRef.current.appendChild(renderer.domElement);
             rendererRef.current = renderer;
 
             // Lighting setup
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
             scene.add(ambientLight);
 
-            const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.6);
+            const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.7);
             hemisphereLight.position.set(0, 1, 0);
             scene.add(hemisphereLight);
 
-            const directionalLight = new THREE.DirectionalLight(0xffeedd, 0.6);
-            directionalLight.position.set(0, 1, 0).normalize();
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(0, 10, 10);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 1024;
+            directionalLight.shadow.mapSize.height = 1024;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 500;
             scene.add(directionalLight);
 
             const pointLight = new THREE.PointLight(0xffffff, 1);
             pointLight.position.set(5, 5, 5);
             scene.add(pointLight);
+
+            const spotLight = new THREE.SpotLight(0xffffff, 1);
+            spotLight.position.set(15, 20, 10);
+            spotLight.angle = Math.PI / 6;
+            spotLight.penumbra = 0.1;
+            spotLight.decay = 2;
+            spotLight.distance = 200;
+            spotLight.castShadow = true;
+            scene.add(spotLight);
 
             // Load .mtl and .obj files
             const mtlLoader = new MTLLoader();
@@ -54,7 +70,19 @@ const ThreeDPreview = ({ objUrl, mtlUrl }) => {
                         objUrl,
                         (object) => {
                             scene.add(object);
-                            object.position.y = -5; // Adjust object position if necessary
+
+                            // Center the object
+                            const box = new THREE.Box3().setFromObject(object);
+                            const center = box.getCenter(new THREE.Vector3());
+                            const size = box.getSize(new THREE.Vector3());
+                            const maxDim = Math.max(size.x, size.y, size.z);
+
+                            // Adjust object position and camera
+                            object.position.sub(center);
+                            const distance = maxDim / (2 * Math.atan(Math.PI / 360 * camera.fov));
+                            camera.position.set(0, distance / 2, distance * 1.2);
+                            camera.lookAt(new THREE.Vector3(0, 0, 0));
+
                             animate();
                         },
                         undefined,
@@ -89,7 +117,7 @@ const ThreeDPreview = ({ objUrl, mtlUrl }) => {
     }, [objUrl, mtlUrl]);
 
     return (
-        <div ref={containerRef} style={{ width: '300px', height: '400px' }} />
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
     );
 };
 

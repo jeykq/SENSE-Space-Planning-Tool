@@ -39,11 +39,29 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         <ObjPreview objUrl="/3Dmodels/table.obj" mtlUrl="/3Dmodels/table.mtl" />
                     </div>
                     <div className="mt-auto mb-1 text-sm w-full break-words px-1">
-                        testing_preview_lol3
+                        testing_table_preview
                     </div>
                 </div>
             </div>
             {/* testing end */}
+
+             {/* testing second item preview start */}
+             <div className="grid grid-cols-3 gap-2 p-2">
+                <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center" >
+                    <div
+                        draggable
+                        onDragStart={(event) => handleDragStart(event, 'DesignChair1.obj', 'DesignChair1.mtl')}
+                        className="mb-2 cursor-pointer"
+                    >
+                        <ObjPreview objUrl="/3Dmodels/DesignChair1.obj" mtlUrl="/3Dmodels/DesignChair1.mtl" />
+                    </div>
+                    <div className="mt-auto mb-1 text-sm w-full break-words px-1">
+                        design_chair_preview
+                    </div>
+                </div>
+            </div>
+            {/* testing end */}
+
         </div>
     );
 };
