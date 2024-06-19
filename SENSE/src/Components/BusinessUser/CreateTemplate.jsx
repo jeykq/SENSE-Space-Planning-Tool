@@ -33,7 +33,7 @@ const CreateTemplate = () => {
   return (
     <>
       <Topbar title="Create New Template" onClick={handleGoBack} />
-      <div className="flex flex-col gap-4 items-center min-h-screen mt-20">
+      <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="template_name">Template name</label>
         </div>
@@ -105,7 +105,7 @@ const CreateTemplate = () => {
         </div>
         <div className="col-span-4 flex items-center justify-center">
           <button 
-            className="w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
+            className="rounded w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
             onClick={handleCreateTemplate}
           >
             Generate Room

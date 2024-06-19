@@ -23,12 +23,12 @@ const ConfirmDialogPopup = ({ title, text, onClose, onConfirm }: ConfirmDialogPo
                 </span>
                 <div className="flex flex-row py-2 mt-2">
                     <div className="mx-6">
-                        <button onClick={() => onClose()} className="bg-gray-300 hover:bg-gray-400 px-5 py-2">
+                        <button onClick={() => onClose()} className="bg-gray-300 hover:bg-gray-400 px-5 py-2 rounded">
                             No
                         </button>
                     </div>
                     <div className="mx-6">
-                        <button onClick={() => onConfirm()} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2">
+                        <button onClick={() => onConfirm()} className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">
                             Yes
                         </button>
                     </div>

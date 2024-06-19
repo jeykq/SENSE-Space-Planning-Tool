@@ -4,6 +4,7 @@ import Topbar from '../BusinessUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 import AlertPopup from '../UI/AlertPopup'; // Assuming this is correctly imported
+import ConfirmDialogPopup from '../UI/ConfirmDialog'; // Import ConfirmDialogPopup
 
 const SA_ManageSignUpPage = () => {
   const navigate = useNavigate();
@@ -12,8 +13,11 @@ const SA_ManageSignUpPage = () => {
   const [showAddInput, setShowAddInput] = useState(false);
   const [newIndustryName, setNewIndustryName] = useState('');
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState(''); // New state for alert message
   const [editingIndustryId, setEditingIndustryId] = useState(null);
   const [editedIndustryName, setEditedIndustryName] = useState('');
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false); // State for confirmation dialog visibility
+  const [industryToDelete, setIndustryToDelete] = useState(null); // State to store the industry to delete
 
   useEffect(() => {
     fetchJobIndustries();
@@ -61,6 +65,7 @@ const SA_ManageSignUpPage = () => {
       fetchJobIndustries(); // Refresh job industries after updating
       setEditingIndustryId(null); // Exit editing mode
       setEditedIndustryName(''); // Clear edited name
+      setAlertMessage('Job Industry Updated Successfully!'); // Set success message
       setIsAlertVisible(true); // Show success alert
 
     } catch (error) {
@@ -74,18 +79,30 @@ const SA_ManageSignUpPage = () => {
     setEditedIndustryName(''); // Clear edited name
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = (id) => {
+    setIndustryToDelete(id); // Store the industry ID to delete
+    setShowConfirmDialog(true); // Show the confirmation dialog
+  };
+
+  const confirmDelete = async () => {
     try {
       const headers = getHeaders(); // Assuming getHeaders provides necessary headers
-      await axios.post(
-        `https://api.sensespacesplanningtool.com/job_industry/delete/${id}`,
-        {},
+      const response = await axios.post(
+        'https://api.sensespacesplanningtool.com/job_industry/delete',
+        { id: industryToDelete }, // Sending the ID in the request body
         { headers }
       );
+
+      console.log('Delete response:', response);
       fetchJobIndustries(); // Refresh job industries after deletion
+      setAlertMessage('Job Industry Deleted Successfully!'); // Set success message
+      setIsAlertVisible(true); // Show success alert
     } catch (error) {
-      console.error('Error deleting job industry:', error);
+      console.error('Error deleting job industry:', error.response || error.message || error);
       setError('Failed to delete job industry.');
+    } finally {
+      setShowConfirmDialog(false); // Hide the confirmation dialog
+      setIndustryToDelete(null); // Clear the stored industry ID
     }
   };
 
@@ -113,6 +130,7 @@ const SA_ManageSignUpPage = () => {
       fetchJobIndustries(); // Refresh job industries after adding
       setShowAddInput(false); // Hide the input field after successful addition
       setNewIndustryName(''); // Clear the new industry name input field
+      setAlertMessage('New Job Industry Added Successfully!'); // Set success message
       setIsAlertVisible(true); // Show success alert
 
     } catch (error) {
@@ -159,7 +177,7 @@ const SA_ManageSignUpPage = () => {
           {isAlertVisible && (
             <AlertPopup
               title="Success"
-              text="Operation Successfully!"
+              text={alertMessage} // Display the dynamic alert message
               onClose={handleAlertClose}
               onOk={handleAlertOk}
             />
@@ -247,11 +265,23 @@ const SA_ManageSignUpPage = () => {
               )}
             </tbody>
           </table>
-          {error && <p className="text-red-500 mt-4">{error}</p>}
+          {error && (
+            <div className="text-red-500 text-center mt-4">
+              {error}
+            </div>
+          )}
         </div>
       </div>
+      {showConfirmDialog && (
+        <ConfirmDialogPopup
+          title="Confirm Delete"
+          text="Are you sure you want to delete this Job Industry?"
+          onConfirm={confirmDelete}
+          onClose={() => setShowConfirmDialog(false)}
+        />
+      )}
     </div>
   );
 };
 
-export default SA_ManageSignUpPage
+export default SA_ManageSignUpPage;

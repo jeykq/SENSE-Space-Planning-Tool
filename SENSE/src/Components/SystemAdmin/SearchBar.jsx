@@ -16,7 +16,7 @@ const SearchBar = ({ handleSearch }) => {
           placeholder="Search for users..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ borderRadius: "20px", padding: "5px 10px", marginRight: "5px" }}
+          style={{ borderRadius: "20px", padding: "5px 10px", marginRight: "5px" ,borderWidth: "1px"}}
         />
         <button type="submit" style={{ border: "none", borderRadius: "40px", background: "white", cursor: "pointer", padding: "5px 10px" }}>
           <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
