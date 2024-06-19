@@ -62,11 +62,11 @@ const BU_ImportObjects = ({ submit }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+    
         if (objFile && mtlFile && isObjectNameFilled) {
             try {
                 const headers = getHeaders(); // Ensure this function correctly retrieves headers with authentication tokens or other necessary data
-
+    
                 // Prepare the data object to be sent
                 const data = {
                     name: objectName,
@@ -75,17 +75,17 @@ const BU_ImportObjects = ({ submit }) => {
                     tag_ids: selectedTags, // Assuming selectedTags is an array of tag IDs
                     filenames: [objFileName, mtlFileName] // Assuming objFileName and mtlFileName are the filenames
                 };
-
+    
                 // Step 1: Import object metadata and get object_id
                 const importResponse = await axios.post(
                     'https://api.sensespacesplanningtool.com/object/import',
                     data,
                     { headers }
                 );
-
+    
                 const objectId = importResponse.data.body.id; // Extract object ID from response
                 console.log('Object ID:', objectId);
-
+    
                 // Step 2: Upload .obj file to S3 with dynamic folder path
                 const objUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${objFileName}`;
                 
@@ -94,36 +94,38 @@ const BU_ImportObjects = ({ submit }) => {
                     objFile,
                     {
                         headers: {
-                            'Content-Type': 'multipart/form-data',
+                            'Content-Type': 'application/octet-stream',
+                            'Content-Disposition': 'attachment',
                             ...headers // Include all headers required for this request
                         },
                     }
                 );
-
+    
                 console.log("Uploaded .obj file successfully");
-
+    
                 // Step 3: Upload .mtl file to S3 with dynamic folder path
                 const mtlUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${mtlFileName}`;
-
+    
                 await axios.put(
                     mtlUpdateUrl,
                     mtlFile,
                     {
                         headers: {
-                            'Content-Type': 'multipart/form-data',
+                            'Content-Type': 'application/octet-stream',
+                            'Content-Disposition': 'attachment',
                             ...headers // Include all headers required for this request
                         },
                     }
                 );
-
+    
                 console.log("Uploaded .mtl file successfully");
-
+    
                 setObjUrl(objUpdateUrl);
                 setMtlUrl(mtlUpdateUrl);
-
+    
                 console.log("Upload complete", importResponse.data);
                 setShowAlert(true);
-
+    
             } catch (error) {
                 console.error('Error uploading files:', error);
             }
@@ -131,7 +133,7 @@ const BU_ImportObjects = ({ submit }) => {
             alert('Please select both .obj and .mtl files to upload.');
         }
     };
-
+    
     const handleOK = () => {
         setShowAlert(false);
         navigate("/BusinessUserHomepage");
