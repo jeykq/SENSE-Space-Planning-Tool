@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const ThreeDPreview = ({ objUrl, mtlUrl }) => {
     const containerRef = useRef(null);
     const sceneRef = useRef(null);
     const rendererRef = useRef(null);
+    const controlsRef = useRef(null);
 
     useEffect(() => {
         if (objUrl && mtlUrl) {
@@ -27,6 +29,10 @@ const ThreeDPreview = ({ objUrl, mtlUrl }) => {
             renderer.setClearColor(0xdfefff); // Set background color
             containerRef.current.appendChild(renderer.domElement);
             rendererRef.current = renderer;
+
+            // Controls setup
+            const controls = new OrbitControls(camera, renderer.domElement);
+            controlsRef.current = controls;
 
             // Lighting setup
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
@@ -98,6 +104,7 @@ const ThreeDPreview = ({ objUrl, mtlUrl }) => {
             );
 
             const animate = () => {
+                controls.update();
                 renderer.render(scene, camera);
                 requestAnimationFrame(animate);
             };
