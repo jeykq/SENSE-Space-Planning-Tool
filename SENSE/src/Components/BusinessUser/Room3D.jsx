@@ -257,15 +257,28 @@ const Room3D = () => {
         objLoader.setMaterials(materials);
         objLoader.setPath('/3Dmodels/');
         objLoader.load(modelPath, (object) => {
-          // Clamp the object's position within the room bounds
-          object.position.set(
-            Math.max(-roomW / 2, Math.min(roomW / 2, position.x)),
-            0,
-            Math.max(-roomD / 2, Math.min(roomD / 2, position.z))
-          );
-          object.scale.set(1, 1, 1);
-          object.userData.selectable = true;
-          scene.add(object);
+          // Calculate the bounding box of the loaded object
+      const boundingBox = new THREE.Box3().setFromObject(object);
+      const size = boundingBox.getSize(new THREE.Vector3());
+      
+      // Calculate the scaling factor to fit the object within the room
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
+      object.scale.set(scale, scale, scale);
+
+      // Recalculate the bounding box after scaling
+      const scaledBoundingBox = new THREE.Box3().setFromObject(object);
+      const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
+
+      // Adjust the position of the object to fit within the room bounds
+      const adjustedPosition = {
+        x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
+        y: Math.max(0, position.y),
+        z: Math.max(-roomD / 2 + scaledSize.z / 2, Math.min(roomD / 2 - scaledSize.z / 2, position.z))
+      };
+      object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
+      object.userData.selectable = true;
+      scene.add(object);
     
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
