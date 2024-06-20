@@ -526,30 +526,36 @@ const Room3D = () => {
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
         <button 
           onClick={handleSaveAsTemplate} 
-          className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
         >
           Save as Template
         </button>
         <button 
           onClick={handleImportRoom} 
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
         >
           Import Room
         </button>
         <button 
           onClick={handleExportRoom} 
-          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
         >
           Export Room
         </button>
         {showConfirmExport && 
           <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={()=> setShowConfirmExport(false)} />
         }
+        <button 
+          onClick={() => navigate('/BusinessUserHomepage')} 
+          className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
+        >
+          Exit
+        </button>
       </div>
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
         <button 
           onClick={toggleDropdown} 
-          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-100"
         >
           Add Objects
         </button>
@@ -561,7 +567,7 @@ const Room3D = () => {
         {showEditButton && (
           <button 
             onClick={() => setIsEditMode(!isEditMode)} 
-            className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg"
+            className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
           >
             {isEditMode ? 'Exit Edit Mode' : 'Edit Objects'}
           </button>
@@ -570,13 +576,13 @@ const Room3D = () => {
           <div className="flex flex-col space-y-2 mt-1">
             <button 
               onClick={handlePreviousObject} 
-              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-1"
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-1 hover:bg-gray-100 transition duration-100"
             >
               Previous Object
             </button>
             <button 
               onClick={handleNextObject} 
-              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-2"
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-2 hover:bg-gray-100 transition duration-100"
             >
               Next Object
             </button>
@@ -586,25 +592,25 @@ const Room3D = () => {
           <>
           <button 
             onClick={() => setMode('translate')} 
-            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
           >
             Move
           </button>
           <button 
             onClick={() => setMode('rotate')} 
-            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-orange-700 transition duration-100"
           >
             Rotate
           </button>
           <button 
             onClick={() => setMode('scale')} 
-            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
             Scale
           </button>
           <button 
             onClick={handleRemove} 
-            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
           >
             Remove
           </button>
@@ -613,7 +619,7 @@ const Room3D = () => {
         {showDoneButton && (
           <button 
               onClick={handleDone} 
-              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg"
+              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-100"
             >
               Done
           </button>
