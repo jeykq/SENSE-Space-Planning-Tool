@@ -40,7 +40,7 @@ const CreateTemplate = () => {
         <div className="col-span-2 mb-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-2 px-2 w-72" 
+            className="border border-gray-400 py-2 px-2 w-72 text-center" 
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)} 
             required 
@@ -51,7 +51,7 @@ const CreateTemplate = () => {
         </div>
         <div className="col-span-2 mb-2 relative">
           <select
-            className="border border-gray-400 py-2 px-2 w-72"
+            className="border border-gray-400 py-2 px-2 w-72 text-center"
             value={roomType}
             onChange={(e) => setRoomType(e.target.value)}
             required
@@ -73,7 +73,7 @@ const CreateTemplate = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72" 
+            className="border border-gray-400 py-1 w-72 text-center" 
             value={roomLength}
             onChange={(e) => setRoomLength(e.target.value)} 
             required 
@@ -85,7 +85,7 @@ const CreateTemplate = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72" 
+            className="border border-gray-400 py-1 w-72 text-center" 
             value={roomWidth}
             onChange={(e) => setRoomWidth(e.target.value)} 
             required 
@@ -97,7 +97,7 @@ const CreateTemplate = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72" 
+            className="border border-gray-400 py-1 w-72 text-center" 
             value={roomHeight}
             onChange={(e) => setRoomHeight(e.target.value)} 
             required 
