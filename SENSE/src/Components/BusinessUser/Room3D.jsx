@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
@@ -468,21 +469,49 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
+  async function convertToGLB(objectsData) {
+    const exporter = new GLTFExporter();
+  
+    // Create a Three.js scene to hold the objects
+    const scene = new THREE.Scene();
+  
+    // Function to load each OBJ model and add to the scene
+    function loadOBJModel(obj) {
+      return new Promise((resolve, reject) => {
+        const loader = new OBJLoader();
+        loader.load(obj.modelPath, (object) => {
+          object.position.set(obj.position.x, obj.position.y, obj.position.z);
+          scene.add(object);
+          resolve();
+        }, undefined, reject);
+      });
+    }
+  
+    // Load all OBJ models sequentially
+    try {
+      for (const obj of objectsData) {
+        await loadOBJModel(obj);
+      }
+  
+      // Export scene to GLB format
+      return new Promise((resolve, reject) => {
+        exporter.parse(scene, (glb) => {
+          resolve(glb);
+        }, { binary: true }, reject);
+      });
+    } catch (error) {
+      console.error('Error converting to GLB:', error);
+      throw error;
+    }
+  }
+
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-    
-
-    const currentTimestamp = Date.now() / 1000;
 
       try {
-        const objectsData = objects.map(obj => ({
-          model: obj.modelPath,
-          position: {
-            x: obj.position.x,
-            y: obj.position.y,
-            z: obj.position.z
-          },
-        }));
+        const glbData = await convertToGLB(objects);
+
+        const glbFileName = `${templateName}.glb`;
 
         const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
           method: 'POST',
@@ -497,13 +526,21 @@ const Room3D = () => {
                 "height": roomHeight,
                 "length": roomLength
             },
-            "room_layout": {
-                "room_layout": objectsData
-            },
-            "last_modified_timestamp": currentTimestamp,
             "room_type_id": roomType
           }),
         });
+
+        const TemplateURL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/room/${templateName}/${glbFileName}`;
+
+        await axios.put(
+          TemplateURL,
+          glbData,
+          {
+              headers: {
+                  'Content-Type': 'model/gltf-binary',
+              },
+          }
+      );
   
         if (response.ok) {
           setShowAlert(true);
@@ -513,7 +550,7 @@ const Room3D = () => {
           console.error('Template publishing failed:', errorData);
         }
       } catch (error) {
-        console.error('Error during upload:', error);
+        console.error('Error converting to GLB or uploading:', error);
         setShowConfirmSave(false);
       }
 
