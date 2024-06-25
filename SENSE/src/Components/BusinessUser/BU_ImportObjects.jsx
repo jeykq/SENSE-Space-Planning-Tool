@@ -87,7 +87,7 @@ const BU_ImportObjects = ({ submit }) => {
                 console.log('Object ID:', objectId);
     
                 // Step 2: Upload .obj file to S3 with dynamic folder path
-                const objUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${objFileName}`;
+                const objUpdateUrl = importResponse.data.body.object_files[objFileName];
                 
                 await axios.put(
                     objUpdateUrl,
@@ -104,7 +104,7 @@ const BU_ImportObjects = ({ submit }) => {
                 console.log("Uploaded .obj file successfully");
     
                 // Step 3: Upload .mtl file to S3 with dynamic folder path
-                const mtlUpdateUrl = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${objectId}/${mtlFileName}`;
+                const mtlUpdateUrl = importResponse.data.body.object_files[mtlFileName];
     
                 await axios.put(
                     mtlUpdateUrl,

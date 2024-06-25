@@ -509,9 +509,9 @@ const Room3D = () => {
     e.preventDefault();
 
       try {
-        const glbData = await convertToGLB(objects);
+        const glbData = await convertToGLB(objects);  // This is failing with "Error converting to GLB or uploading: "
 
-        const glbFileName = `${templateName}.glb`;
+        // const glbFileName = `${templateName}.glb`;
 
         const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
           method: 'POST',
@@ -530,7 +530,7 @@ const Room3D = () => {
           }),
         });
 
-        const TemplateURL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/room/${templateName}/${glbFileName}`;
+        const TemplateURL = response.data.body.room_layout;
 
         await axios.put(
           TemplateURL,
