@@ -507,56 +507,65 @@ const Room3D = () => {
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-
-      try {
-        const glbData = await convertToGLB(objects);  // This is failing with "Error converting to GLB or uploading: "
-
-        // const glbFileName = `${templateName}.glb`;
-
-        const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'sense-token': token
-          },
-          body: JSON.stringify({
-            "name": templateName,
-            "dimension": {
-                "width": roomWidth,
-                "height": roomHeight,
-                "length": roomLength
-            },
-            "room_type_id": roomType
-          }),
-        });
-
-        const TemplateURL = response.data.body.room_layout;
-
-        await axios.put(
-          TemplateURL,
-          glbData,
-          {
-              headers: {
-                  'Content-Type': 'model/gltf-binary',
-              },
-          }
-      );
   
-        if (response.ok) {
-          setShowAlert(true);
-          console.log('Template successfully published!');
+    try {
+      const glbData = await convertToGLB(objects);
+  
+      const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'sense-token': token
+        },
+        body: JSON.stringify({
+          "name": templateName,
+          "dimension": {
+            "width": roomWidth,
+            "height": roomHeight,
+            "length": roomLength
+          },
+          "room_type_id": roomType
+        }),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
+  
+        if (TemplateURL) {
+          
+          // Perform the PUT request
+          await axios.put(
+            TemplateURL,
+            {
+              headers: {
+                'Content-Type': 'model/gltf-binary',
+                'sense-token': token
+              },
+              glbData
+            }
+          );
+  
+          if (response.status >= 200 && response.status < 300) {
+            setShowAlert(true);
+            console.log('Template successfully published!');
+          } else {
+            console.error('Template uploading failed:', response);
+          }
         } else {
-          const errorData = await response.json();
-          console.error('Template publishing failed:', errorData);
+          console.error('Template URL is not available in the response:', responseData);
         }
-      } catch (error) {
-        console.error('Error converting to GLB or uploading:', error);
-        setShowConfirmSave(false);
+      } else {
+        const errorData = await response.json();
+        console.error('Template publishing failed:', errorData);
       }
-
-      setShowConfirmSave(false);
-  };
-
+    } catch (error) {
+      console.error('Error converting to GLB or uploading:', error);
+    }
+  
+    setShowConfirmSave(false);
+  };  
+  
   return (
     <div className="relative w-full h-full">
       <div ref={mountRef} className="w-full h-screen" />
