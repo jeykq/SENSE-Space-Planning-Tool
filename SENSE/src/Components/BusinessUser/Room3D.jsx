@@ -537,12 +537,12 @@ const Room3D = () => {
           // Perform the PUT request
           await axios.put(
             TemplateURL,
+            glbData,
             {
               headers: {
                 'Content-Type': 'model/gltf-binary',
-                'sense-token': token
+                'Content-Disposition': 'attachment',
               },
-              glbData
             }
           );
   
