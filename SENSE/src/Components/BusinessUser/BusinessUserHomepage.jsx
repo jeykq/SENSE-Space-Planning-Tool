@@ -66,6 +66,9 @@ const BusinessUserHomepage = () => {
 
     fetchRoomTypes();
     fetchTemplateNames();
+  }, []);
+
+  useEffect(() => {
 
     const initializeSwiper = () => {
       if (swiperContainer2.current) {
@@ -98,7 +101,7 @@ const BusinessUserHomepage = () => {
     return () => {
       window.removeEventListener("scroll", handleScroll);
     };
-  }, [showDropdown, navigate, roomTypes]);
+  }, [showDropdown, roomTypes]);
 
   const toggleDropdown = (event) => {
     setShowDropdown(!showDropdown);
