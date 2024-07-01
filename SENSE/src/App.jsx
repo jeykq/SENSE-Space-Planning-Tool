@@ -26,6 +26,8 @@ import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
 import SA_ManageObjCategoriesPage from './Components/SystemAdmin/SA_ManageObjCategories';
 import SA_ManageTagsPage from './Components/SystemAdmin/SA_ManageTags';
 import SA_ManageRoomTypesPage from './Components/SystemAdmin/SA_ManageRoomTypes';
+import GiveReview from './Components/ManageAccount/GiveReview';
+import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute'; 
 
@@ -59,6 +61,8 @@ const App = () => {
           <Route path="/manageObjectCategories" element={<ProtectedRoute><SA_ManageObjCategoriesPage /></ProtectedRoute>} />
           <Route path="/manageTags" element={<ProtectedRoute><SA_ManageTagsPage /></ProtectedRoute>} />
           <Route path="/manageRoomTypes" element={<ProtectedRoute><SA_ManageRoomTypesPage /></ProtectedRoute>} />
+          <Route path="/GiveReview" element={<ProtectedRoute><GiveReview /></ProtectedRoute>} />
+          <Route path="/ApplyBusinessUser" element={<ProtectedRoute><ApplyBusinessUser /></ProtectedRoute>} />
         </Routes>
       </Router>
     </AuthProvider>
