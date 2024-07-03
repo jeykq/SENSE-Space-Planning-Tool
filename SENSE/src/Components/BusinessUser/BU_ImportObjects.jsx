@@ -23,6 +23,9 @@ const BU_ImportObjects = ({ submit }) => {
     const [objUrl, setObjUrl] = useState('');
     const [mtlUrl, setMtlUrl] = useState('');
     const [fileContent, setFileContent] = useState(null);
+    const [screenshotDataUrl, setScreenshotDataUrl] = useState('');
+    let previewUploadUrl;
+    let headers;
 
     const navigate = useNavigate();
     const handleGoBack = () => {
@@ -35,7 +38,7 @@ const BU_ImportObjects = ({ submit }) => {
 
     const fetchCategoriesAndTags = async () => {
         try {
-            const headers = getHeaders();
+            headers = getHeaders();
             const categoriesResponse = await axios.post('https://api.sensespacesplanningtool.com/category/list', {}, { headers });
             const tagsResponse = await axios.post('https://api.sensespacesplanningtool.com/tag/list', {}, { headers });
 
@@ -63,7 +66,7 @@ const BU_ImportObjects = ({ submit }) => {
     const handleSubmit = async (event) => {
         event.preventDefault();
     
-        if (objFile && mtlFile && isObjectNameFilled) {
+        if (objFile && mtlFile && isObjectNameFilled ) {
             try {
                 const headers = getHeaders(); // Ensure this function correctly retrieves headers with authentication tokens or other necessary data
     
@@ -105,6 +108,7 @@ const BU_ImportObjects = ({ submit }) => {
     
                 // Step 3: Upload .mtl file to S3 with dynamic folder path
                 const mtlUpdateUrl = importResponse.data.body.object_files[mtlFileName];
+                previewUploadUrl = importResponse.data.body.object_media.preview;
     
                 await axios.put(
                     mtlUpdateUrl,
@@ -122,6 +126,23 @@ const BU_ImportObjects = ({ submit }) => {
     
                 setObjUrl(objUpdateUrl);
                 setMtlUrl(mtlUpdateUrl);
+
+                // Step 4: Upload screenshot to S3
+                const previewUpdateUrl = importResponse.data.body.object_media.preview; 
+                await axios.put(
+                    previewUpdateUrl,
+                    screenshotDataUrl,
+                    {
+                        headers: {
+                            'Content-Type': 'image/png',
+                            // 'Content-Disposition': 'attachment',
+                            ...headers
+                        },
+                        // responseType: 'blob' // Ensure response is treated as a binary object
+                    }
+                );
+
+                console.log("Uploaded screenshot successfully");
     
                 console.log("Upload complete", importResponse.data);
                 setShowAlert(true);
@@ -201,6 +222,34 @@ const BU_ImportObjects = ({ submit }) => {
     };
 
     const isObjectNameFilled = objectName.trim() !== '';
+
+    
+
+    const captureScreenshotAndUpload = async (dataUrl, previewUploadUrl) => {
+        try {
+            // const dataUrl = await captureScreenshot();
+            if (dataUrl) {
+                const response = await axios.put(
+                    previewUploadUrl,
+                    dataUrl,
+                    {
+                        headers: {
+                            'Content-Type': 'image/png',
+                            ...headers
+                        }
+                    }
+                );
+    
+                console.log("Uploaded screenshot successfully", response);
+                setScreenshotDataUrl(dataUrl);
+    
+            } else {
+                console.error('Failed to capture screenshot.');
+            }
+        } catch (error) {
+            console.error('Error capturing or uploading screenshot:', error);
+        }
+    };
 
     return (
         <div>
@@ -314,7 +363,7 @@ const BU_ImportObjects = ({ submit }) => {
                     <div className="col-span-2 mx-8 -translate-y-2 rounded-md border border-gray-400" style={{ height: '300px', width: '400px' }}>
                         {/* Render 3D Preview here */}
                         {objUrl && mtlUrl ? (
-                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} />
+                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} onCapture={captureScreenshotAndUpload} previewUploadUrl={previewUploadUrl} />
                         ) : (
                             <p>Select .obj and .mtl files to see the preview.</p>
                         )}
