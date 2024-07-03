@@ -115,7 +115,6 @@ const BusinessUserHomepage = () => {
   };
 
   const handleConfirmDelete = () => {
-    // Implement deletion logic here
     setShowDeleteConfirmation(false);
   };
 
@@ -130,6 +129,32 @@ const BusinessUserHomepage = () => {
       navigate('/BU_ImportObjects');
     }
   };
+
+  const viewTemplate = (template) => {
+    const { 
+      name: templateName, 
+      room_type_id: roomType, 
+      dimension: { 
+        length: roomLength, 
+        width: roomWidth, 
+        height: roomHeight 
+      }, 
+      room_layout: { 
+        room_layout: roomLayoutUrl 
+      } } = template;
+  
+    navigate('/Room3D', {
+      state: {
+        templateName,
+        roomType,
+        roomLength: parseFloat(roomLength),
+        roomWidth: parseFloat(roomWidth),
+        roomHeight: parseFloat(roomHeight),
+        roomLayoutUrl
+      }
+    });
+  };
+  
 
   return (
     <div>
@@ -150,7 +175,7 @@ const BusinessUserHomepage = () => {
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
               {templateNames.map((template, index) => (
-                <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
+                <div key={index} className="swiper-slide" style={{ position: 'relative' }} onClick={() => viewTemplate(template)}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
                   <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>

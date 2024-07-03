@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
 import AddObjDropdown from './AddObjDropdown';
@@ -15,10 +16,9 @@ const Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { templateName, roomType, roomLength, roomWidth, roomHeight } = location.state || {};
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
 
-  // Debug: log the received state
-  console.log("Received state from CreateTemplate:", location.state);
+  console.log("Received State:", location.state)
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTransformControls, setShowTransformControls] = useState(false);
@@ -121,17 +121,17 @@ const Room3D = () => {
     }
 
     // Scene
-    const scene = new THREE.Scene();
+    let scene = new THREE.Scene();
     scene.background = new THREE.Color(0xdfefff);
     sceneRef.current = scene;
-
+    
     // Camera
-    const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
+    let camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
     camera.position.set(5, 5, 15); 
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    let renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setClearColor(0xdfefff);
     mount.appendChild(renderer.domElement);
@@ -240,6 +240,22 @@ const Room3D = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controlsRef.current = controls;
 
+    // View Template from roomLayoutUrl
+    if (roomLayoutUrl != null) {
+      fetch(roomLayoutUrl)
+      .then(response => response.arrayBuffer())
+      .then(data => {
+        const loader = new GLTFLoader();
+        loader.parse(data, '', (glb) => {
+          scene.add(glb.scene);
+          console.log("Model loaded:", glb.scene);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading GLB:', error);
+      });
+    }
+
     // Load 3D Model
     const loadModel = (modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
       const mtlLoader = new MTLLoader();
@@ -258,7 +274,8 @@ const Room3D = () => {
         objLoader.setMaterials(materials);
         objLoader.setPath('/3Dmodels/');
         objLoader.load(modelPath, (object) => {
-          // Calculate the bounding box of the loaded object
+      
+      // Calculate the bounding box of the loaded object
       const boundingBox = new THREE.Box3().setFromObject(object);
       const size = boundingBox.getSize(new THREE.Vector3());
       
@@ -321,7 +338,7 @@ const Room3D = () => {
       }
     };
 
-    mount.addEventListener('click', onMouseClick);
+    mount.addEventListener('click', onMouseClick);    
 
     // Render Loop
     const animate = () => {
@@ -378,7 +395,7 @@ const Room3D = () => {
       mount.removeEventListener('drop', handleDrop);
       mount.removeEventListener('click', onMouseClick);
     };
-  }, [roomLength, roomWidth, roomHeight]);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -391,8 +408,8 @@ const Room3D = () => {
   };
 
   const handleImportRoom = () => {
-    navigate("/ImportRoom");
     // Logic to import a room
+    navigate("/ImportRoom");
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
@@ -469,47 +486,26 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
-  async function convertToGLB(objectsData) {
+  async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
   
-    // Create a Three.js scene to hold the objects
-    const scene = new THREE.Scene();
-  
-    // Function to load each OBJ model and add to the scene
-    function loadOBJModel(obj) {
-      return new Promise((resolve, reject) => {
-        const loader = new OBJLoader();
-        loader.load(obj.modelPath, (object) => {
-          object.position.set(obj.position.x, obj.position.y, obj.position.z);
-          scene.add(object);
-          resolve();
-        }, undefined, reject);
-      });
-    }
-  
-    // Load all OBJ models sequentially
-    try {
-      for (const obj of objectsData) {
-        await loadOBJModel(obj);
-      }
-  
-      // Export scene to GLB format
-      return new Promise((resolve, reject) => {
-        exporter.parse(scene, (glb) => {
-          resolve(glb);
-        }, { binary: true }, reject);
-      });
-    } catch (error) {
-      console.error('Error converting to GLB:', error);
-      throw error;
-    }
+    // Export scene to GLB format
+    return new Promise((resolve, reject) => {
+      exporter.parse(scene, (glb) => {
+        resolve(glb);
+      }, { binary: true }, reject);
+    });
   }
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
   
     try {
-      const glbData = await convertToGLB(objects);
+      if (!sceneRef.current) {
+        throw new Error("Scene not available");
+      }
+  
+      const glbData = await convertToGLB(sceneRef.current);
   
       const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
         method: 'POST',
@@ -533,8 +529,6 @@ const Room3D = () => {
         const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
   
         if (TemplateURL) {
-          
-          // Perform the PUT request
           await axios.put(
             TemplateURL,
             glbData,
@@ -564,7 +558,7 @@ const Room3D = () => {
     }
   
     setShowConfirmSave(false);
-  };  
+  };    
   
   return (
     <div className="relative w-full h-full">

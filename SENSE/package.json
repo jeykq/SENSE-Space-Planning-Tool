@@ -29,6 +29,7 @@
     "slick-carousel": "^1.8.1",
     "swiper": "^11.1.4",
     "three": "^0.164.1",
+    "three-gltf-loader": "^1.111.0",
     "three-orbitcontrols": "^2.110.3"
   },
   "devDependencies": {
