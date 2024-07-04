@@ -10,6 +10,7 @@ import { TransformControls } from 'three/examples/jsm/controls/TransformControls
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
+import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
 
 const Room3D = () => {
@@ -40,6 +41,7 @@ const Room3D = () => {
   const [catError, setCatError] = useState(null);
   const [catLoading, setCatLoading] = useState(false);
   const [objListLoading, setObjListLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
 
   const token = localStorage.getItem('authToken');
 
@@ -407,6 +409,7 @@ const Room3D = () => {
     setShowConfirmSave(true);
   };
 
+
   const handleImportRoom = () => {
     // Logic to import a room
     navigate("/ImportRoom");
@@ -558,18 +561,47 @@ const Room3D = () => {
     }
   
     setShowConfirmSave(false);
-  };    
+  };
+
+  const handleUpdateTemplate = async (e) => {
+    e.preventDefault();
+  }
+
+  const handleClose = () => {
+    setShowAlert(false);
+  };
+
+  const handleOk = () => {
+    setShowAlert(false);
+  };
   
   return (
     <div className="relative w-full h-full">
       <div ref={mountRef} className="w-full h-screen" />
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
-        <button 
-          onClick={handleSaveAsTemplate} 
-          className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
-        >
-          Save as Template
-        </button>
+        {roomLayoutUrl ? (
+            <button 
+              onClick={handleUpdateTemplate} 
+              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            >
+              Update Template
+            </button>
+          ) : (
+            <button 
+              onClick={handleSaveAsTemplate} 
+              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            >
+              Save as Template
+            </button>
+        )}
+        {showAlert && (
+            <AlertPopup
+              title={templateName}
+              text="Template published successfully!"
+              onClose={handleClose}
+              onOk={handleOk}
+            />
+        )}
         <button 
           onClick={handleImportRoom} 
           className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"

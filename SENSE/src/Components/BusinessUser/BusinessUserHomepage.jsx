@@ -4,6 +4,7 @@ import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 import axios from 'axios'; 
+import AlertPopup from '../UI/AlertPopup';
 import { getHeaders } from '../../../apiUtils';
 import "./BusinessUserHomepage.css";
 
@@ -14,13 +15,14 @@ const BusinessUserHomepage = () => {
   const swiperContainer2 = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
-  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
   const [deleteTemplateURL, setDeleteTemplateURL] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
   const [templateNames, setTemplateNames] = useState([]);
   const [error, setError] = useState(null);
   const [confirmDeletePopup, setConfirmDeletePopup] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [refreshTemplates, setRefreshTemplates] = useState(false); // State for triggering template refresh
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -67,7 +69,7 @@ const BusinessUserHomepage = () => {
 
     fetchRoomTypes();
     fetchTemplateNames();
-  }, []);
+  }, [refreshTemplates]);
 
   useEffect(() => {
     const initializeSwiper = () => {
@@ -113,8 +115,9 @@ const BusinessUserHomepage = () => {
   };
 
   // Delete Template functions
-  const handleDelete = (templateId) => {
+  const handleDelete = (templateId, deleteURL) => {
     setDeleteTemplateId(templateId);
+    setDeleteTemplateURL(deleteURL);
     setShowDeleteConfirmation(true);
     setShowDropdown(false);
   };
@@ -132,6 +135,8 @@ const BusinessUserHomepage = () => {
         { headers }
       );
 
+      setConfirmDeletePopup(true);
+      setRefreshTemplates(prev => !prev);
       console.log("Room Layout URL: ", deleteTemplateURL);
       console.log("Template ID: ", deleteTemplateId);
     } catch (error) {
@@ -180,7 +185,7 @@ const BusinessUserHomepage = () => {
   const renderDropdown = () => (
     <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
       <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left">Update</button>
-      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteTemplateId)}>Delete</button>
+      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteTemplateId, deleteTemplateURL)}>Delete</button>
     </div>
   );
 
