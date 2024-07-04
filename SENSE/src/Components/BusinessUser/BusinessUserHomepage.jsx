@@ -211,12 +211,6 @@ const BusinessUserHomepage = () => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
-  const listRoomTypesWithNumbers = () => {
-    return roomTypes.map(room => {
-      return `${room.id}. ${capitalizeFirstLetter(room.name)}`;
-    });
-  };
-
   const getRoomTypeName = (roomTypeId) => {
     const roomType = roomTypes.find(room => room.id === roomTypeId);
     console.log(listRoomTypesWithNumbers());
