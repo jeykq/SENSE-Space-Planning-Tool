@@ -42,6 +42,7 @@ const Room3D = () => {
   const [catLoading, setCatLoading] = useState(false);
   const [objListLoading, setObjListLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState('');
 
   const token = localStorage.getItem('authToken');
 
@@ -489,6 +490,7 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
+  // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
   
@@ -544,6 +546,7 @@ const Room3D = () => {
           );
   
           if (response.status >= 200 && response.status < 300) {
+            setAlertType('save');
             setShowAlert(true);
             console.log('Template successfully published!');
           } else {
@@ -563,8 +566,35 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
+  // Update Template Function
   const handleUpdateTemplate = async (e) => {
     e.preventDefault();
+
+    try {
+      if (!sceneRef.current) {
+        throw new Error("Scene not available");
+      }
+  
+      const glbData = await convertToGLB(sceneRef.current);
+
+      await axios.put(
+        roomLayoutUrl,
+        glbData,
+        {
+          headers: {
+            'Content-Type': 'model/gltf-binary',
+            'Content-Disposition': 'attachment',
+          },
+        }
+      );
+
+      setAlertType('update');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error converting to GLB or updating:', error);
+    }
+  
+    setShowConfirmSave(false);
   }
 
   const handleClose = () => {
@@ -597,7 +627,7 @@ const Room3D = () => {
         {showAlert && (
             <AlertPopup
               title={templateName}
-              text="Template published successfully!"
+              text={alertType === 'update' ? 'Template updated successfully!' : 'Template published successfully!'}
               onClose={handleClose}
               onOk={handleOk}
             />
