@@ -38,4 +38,8 @@
   .swiper-slide:hover .overlay {
     display: flex; /* Show overlay on hover */
   }
-  
+
+.custom-hover:hover {
+  background-color: #f7fafc; /* Adjust the hover background color if needed */
+  border-radius: 10px;
+}

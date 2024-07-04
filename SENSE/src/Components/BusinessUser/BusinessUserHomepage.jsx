@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
-import { FaPencilAlt } from "react-icons/fa";
 import axios from 'axios'; 
 import { getHeaders } from '../../../apiUtils';
 import "./BusinessUserHomepage.css";
@@ -16,10 +15,12 @@ const BusinessUserHomepage = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [deleteIndex, setDeleteIndex] = useState(null);
+  const [deleteTemplateId, setDeleteTemplateId] = useState(null);
+  const [deleteTemplateURL, setDeleteTemplateURL] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
   const [templateNames, setTemplateNames] = useState([]);
   const [error, setError] = useState(null);
+  const [confirmDeletePopup, setConfirmDeletePopup] = useState(false);
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -69,7 +70,6 @@ const BusinessUserHomepage = () => {
   }, []);
 
   useEffect(() => {
-
     const initializeSwiper = () => {
       if (swiperContainer2.current) {
         new Swiper(swiperContainer2.current, {
@@ -103,19 +103,41 @@ const BusinessUserHomepage = () => {
     };
   }, [showDropdown, roomTypes]);
 
-  const toggleDropdown = (event) => {
+  const toggleDropdown = (event, templateId, url) => {
+    event.stopPropagation();
     setShowDropdown(!showDropdown);
+    setDeleteTemplateId(templateId);
+    setDeleteTemplateURL(url);
     const rect = event.target.getBoundingClientRect();
     setDropdownPosition({ x: rect.left + window.scrollX, y: rect.bottom + window.scrollY });
   };
 
-  const handleDelete = (index) => {
-    setDeleteIndex(index);
+  // Delete Template functions
+  const handleDelete = (templateId) => {
+    setDeleteTemplateId(templateId);
     setShowDeleteConfirmation(true);
+    setShowDropdown(false);
   };
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     setShowDeleteConfirmation(false);
+
+    try {
+      const headers = getHeaders();
+
+      await axios.delete(deleteTemplateURL);
+
+      await axios.post('https://api.sensespacesplanningtool.com/template/delete',
+        { id: deleteTemplateId },
+        { headers }
+      );
+
+      console.log("Room Layout URL: ", deleteTemplateURL);
+      console.log("Template ID: ", deleteTemplateId);
+    } catch (error) {
+      setError('Failed to delete template ID', deleteTemplateId);
+      console.error("Error:", error);
+    }
   };
 
   const handleCancelDelete = () => {
@@ -154,7 +176,52 @@ const BusinessUserHomepage = () => {
       }
     });
   };
-  
+
+  const renderDropdown = () => (
+    <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
+      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left">Update</button>
+      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteTemplateId)}>Delete</button>
+    </div>
+  );
+
+  const renderDeleteConfirmation = () => (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
+      <div className="bg-white rounded-lg p-8">
+        <p className="mb-4">Are you sure you want to delete this template?</p>
+        <div className="flex justify-center">
+          <button className="bg-red-500 text-white px-4 py-2 rounded mr-2" onClick={handleConfirmDelete}>Delete</button>
+          <button className="bg-gray-300 px-4 py-2 rounded" onClick={handleCancelDelete}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderConfirmDeletePopup = () => (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-100 bg-gray-900">
+      <div className="bg-white rounded-lg p-8">
+        <p className="mb-4">{`Template deleted successfully!`}</p>
+        <div className="flex justify-center">
+          <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => setConfirmDeletePopup(false)}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const capitalizeFirstLetter = (string) => {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+  };
+
+  const listRoomTypesWithNumbers = () => {
+    return roomTypes.map(room => {
+      return `${room.id}. ${capitalizeFirstLetter(room.name)}`;
+    });
+  };
+
+  const getRoomTypeName = (roomTypeId) => {
+    const roomType = roomTypes.find(room => room.id === roomTypeId);
+    console.log(listRoomTypesWithNumbers());
+    return roomType ? capitalizeFirstLetter(roomType.name) : 'Unknown Category';
+  };
 
   return (
     <div>
@@ -174,17 +241,16 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {templateNames.map((template, index) => (
-                <div key={index} className="swiper-slide" style={{ position: 'relative' }} onClick={() => viewTemplate(template)}>
-                  <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
-                  <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
+              {templateNames.map((template) => (
+                <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
+                  <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p>Template Name</p>
+                      <p>{template.name}</p>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <p>{template.name}</p>
+                      <p>{getRoomTypeName(template.room_type_id)}</p>
                     </div>
                   </div>
                 </div>
@@ -195,15 +261,13 @@ const BusinessUserHomepage = () => {
       </div>
 
       {/* Dropdown list for Room Templates */}
-      {showDropdown && (
-        <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
-          <ul>
-            <li>View</li>
-            <li>Update</li>
-            <li onClick={() => handleDelete(deleteIndex)}>Delete</li>
-          </ul>
-        </div>
-      )}
+      {showDropdown && renderDropdown()}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirmation && renderDeleteConfirmation()}
+
+      {/* Delete Confirmation Success Popup */}
+      {confirmDeletePopup && renderConfirmDeletePopup()}
 
       <hr style={{ border: "1px solid black" }} />
 
@@ -223,8 +287,6 @@ const BusinessUserHomepage = () => {
                     <div className="option" onClick={() => handleCategoryClick('view')}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
-                  <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={toggleDropdown}>...</div>
-                  <FaPencilAlt style={{ position: 'absolute', top: '10px', left: '10px', cursor: 'pointer' }} />
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
@@ -238,20 +300,7 @@ const BusinessUserHomepage = () => {
         </div>
       </div>
 
-      {/* Dropdown list for Room Objects */}
-      {showDropdown && (
-        <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
-          <ul>
-            <li>View</li>
-            <li>Update</li>
-            <li>Delete</li>
-          </ul>
-        </div>
-      )}
-
-      <div>
-        <Footer/>
-      </div>
+      <Footer />
     </div>
   );
 };
