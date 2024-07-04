@@ -213,7 +213,6 @@ const BusinessUserHomepage = () => {
 
   const getRoomTypeName = (roomTypeId) => {
     const roomType = roomTypes.find(room => room.id === roomTypeId);
-    console.log(listRoomTypesWithNumbers());
     return roomType ? capitalizeFirstLetter(roomType.name) : 'Unknown Category';
   };
 
