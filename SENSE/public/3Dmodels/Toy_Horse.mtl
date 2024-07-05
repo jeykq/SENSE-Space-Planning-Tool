@@ -1,0 +1,86 @@
+# Blender MTL File: 'Toy Horse.blend'
+# Material Count: 7
+
+newmtl Material.001
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\GWC Plastic_BaseColor_beyaz.jpg
+
+newmtl Material.002
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\GWC Plastic_BaseColor_kırmızı.jpg
+map_Ns textures\\GWC Plastic_Roughness.jpg
+
+newmtl Material.003
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\GWC Plastic_BaseColor_mavi.jpg
+map_Ns textures\\GWC Plastic_Roughness.jpg
+
+newmtl Material.004
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\GWC Plastic_BaseColor_sarı.jpg
+map_Ns textures\\GWC Plastic_Roughness.jpg
+
+newmtl Material.005
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\GWC Plastic_BaseColor_yeşil.jpg
+map_Ns textures\\GWC Plastic_Roughness.jpg
+
+newmtl Material.006
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\Gözler_Color.jpg
+map_Ns textures\\GWC Plastic_Roughness.jpg
+
+newmtl Material.008
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\2K-Silver_Base Color.jpg
+map_Ns textures\\2K-Silver_Roughness.jpg
+refl textures\\2K-Silver_Metallic.jpg

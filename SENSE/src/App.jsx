@@ -15,6 +15,7 @@ import Room3D from './Components/BusinessUser/Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
+import BU_UpdateObjectInfo from './Components/BusinessUser/BU_UpdateObjectInfo';
 import ViewAccount from './Components/ManageAccount/ViewAccount';
 import UpdateAccount from './Components/ManageAccount/UpdateAccount';
 import ChangePassword from './Components/ManageAccount/ChangePassword';
@@ -51,6 +52,7 @@ const App = () => {
           <Route path="/BU_ViewObjects" element={<ProtectedRoute><BU_ViewObjects /></ProtectedRoute>} />
           <Route path="/BU_ViewObjectsInfo" element={<ProtectedRoute><BU_ViewObjectsInfo /></ProtectedRoute>} />
           <Route path="/BU_ImportObjects" element={<ProtectedRoute><BU_ImportObjects /></ProtectedRoute>} />
+          <Route path="/BU_UpdateObjectInfo" element={<ProtectedRoute><BU_UpdateObjectInfo /></ProtectedRoute>} />
           <Route path="/viewaccount" element={<ProtectedRoute><ViewAccount /></ProtectedRoute>} />
           <Route path="/updateaccount" element={<ProtectedRoute><UpdateAccount /></ProtectedRoute>} />
           <Route path="/ChangePassword" element={<ProtectedRoute><ChangePassword /></ProtectedRoute>} />
