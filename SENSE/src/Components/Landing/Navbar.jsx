@@ -16,7 +16,9 @@ const Navbar = () => {
 
   return (
     <nav className={`navbar text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between max-h-20 z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
-      <img src={logo} alt="" className='logo w-20 mx-2' />
+      <Link onClick={() => setSidebarOpen(false)} to='sense' smooth={true} offset={-150} duration={500}>
+        <img src={logo} alt="" className='logo w-20 mx-2' />
+      </Link>
       <button onClick={() => setSidebarOpen(!sidebarOpen)} className="fixed lg:hidden right-0 top-0 m-4 h-6 w-6 z-50">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
