@@ -24,7 +24,7 @@ const AlertPopup = ({ title, text, onClose, onOk }: AlertPopupProps) => {
                     <div className="mx-auto">
                         <button 
                             onClick={() => onOk()} 
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2">
+                            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded">
                             OK
                         </button>
                     </div>

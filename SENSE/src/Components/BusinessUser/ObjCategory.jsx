@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
+import ObjPreview from './ObjPreview';
 
 const ObjCategory = ({ name, catId, objectListData }) => {
+    const handleDragStart = (event, modelPath, materialPath) => {
+        event.dataTransfer.setData('modelPath', modelPath);
+        event.dataTransfer.setData('materialPath', materialPath);
+    };
     const [expand, setIsExpand] = useState(false);
     const [showInfo, setShowInfo] = useState(0);
 

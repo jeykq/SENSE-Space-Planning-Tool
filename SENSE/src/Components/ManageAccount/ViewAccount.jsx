@@ -32,11 +32,11 @@ const ViewAccount = () => {
   };
 
   const handleApplyForBusinessUser = () => {
-    navigate('/applybusinessuser');
+    navigate('/ApplyBusinessUser');
   };
 
   const handleGiveRatingAndReview = () => {
-    navigate('/giveratingreview');
+    navigate('/GiveReview');
   };
 
   const handleChangePassword = () => {

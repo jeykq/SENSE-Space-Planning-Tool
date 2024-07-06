@@ -1,17 +1,26 @@
 import React, { useRef, useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import { useNavigate } from 'react-router-dom';
 import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
+import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
 
 const Room3D = () => {
   const mountRef = useRef(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
+
+  console.log("Received State:", location.state)
+
   const [showDropdown, setShowDropdown] = useState(false);
   const [showTransformControls, setShowTransformControls] = useState(false);
   const [showDoneButton, setShowDoneButton] = useState(false);
@@ -21,7 +30,6 @@ const Room3D = () => {
   const [selectedObjectIndex, setSelectedObjectIndex] = useState(0);
   const [showEditButton, setShowEditButton] = useState(false);
   const [showConfirmSave, setShowConfirmSave] = useState(false);
-  const navigate = useNavigate();
   const transformControlsRef = useRef(null);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
@@ -33,6 +41,10 @@ const Room3D = () => {
   const [catError, setCatError] = useState(null);
   const [catLoading, setCatLoading] = useState(false);
   const [objListLoading, setObjListLoading] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertType, setAlertType] = useState('');
+
+  const token = localStorage.getItem('authToken');
 
   // get list of all categories
   useEffect(() => {
@@ -65,7 +77,7 @@ const Room3D = () => {
           .finally(() => {
               setCatLoading(false);
           });
-  }, []);
+  }, [navigate]);
 
   // get list of all objects
   useEffect(() => {
@@ -101,94 +113,116 @@ const Room3D = () => {
     };
 
     fetchObjData();
-}, []);
+  }, [navigate]);
 
   useEffect(() => {
     const mount = mountRef.current;
 
-    // Scene
-    const scene = new THREE.Scene();
-    sceneRef.current = scene;
+    if (!mount) {
+      console.error("Mount ref not found");
+      return;
+    }
 
+    // Scene
+    let scene = new THREE.Scene();
+    scene.background = new THREE.Color(0xdfefff);
+    sceneRef.current = scene;
+    
     // Camera
-    const camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
+    let camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
     camera.position.set(5, 5, 15); 
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     // Renderer
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    let renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
-    renderer.setClearColor(0xccccff);
+    renderer.setClearColor(0xdfefff);
     mount.appendChild(renderer.domElement);
 
     // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    // Ambient Light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
-    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.6);
+    // Hemisphere Light
+    const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.7);
     hemisphereLight.position.set(0, 1, 0);
     scene.add(hemisphereLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffeedd, 0.6);
-    directionalLight.position.set(0, 1, 0).normalize();
+    // Directional Light
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(0, 10, 10);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
+    directionalLight.shadow.camera.near = 0.5;
+    directionalLight.shadow.camera.far = 500;
     scene.add(directionalLight);
 
+    // Point Light
     const pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
+    // Spot Light
+    const spotLight = new THREE.SpotLight(0xffffff, 1);
+    spotLight.position.set(15, 20, 10);
+    spotLight.angle = Math.PI / 6;
+    spotLight.penumbra = 0.1;
+    spotLight.decay = 2;
+    spotLight.distance = 200;
+    spotLight.castShadow = true;
+    scene.add(spotLight);
+
+    // Debug: log the room dimensions
+    console.log("Room dimensions:", roomLength, roomWidth, roomHeight);
+
     // Room Dimensions
-    const roomWidth = 12;
-    const roomHeight = 5;
-    const roomDepth = 12;
+    const roomW = roomWidth || 12; // Default to 12 if roomWidth is not provided
+    const roomH = roomHeight || 5; // Default to 5 if roomHeight is not provided
+    const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
-    const floorMaterial = new THREE.MeshBasicMaterial({ color: 0xCCCCCC });
-    const wallMaterial = new THREE.MeshBasicMaterial({ color: 0xAAAAAA });
+    const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
+    const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+    const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
+    const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
 
     // Floor
-    const floorGeometry = new THREE.PlaneGeometry(roomWidth, roomDepth);
+    const floorGeometry = new THREE.PlaneGeometry(roomW, roomD);
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
 
     // Walls
-    const wallGeometry = new THREE.PlaneGeometry(roomWidth, roomHeight);
+    const wallGeometry = new THREE.PlaneGeometry(roomW, roomH);
 
     const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    backWall.position.z = -roomDepth / 2;
-    backWall.position.y = roomHeight / 2;
+    backWall.position.z = -roomD / 2;
+    backWall.position.y = roomH / 2;
     scene.add(backWall);
 
     const frontWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    frontWall.position.z = roomDepth / 2;
-    frontWall.position.y = roomHeight / 2;
+    frontWall.position.z = roomD / 2;
+    frontWall.position.y = roomH / 2;
     frontWall.rotation.y = Math.PI;
     scene.add(frontWall);
 
-    const sideWallGeometry = new THREE.PlaneGeometry(roomDepth, roomHeight);
+    const sideWallGeometry = new THREE.PlaneGeometry(roomD, roomH);
 
     const leftWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
-    leftWall.position.x = -roomWidth / 2;
-    leftWall.position.y = roomHeight / 2;
+    leftWall.position.x = -roomW / 2;
+    leftWall.position.y = roomH / 2;
     leftWall.rotation.y = Math.PI / 2;
     scene.add(leftWall);
 
     const rightWall = new THREE.Mesh(sideWallGeometry, wallMaterial);
-    rightWall.position.x = roomWidth / 2;
-    rightWall.position.y = roomHeight / 2;
+    rightWall.position.x = roomW / 2;
+    rightWall.position.y = roomH / 2;
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
-    // Axes Helper
-    const axesHelper = new THREE.AxesHelper(5);
-    scene.add(axesHelper);
-
-    // Grid Helper
-    const gridHelper = new THREE.GridHelper(roomWidth, 10);
-    scene.add(gridHelper);
-
-    // TransformControls, it allows to move around and scale the objects interactively
+    // TransformControls
     const transformControls = new TransformControls(camera, renderer.domElement);
     transformControlsRef.current = transformControls;
     scene.add(transformControls);
@@ -209,29 +243,67 @@ const Room3D = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controlsRef.current = controls;
 
+    // View Template from roomLayoutUrl
+    if (roomLayoutUrl != null) {
+      fetch(roomLayoutUrl)
+      .then(response => response.arrayBuffer())
+      .then(data => {
+        const loader = new GLTFLoader();
+        loader.parse(data, '', (glb) => {
+          scene.add(glb.scene);
+          console.log("Model loaded:", glb.scene);
+        });
+      })
+      .catch(error => {
+        console.error('Error loading GLB:', error);
+      });
+    }
+
     // Load 3D Model
     const loadModel = (modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
       const mtlLoader = new MTLLoader();
       mtlLoader.setPath('/3Dmodels/');
       mtlLoader.load(materialPath, (materials) => {
         materials.preload();
+
+        // Ensure that materials are not transparent and have full opacity
+        for (let materialName in materials.materials) {
+          const material = materials.materials[materialName];
+          material.transparent = false;
+          material.opacity = 1.0;
+        }
+
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
         objLoader.setPath('/3Dmodels/');
         objLoader.load(modelPath, (object) => {
-          // Clamp the object's position within the room bounds
-          object.position.set(
-            Math.max(-roomWidth / 2, Math.min(roomWidth / 2, position.x)),
-            0,
-            Math.max(-roomDepth / 2, Math.min(roomDepth / 2, position.z))
-          );
-          object.scale.set(1, 1, 1);
-          object.userData.selectable = true;
-          scene.add(object);
+      
+      // Calculate the bounding box of the loaded object
+      const boundingBox = new THREE.Box3().setFromObject(object);
+      const size = boundingBox.getSize(new THREE.Vector3());
+      
+      // Calculate the scaling factor to fit the object within the room
+      const maxDimension = Math.max(size.x, size.y, size.z);
+      const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
+      object.scale.set(scale, scale, scale);
 
+      // Recalculate the bounding box after scaling
+      const scaledBoundingBox = new THREE.Box3().setFromObject(object);
+      const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
+
+      // Adjust the position of the object to fit within the room bounds
+      const adjustedPosition = {
+        x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
+        y: Math.max(0, position.y),
+        z: Math.max(-roomD / 2 + scaledSize.z / 2, Math.min(roomD / 2 - scaledSize.z / 2, position.z))
+      };
+      object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
+      object.userData.selectable = true;
+      scene.add(object);
+    
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-
+    
           // Attach transform controls to the object
           transformControls.attach(object);
           selectedObjectRef.current = object;
@@ -269,7 +341,7 @@ const Room3D = () => {
       }
     };
 
-    mount.addEventListener('click', onMouseClick);
+    mount.addEventListener('click', onMouseClick);    
 
     // Render Loop
     const animate = () => {
@@ -295,19 +367,19 @@ const Room3D = () => {
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-
+    
       const vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
       const dir = vector.sub(camera.position).normalize();
       const distance = -camera.position.z / dir.z;
       let pos = camera.position.clone().add(dir.multiplyScalar(distance));
-
+    
       // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
-        Math.max(-roomWidth / 2, Math.min(roomWidth / 2, pos.x)),
+        Math.max(-roomW / 2, Math.min(roomW / 2, pos.x)),
         0,
-        Math.max(-roomDepth / 2, Math.min(roomDepth / 2, pos.z))
+        Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
-
+    
       loadModel(modelPath, materialPath, pos);
       setShowDropdown(false);
     };
@@ -326,7 +398,7 @@ const Room3D = () => {
       mount.removeEventListener('drop', handleDrop);
       mount.removeEventListener('click', onMouseClick);
     };
-  }, []);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -338,9 +410,10 @@ const Room3D = () => {
     setShowConfirmSave(true);
   };
 
+
   const handleImportRoom = () => {
-    navigate("/ImportRoom");
     // Logic to import a room
+    navigate("/ImportRoom");
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
@@ -417,41 +490,174 @@ const Room3D = () => {
     setShowConfirmSave(false);
   };
 
-  const handlePublishTemplate = () => {
-    // Logic to publish template
+  // Publish Template Functions
+  async function convertToGLB(scene) {
+    const exporter = new GLTFExporter();
+  
+    // Export scene to GLB format
+    return new Promise((resolve, reject) => {
+      exporter.parse(scene, (glb) => {
+        resolve(glb);
+      }, { binary: true }, reject);
+    });
+  }
+
+  const handlePublishTemplate = async (e) => {
+    e.preventDefault();
+  
+    try {
+      if (!sceneRef.current) {
+        throw new Error("Scene not available");
+      }
+  
+      const glbData = await convertToGLB(sceneRef.current);
+  
+      const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'sense-token': token
+        },
+        body: JSON.stringify({
+          "name": templateName,
+          "dimension": {
+            "width": roomWidth,
+            "height": roomHeight,
+            "length": roomLength
+          },
+          "room_type_id": roomType
+        }),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
+  
+        if (TemplateURL) {
+          await axios.put(
+            TemplateURL,
+            glbData,
+            {
+              headers: {
+                'Content-Type': 'model/gltf-binary',
+                'Content-Disposition': 'attachment',
+              },
+            }
+          );
+  
+          if (response.status >= 200 && response.status < 300) {
+            setAlertType('save');
+            setShowAlert(true);
+            console.log('Template successfully published!');
+          } else {
+            console.error('Template uploading failed:', response);
+          }
+        } else {
+          console.error('Template URL is not available in the response:', responseData);
+        }
+      } else {
+        const errorData = await response.json();
+        console.error('Template publishing failed:', errorData);
+      }
+    } catch (error) {
+      console.error('Error converting to GLB or uploading:', error);
+    }
+  
     setShowConfirmSave(false);
   };
 
+  // Update Template Function
+  const handleUpdateTemplate = async (e) => {
+    e.preventDefault();
+
+    try {
+      if (!sceneRef.current) {
+        throw new Error("Scene not available");
+      }
+  
+      const glbData = await convertToGLB(sceneRef.current);
+
+      await axios.put(
+        roomLayoutUrl,
+        glbData,
+        {
+          headers: {
+            'Content-Type': 'model/gltf-binary',
+            'Content-Disposition': 'attachment',
+          },
+        }
+      );
+
+      setAlertType('update');
+      setShowAlert(true);
+    } catch (error) {
+      console.error('Error converting to GLB or updating:', error);
+    }
+  
+    setShowConfirmSave(false);
+  }
+
+  const handleClose = () => {
+    setShowAlert(false);
+  };
+
+  const handleOk = () => {
+    setShowAlert(false);
+  };
+  
   return (
     <div className="relative w-full h-full">
       <div ref={mountRef} className="w-full h-screen" />
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
-        <button 
-          onClick={handleSaveAsTemplate} 
-          className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
-        >
-          Save as Template
-        </button>
+        {roomLayoutUrl ? (
+            <button 
+              onClick={handleUpdateTemplate} 
+              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            >
+              Update Template
+            </button>
+          ) : (
+            <button 
+              onClick={handleSaveAsTemplate} 
+              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            >
+              Save as Template
+            </button>
+        )}
+        {showAlert && (
+            <AlertPopup
+              title={templateName}
+              text={alertType === 'update' ? 'Template updated successfully!' : 'Template published successfully!'}
+              onClose={handleClose}
+              onOk={handleOk}
+            />
+        )}
         <button 
           onClick={handleImportRoom} 
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
         >
           Import Room
         </button>
         <button 
           onClick={handleExportRoom} 
-          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
         >
           Export Room
         </button>
         {showConfirmExport && 
           <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={()=> setShowConfirmExport(false)} />
         }
+        <button 
+          onClick={() => navigate('/BusinessUserHomepage')} 
+          className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
+        >
+          Exit
+        </button>
       </div>
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
         <button 
           onClick={toggleDropdown} 
-          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg"
+          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-100"
         >
           Add Objects
         </button>
@@ -463,7 +669,7 @@ const Room3D = () => {
         {showEditButton && (
           <button 
             onClick={() => setIsEditMode(!isEditMode)} 
-            className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg"
+            className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
           >
             {isEditMode ? 'Exit Edit Mode' : 'Edit Objects'}
           </button>
@@ -472,13 +678,13 @@ const Room3D = () => {
           <div className="flex flex-col space-y-2 mt-1">
             <button 
               onClick={handlePreviousObject} 
-              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-1"
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-1 hover:bg-gray-100 transition duration-100"
             >
               Previous Object
             </button>
             <button 
               onClick={handleNextObject} 
-              className="bg-gray-100 text-black py-2 px-4 rounded-full shadow-lg mt-2"
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-2 hover:bg-gray-100 transition duration-100"
             >
               Next Object
             </button>
@@ -488,25 +694,25 @@ const Room3D = () => {
           <>
           <button 
             onClick={() => setMode('translate')} 
-            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
           >
             Move
           </button>
           <button 
             onClick={() => setMode('rotate')} 
-            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-orange-700 transition duration-100"
           >
             Rotate
           </button>
           <button 
             onClick={() => setMode('scale')} 
-            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
             Scale
           </button>
           <button 
             onClick={handleRemove} 
-            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg"
+            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
           >
             Remove
           </button>
@@ -515,7 +721,7 @@ const Room3D = () => {
         {showDoneButton && (
           <button 
               onClick={handleDone} 
-              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg"
+              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-100"
             >
               Done
           </button>

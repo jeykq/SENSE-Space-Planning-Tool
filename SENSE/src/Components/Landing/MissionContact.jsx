@@ -10,9 +10,9 @@ const MissionContact = () => {
         For inquiries, feedback, or assistance, please feel free to contact us using the following methods:
       </p>
       <ul className="text-center text-lg max-w-[800px] mx-auto mb-20">
-        <li>Email: example@example.com</li>
+        <li>Email: sense@sensespacesplanningtool.com</li>
         <li>Phone: +1 123-456-7890</li>
-        <li>Address: 123 Street, City, Country</li>
+        <li>Address: 123 Street, Singapore</li>
       </ul>
     </div>
   );
