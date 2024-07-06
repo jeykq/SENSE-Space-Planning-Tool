@@ -28,7 +28,7 @@ const ViewAccount = () => {
   };
 
   const handleBuySubscription = () => {
-    navigate('/buysubscription');
+    navigate('/BuySubscription');
   };
 
   const handleApplyForBusinessUser = () => {
@@ -186,7 +186,12 @@ const ViewAccount = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <>
+        <Topbar title="My Profile" onClick={handleGoBack} />
+        <div>Loading...</div>
+      </>
+    );
   }
 
   if (error) {

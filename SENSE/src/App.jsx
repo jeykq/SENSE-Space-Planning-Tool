@@ -31,6 +31,7 @@ import GiveReview from './Components/ManageAccount/GiveReview';
 import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import { AuthProvider } from './AuthContext';
 import ProtectedRoute from './ProtectedRoute'; 
+import BuySubscription from './Components/ManageAccount/BuySubscription';
 
 const App = () => {
   return (
@@ -64,6 +65,7 @@ const App = () => {
           <Route path="/manageRoomTypes" element={<ProtectedRoute><SA_ManageRoomTypesPage /></ProtectedRoute>} />
           <Route path="/updateLanding" element={<ProtectedRoute><SA_UpdateLanding /></ProtectedRoute>} />
           <Route path="/GiveReview" element={<ProtectedRoute><GiveReview /></ProtectedRoute>} />
+          <Route path="/BuySubscription" element={<ProtectedRoute><BuySubscription /></ProtectedRoute>} />
           <Route path="/ApplyBusinessUser" element={<ProtectedRoute><ApplyBusinessUser /></ProtectedRoute>} />
         </Routes>
       </Router>
