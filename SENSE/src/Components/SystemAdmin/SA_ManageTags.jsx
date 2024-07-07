@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
 import axios from 'axios';
-import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
-import AlertPopup from '../UI/AlertPopup'; // Assuming this is correctly imported
+import { getHeaders } from '../../../apiUtils'; 
+import AlertPopup from '../UI/AlertPopup'; 
 
 const SA_ManageTagsPage = () => {
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ const SA_ManageTagsPage = () => {
 
   const fetchTags = async () => {
     try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
+      const headers = getHeaders(); 
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/tag/list',
         {},
@@ -47,7 +47,7 @@ const SA_ManageTagsPage = () => {
 
   const handleUpdate = async () => {
     try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
+      const headers = getHeaders(); 
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/tag/update',
         { id: editingTagId, name: editedTagName },
@@ -76,7 +76,7 @@ const SA_ManageTagsPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
+      const headers = getHeaders(); 
       await axios.post(
         `https://api.sensespacesplanningtool.com/tag/delete/${id}`,
         {},
@@ -99,7 +99,7 @@ const SA_ManageTagsPage = () => {
 
   const confirmAdd = async () => {
     try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
+      const headers = getHeaders(); 
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/tag/create',
         { name: newTagName },
