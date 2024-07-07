@@ -13,6 +13,7 @@ const BusinessUserHomepage = () => {
   const handleClickCreateTemplate = () => navigate('/CreateTemplate');
   const swiperContainer1 = useRef(null);
   const swiperContainer2 = useRef(null);
+  const dropdownRef = useRef(null); // Add ref for dropdown
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
@@ -105,6 +106,20 @@ const BusinessUserHomepage = () => {
     };
   }, [showDropdown, roomTypes]);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   const toggleDropdown = (event, templateId, url) => {
     event.stopPropagation();
     setShowDropdown(!showDropdown);
@@ -183,7 +198,7 @@ const BusinessUserHomepage = () => {
   };
 
   const renderDropdown = () => (
-    <div style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
+    <div ref={dropdownRef} style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
       <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left">Update</button>
       <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteTemplateId, deleteTemplateURL)}>Delete</button>
     </div>
