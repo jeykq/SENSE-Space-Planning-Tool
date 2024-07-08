@@ -1,82 +1,119 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import Navbar from "./Navbar";
-import SearchBar from "./SearchBar";
-import Footer from "../Landing/Footer";
-import axios from 'axios';
-import { getHeaders } from '../../../apiUtils';
+import React, { useState, useEffect } from 'react';
+import backgroundImage from '../../assets/p2.png';
+import LandingPageAPIUtils from './LandingPageAPIUtils';
+import AlertPopup from '../UI/AlertPopup';
 
 const SA_UpdateLanding = () => {
-  // Hardcoded initial content for testing
-  const initialLandingContent = `
-    <div>
-      <h1>Welcome to Our Website</h1>
-      <p>This is the landing page content.</p>
-    </div>
-  `;
+  const { mainParagraph, loading, fetchMainParagraph, updateLandingPage } = LandingPageAPIUtils({
+    onUpdateSuccess: () => {
+      setSuccessMessage(true); // Show success message
+      setEditMode(false); // Exit edit mode after successful update
+      fetchMainParagraph(); // Refresh main paragraph after update
+    },
+    onError: (error) => {
+      console.error('Error updating landing page:', error);
+      alert('Failed to update landing page. Please try again later.');
+    }
+  });
 
-  const [landingContent, setLandingContent] = useState(initialLandingContent);
-  const [editedLandingContent, setEditedLandingContent] = useState(initialLandingContent);
-  const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState(null);
+  const [editMode, setEditMode] = useState(false);
+  const [editedParagraph, setEditedParagraph] = useState(mainParagraph);
+  const [successMessage, setSuccessMessage] = useState(false); // State to control success message display
+  const [isAlertVisible, setIsAlertVisible] = useState(false); // State to control AlertPopup visibility
 
-  const handleEditClick = () => {
-    setIsEditing(true);
+  useEffect(() => {
+    // Clear success message after 3 seconds
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage(false);
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  const toggleEditMode = () => {
+    setEditMode(!editMode);
+    setEditedParagraph(mainParagraph); // Reset edited paragraph on toggle
   };
 
-  const handleSaveClick = () => {
-    setLandingContent(editedLandingContent);
-    setIsEditing(false);
+  const handleInputChange = (event) => {
+    setEditedParagraph(event.target.value);
   };
 
-  const handleCancelClick = () => {
-    setEditedLandingContent(landingContent);
-    setIsEditing(false);
+  const handleUpdateLandingPage = () => {
+    updateLandingPage(editedParagraph);
+  };
+
+  const handleAlertClose = () => {
+    setIsAlertVisible(false);
+    // Optionally perform any cleanup or action on close
+  };
+
+  const handleAlertOk = () => {
+    setIsAlertVisible(false);
+    // Optionally navigate back to LandingSense page or perform related action
   };
 
   return (
-    <div>
-      <Navbar />
-      <div>
-        {isEditing ? (
-          <h2 style={{ textAlign: "center" }}>Edit Landing Page</h2>
+    <div
+      name='sense'
+      className="w-full min-h-screen flex items-center justify-center"
+      style={{
+        backgroundImage: `linear-gradient(rgba(8, 0, 58, 0.7), rgba(8, 0, 58, 0.7)), url(${backgroundImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        color: '#fff',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <div className='text-center mx-auto max-w-screen-lg'>
+        <h1 className='text-6xl font-semibold'>SENSE SPACES Planning Tool</h1>
+        {editMode ? (
+          <textarea
+            className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-transparent text-black border-b-2 border-white p-2'
+            value={editedParagraph}
+            onChange={handleInputChange}
+            rows={6}
+          />
         ) : (
-          <h2 style={{ textAlign: "center" }}>Landing Page Content</h2>
+          <p className='text-justify text-lg max-w-[800px] my-10 md:my-20 leading-relaxed'>
+            {mainParagraph}
+          </p>
         )}
-      </div>
-      <div style={{ paddingTop: "100px", paddingLeft: "50px", paddingRight: "50px" }} className="justify-center">
-        <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "10px", textAlign: "center", maxWidth: "600px", margin: "0 auto", background: isEditing ? "none" : "#f0f0f0" }}>
-          {isEditing ? (
-            <div>
-              <label htmlFor="landingContent"><strong>Landing Page Content:</strong></label>
-              <textarea
-                id="landingContent"
-                value={editedLandingContent}
-                onChange={(e) => setEditedLandingContent(e.target.value)}
-                style={{ width: "100%", minHeight: "300px" }}
-              />
-            </div>
+        <div className="flex justify-center">
+          {editMode ? (
+            <button
+              onClick={handleUpdateLandingPage}
+              className={`bg-red-500 hover:bg-red-700 text-white rounded-full px-4 py-2 my-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              disabled={loading}
+            >
+              {loading ? 'Updating...' : 'Update'}
+            </button>
           ) : (
-            <div>
-              <div style={{ background: "#fff", padding: "10px", borderRadius: "5px", marginBottom: "10px" }}>
-                <pre>{landingContent}</pre>
-              </div>
-            </div>
-          )}
-          {isEditing ? (
-            <div>
-              <button style={{ marginRight: "10px", backgroundColor: "#4CAF50", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer" }} onClick={handleSaveClick}>Save</button>
-              <button style={{ backgroundColor: "#f44336", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer" }} onClick={handleCancelClick}>Cancel</button>
-            </div>
-          ) : (
-            <button style={{ backgroundColor: "#008CBA", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer", marginTop: "10px" }} onClick={handleEditClick}>Edit</button>
+            <button
+              onClick={toggleEditMode}
+              className="bg-blue-500 hover:bg-blue-700 text-white rounded-full px-4 py-2 my-2"
+            >
+              Edit Paragraph
+            </button>
           )}
         </div>
-        {error && <div style={{ color: "red", textAlign: "center" }}>{error}</div>}
       </div>
-      <Footer />
+
+      {/* Display success message */}
+      {successMessage && (
+        <AlertPopup
+          title="Success"
+          text="Updated Successful!"
+          onClose={handleAlertClose}
+          onOk={handleAlertOk}
+        />
+      )}
     </div>
   );
-};
+}
 
 export default SA_UpdateLanding;
