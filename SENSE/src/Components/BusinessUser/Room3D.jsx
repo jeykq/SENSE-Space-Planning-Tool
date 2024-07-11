@@ -19,21 +19,21 @@ const Room3D = () => {
   const navigate = useNavigate();
   const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
 
-  console.log("Received State:", location.state)
-
   const [showDropdown, setShowDropdown] = useState(false);
-  const [showTransformControls, setShowTransformControls] = useState(false);
-  const [showDoneButton, setShowDoneButton] = useState(false);
-  const [showRemoveButton, setShowRemoveButton] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [objects, setObjects] = useState([]);
-  const [selectedObjectIndex, setSelectedObjectIndex] = useState(0);
-  const [showEditButton, setShowEditButton] = useState(false);
   const [showConfirmSave, setShowConfirmSave] = useState(false);
-  const transformControlsRef = useRef(null);
+  const [isObjectSelected, setIsObjectSelected] = useState(false);
+  const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
+  const raycasterRef = useRef(new THREE.Raycaster());
+  const mouseRef = useRef(new THREE.Vector2());
+  const dragOffsetRef = useRef(new THREE.Vector3());
+  const planeRef = useRef(new THREE.Plane());
+  const intersectedRef = useRef(null);
+  const transformControlsRef = useRef(null);
+  const isTransformingRef = useRef(false); // Reference state to track if TransformControl is active
 
   const [categoryData, setCategoryData] = useState(null);
   const [objectListData, setObjectListData] = useState(null);
@@ -48,68 +48,68 @@ const Room3D = () => {
 
   // get list of all categories
   useEffect(() => {
-      const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('authToken');
 
-      if (!token) {
-          navigate('/login');
-          return;
-      }
+    if (!token) {
+      navigate('/login');
+      return;
+    }
 
-      const headers = {
-          'Content-Type': 'application/json',
-          'sense-token': token
-      };
-      setCatLoading(true);
+    const headers = {
+      'Content-Type': 'application/json',
+      'sense-token': token
+    };
+    setCatLoading(true);
 
-      axios.post(
-          'https://api.sensespacesplanningtool.com/category/list',
-          {},
-          { headers: headers }
-      )
-          .then(response => {
-              setCategoryData(response.data);
-              setCatError(null); // Reset error state if the request is successful
-          })
-          .catch(err => {
-              setCatError(err.message || 'Something went wrong');
-              setCategoryData(err.message); // Reset response state if the request fails
-          })
-          .finally(() => {
-              setCatLoading(false);
-          });
+    axios.post(
+      'https://api.sensespacesplanningtool.com/category/list',
+      {},
+      { headers: headers }
+    )
+      .then(response => {
+        setCategoryData(response.data);
+        setCatError(null); // Reset error state if the request is successful
+      })
+      .catch(err => {
+        setCatError(err.message || 'Something went wrong');
+        setCategoryData(err.message); // Reset response state if the request fails
+      })
+      .finally(() => {
+        setCatLoading(false);
+      });
   }, [navigate]);
 
   // get list of all objects
   useEffect(() => {
     const fetchObjData = async () => {
-        const token = localStorage.getItem('authToken');
+      const token = localStorage.getItem('authToken');
 
-        if (!token) {
-            navigate('/login');
-            return;
-        }
+      if (!token) {
+        navigate('/login');
+        return;
+      }
 
-        const headers = { 
-            'Content-Type': 'application/json',
-            'sense-token': token
-        };
-        setObjListLoading(true);
+      const headers = {
+        'Content-Type': 'application/json',
+        'sense-token': token
+      };
+      setObjListLoading(true);
 
-        try {
-            const response = await axios.post(
-                'https://api.sensespacesplanningtool.com/object/list', 
-                {},
-                { headers: headers }
-            );
-            setObjectListData(response.data);
-            setObjListError(null);
-        } catch (err) {
-            setObjListError(err.message || 'Something went wrong');
-            setObjectListData(null); // Clear object list data if the request fails
-            console.error('API Error for ' + name, err); // Log the error for debugging
-        } finally {
-          setObjListLoading(false);
-        }
+      try {
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/object/list',
+          {},
+          { headers: headers }
+        );
+        setObjectListData(response.data);
+        setObjListError(null);
+      } catch (err) {
+        setObjListError(err.message || 'Something went wrong');
+        setObjectListData(null); // Clear object list data if the request fails
+        console.error('API Error for ' + name, err); // Log the error for debugging
+      } finally {
+        setObjListLoading(false);
+      }
     };
 
     fetchObjData();
@@ -127,10 +127,10 @@ const Room3D = () => {
     let scene = new THREE.Scene();
     scene.background = new THREE.Color(0xdfefff);
     sceneRef.current = scene;
-    
+
     // Camera
     let camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
-    camera.position.set(5, 5, 15); 
+    camera.position.set(5, 5, 15);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
     // Renderer
@@ -222,19 +222,6 @@ const Room3D = () => {
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
-    // TransformControls
-    const transformControls = new TransformControls(camera, renderer.domElement);
-    transformControlsRef.current = transformControls;
-    scene.add(transformControls);
-
-    transformControls.addEventListener('change', () => {
-      renderer.render(scene, camera);
-    });
-
-    transformControls.addEventListener('dragging-changed', (event) => {
-      controlsRef.current.enabled = !event.value;
-    });
-
     // Orbit Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -243,20 +230,35 @@ const Room3D = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controlsRef.current = controls;
 
+    // Transform Controls
+    const transformControls = new TransformControls(camera, renderer.domElement);
+    transformControlsRef.current = transformControls;
+    transformControls.addEventListener('change', () => renderer.render(scene, camera));
+    transformControls.addEventListener('dragging-changed', (event) => {
+      controls.enabled = !event.value;
+    });
+    transformControls.addEventListener('mouseDown', () => {
+      isTransformingRef.current = true; // Set transforming flag
+    });
+    transformControls.addEventListener('mouseUp', () => {
+      isTransformingRef.current = false; // Reset transforming flag
+    });
+    scene.add(transformControls);
+
     // View Template from roomLayoutUrl
     if (roomLayoutUrl != null) {
       fetch(roomLayoutUrl)
-      .then(response => response.arrayBuffer())
-      .then(data => {
-        const loader = new GLTFLoader();
-        loader.parse(data, '', (glb) => {
-          scene.add(glb.scene);
-          console.log("Model loaded:", glb.scene);
+        .then(response => response.arrayBuffer())
+        .then(data => {
+          const loader = new GLTFLoader();
+          loader.parse(data, '', (glb) => {
+            scene.add(glb.scene);
+            console.log("Model loaded:", glb.scene);
+          });
+        })
+        .catch(error => {
+          console.error('Error loading GLB:', error);
         });
-      })
-      .catch(error => {
-        console.error('Error loading GLB:', error);
-      });
     }
 
     // Load 3D Model
@@ -277,40 +279,33 @@ const Room3D = () => {
         objLoader.setMaterials(materials);
         objLoader.setPath('/3Dmodels/');
         objLoader.load(modelPath, (object) => {
-      
-      // Calculate the bounding box of the loaded object
-      const boundingBox = new THREE.Box3().setFromObject(object);
-      const size = boundingBox.getSize(new THREE.Vector3());
-      
-      // Calculate the scaling factor to fit the object within the room
-      const maxDimension = Math.max(size.x, size.y, size.z);
-      const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
-      object.scale.set(scale, scale, scale);
 
-      // Recalculate the bounding box after scaling
-      const scaledBoundingBox = new THREE.Box3().setFromObject(object);
-      const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
+          // Calculate the bounding box of the loaded object
+          const boundingBox = new THREE.Box3().setFromObject(object);
+          const size = boundingBox.getSize(new THREE.Vector3());
 
-      // Adjust the position of the object to fit within the room bounds
-      const adjustedPosition = {
-        x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
-        y: Math.max(0, position.y),
-        z: Math.max(-roomD / 2 + scaledSize.z / 2, Math.min(roomD / 2 - scaledSize.z / 2, position.z))
-      };
-      object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
-      object.userData.selectable = true;
-      scene.add(object);
-    
+          // Calculate the scaling factor to fit the object within the room
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
+          object.scale.set(scale, scale, scale);
+
+          // Recalculate the bounding box after scaling
+          const scaledBoundingBox = new THREE.Box3().setFromObject(object);
+          const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
+
+          // Adjust the position of the object to fit within the room bounds
+          const adjustedPosition = {
+            x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
+            y: Math.max(0, position.y),  // Keep objects above the floor
+            z: Math.max(-roomD / 2 + scaledSize.z / 2, Math.min(roomD / 2 - scaledSize.z / 2, position.z))
+          };
+          object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
+          object.userData.selectable = true; // Set selectable on the parent group
+          scene.add(object);
+
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-    
-          // Attach transform controls to the object
-          transformControls.attach(object);
-          selectedObjectRef.current = object;
-          setShowTransformControls(true);
-          setShowDoneButton(true);
-          setShowRemoveButton(true);
-          setShowEditButton(false);
+
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
           console.error('Error loading model:', error);
@@ -320,28 +315,105 @@ const Room3D = () => {
       });
     };
 
-    // Raycaster for object selection
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
+    const onMouseDown = (event) => {
+      if (isTransformingRef.current) return; // Ignore if interacting with transform controls
 
-    const onMouseClick = (event) => {
       event.preventDefault();
       const rect = mount.getBoundingClientRect();
-      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+      mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(scene.children, true);
+      console.log('Mouse down at:', mouseRef.current);
+
+      raycasterRef.current.setFromCamera(mouseRef.current, camera);
+      const intersects = raycasterRef.current.intersectObjects(scene.children, true);
 
       if (intersects.length > 0) {
-        const firstIntersected = intersects[0].object;
-        if (firstIntersected.userData.selectable) {
+        let firstIntersected = intersects[0].object;
+
+        // Traverse up to the selectable parent
+        while (firstIntersected && !firstIntersected.userData.selectable && firstIntersected.parent) {
+          firstIntersected = firstIntersected.parent;
+        }
+
+        if (firstIntersected && firstIntersected.userData.selectable) {
+          controls.enabled = false; // Disable controls
           selectObject(firstIntersected);
+          planeRef.current.setFromNormalAndCoplanarPoint(
+            camera.getWorldDirection(planeRef.current.normal),
+            firstIntersected.position
+          );
+          const intersectPoint = new THREE.Vector3();
+          raycasterRef.current.ray.intersectPlane(planeRef.current, intersectPoint);
+          dragOffsetRef.current.copy(intersectPoint).sub(firstIntersected.position);
+          intersectedRef.current = firstIntersected;
+          setIsObjectSelected(true);
+          console.log('Object selected:', firstIntersected);
+        } else {
+          deselectObject();
+          console.log('Object not selectable:', firstIntersected);
+        }
+      } else {
+        deselectObject();
+        console.log('No intersecting objects found');
+      }
+    };
+
+    const onMouseMove = (event) => {
+      if (intersectedRef.current) {
+        const rect = mount.getBoundingClientRect();
+        mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycasterRef.current.setFromCamera(mouseRef.current, camera);
+        const intersectPoint = new THREE.Vector3();
+        raycasterRef.current.ray.intersectPlane(planeRef.current, intersectPoint);
+        const newPosition = intersectPoint.sub(dragOffsetRef.current);
+
+        // Clamp the new position within the room bounds and fix the y position
+        newPosition.x = Math.max(-roomW / 2, Math.min(roomW / 2, newPosition.x));
+        newPosition.y = intersectedRef.current.position.y; // Keep y position fixed
+        newPosition.z = Math.max(-roomD / 2, Math.min(roomD / 2, newPosition.z));
+
+        intersectedRef.current.position.copy(newPosition);
+      } else {
+        const rect = mount.getBoundingClientRect();
+        mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+        mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+        raycasterRef.current.setFromCamera(mouseRef.current, camera);
+        const intersects = raycasterRef.current.intersectObjects(scene.children, true);
+
+        if (intersects.length > 0) {
+          let firstIntersected = intersects[0].object;
+
+          // Traverse up to the selectable parent
+          while (firstIntersected && !firstIntersected.userData.selectable && firstIntersected.parent) {
+            firstIntersected = firstIntersected.parent;
+          }
+
+          if (firstIntersected && firstIntersected.userData.selectable) {
+            mount.style.cursor = 'pointer';
+          } else {
+            mount.style.cursor = 'default';
+          }
+        } else {
+          mount.style.cursor = 'default';
         }
       }
     };
 
-    mount.addEventListener('click', onMouseClick);    
+    const onMouseUp = () => {
+      if (intersectedRef.current) {
+        console.log('Object released:', intersectedRef.current);
+        intersectedRef.current = null;
+        controls.enabled = true; // Re-enable controls
+      }
+    };
+
+    mount.addEventListener('mousedown', onMouseDown);
+    mount.addEventListener('mousemove', onMouseMove);
+    mount.addEventListener('mouseup', onMouseUp);
 
     // Render Loop
     const animate = () => {
@@ -367,19 +439,19 @@ const Room3D = () => {
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-    
+
       const vector = new THREE.Vector3(x, y, 0.5).unproject(camera);
       const dir = vector.sub(camera.position).normalize();
       const distance = -camera.position.z / dir.z;
       let pos = camera.position.clone().add(dir.multiplyScalar(distance));
-    
+
       // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
         Math.max(-roomW / 2, Math.min(roomW / 2, pos.x)),
         0,
         Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
-    
+
       loadModel(modelPath, materialPath, pos);
       setShowDropdown(false);
     };
@@ -396,7 +468,9 @@ const Room3D = () => {
       window.removeEventListener('resize', handleResize);
       mount.removeEventListener('dragover', handleDragOver);
       mount.removeEventListener('drop', handleDrop);
-      mount.removeEventListener('click', onMouseClick);
+      mount.removeEventListener('mousedown', onMouseDown);
+      mount.removeEventListener('mousemove', onMouseMove);
+      mount.removeEventListener('mouseup', onMouseUp);
     };
   }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
 
@@ -409,7 +483,6 @@ const Room3D = () => {
   const handleSaveAsTemplate = () => {
     setShowConfirmSave(true);
   };
-
 
   const handleImportRoom = () => {
     // Logic to import a room
@@ -426,63 +499,42 @@ const Room3D = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const setMode = (mode) => {
-    if (transformControlsRef.current) {
-      transformControlsRef.current.setMode(mode);
-    }
-  };
-
-  const handleDone = () => {
-    if (selectedObjectRef.current) {
-      transformControlsRef.current.detach(selectedObjectRef.current);
-      selectedObjectRef.current = null;
-      setSelectedObjectIndex(0);
-      setShowTransformControls(false);
-      setShowDoneButton(false);
-      setShowRemoveButton(false);
-      setShowEditButton(true);
-    }
-  };
-
   const handleRemove = () => {
     if (selectedObjectRef.current) {
       sceneRef.current.remove(selectedObjectRef.current);
-      transformControlsRef.current.detach(selectedObjectRef.current);
       setObjects(objects.filter(obj => obj !== selectedObjectRef.current));
       selectedObjectRef.current = null;
-      setSelectedObjectIndex(0);
-      setShowTransformControls(false);
-      setShowDoneButton(false);
-      setShowRemoveButton(false);
-      setShowEditButton(objects.length > 1);
+      setIsObjectSelected(false);
+      transformControlsRef.current.detach();
+      setCurrentMode(null); // Reset current mode
+    }
+  };
+
+  const handleModeChange = (mode) => {
+    if (selectedObjectRef.current) {
+      setCurrentMode(mode);
+      transformControlsRef.current.setMode(mode);
+      transformControlsRef.current.attach(selectedObjectRef.current);
     }
   };
 
   const selectObject = (object) => {
-    if (selectedObjectRef.current) {
-      transformControlsRef.current.detach(selectedObjectRef.current);
-    }
-    transformControlsRef.current.attach(object);
     selectedObjectRef.current = object;
-    setShowTransformControls(true);
-    setShowDoneButton(true);
-    setShowRemoveButton(true);
-  };
+    setIsObjectSelected(true);
+    console.log('Object selected:', object);
 
-  const handleNextObject = () => {
-    if (objects.length > 0) {
-      const newIndex = (selectedObjectIndex + 1) % objects.length;
-      setSelectedObjectIndex(newIndex);
-      selectObject(objects[newIndex]);
+    // If a mode is currently selected, attach the transform controls
+    if (currentMode) {
+      transformControlsRef.current.setMode(currentMode);
+      transformControlsRef.current.attach(object);
     }
   };
 
-  const handlePreviousObject = () => {
-    if (objects.length > 0) {
-      const newIndex = (selectedObjectIndex - 1 + objects.length) % objects.length;
-      setSelectedObjectIndex(newIndex);
-      selectObject(objects[newIndex]);
-    }
+  const deselectObject = () => {
+    setIsObjectSelected(false);
+    selectedObjectRef.current = null;
+    transformControlsRef.current.detach(); // Detach transform controls
+    setCurrentMode(null); // Reset current mode
   };
 
   const handleSaveAsDraft = () => {
@@ -493,7 +545,7 @@ const Room3D = () => {
   // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
-  
+
     // Export scene to GLB format
     return new Promise((resolve, reject) => {
       exporter.parse(scene, (glb) => {
@@ -504,14 +556,14 @@ const Room3D = () => {
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-  
+
     try {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-  
+
       const glbData = await convertToGLB(sceneRef.current);
-  
+
       const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
         method: 'POST',
         headers: {
@@ -528,11 +580,11 @@ const Room3D = () => {
           "room_type_id": roomType
         }),
       });
-  
+
       if (response.ok) {
         const responseData = await response.json();
         const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-  
+
         if (TemplateURL) {
           await axios.put(
             TemplateURL,
@@ -544,7 +596,7 @@ const Room3D = () => {
               },
             }
           );
-  
+
           if (response.status >= 200 && response.status < 300) {
             setAlertType('save');
             setShowAlert(true);
@@ -562,7 +614,7 @@ const Room3D = () => {
     } catch (error) {
       console.error('Error converting to GLB or uploading:', error);
     }
-  
+
     setShowConfirmSave(false);
   };
 
@@ -574,7 +626,7 @@ const Room3D = () => {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-  
+
       const glbData = await convertToGLB(sceneRef.current);
 
       await axios.put(
@@ -593,7 +645,7 @@ const Room3D = () => {
     } catch (error) {
       console.error('Error converting to GLB or updating:', error);
     }
-  
+
     setShowConfirmSave(false);
   }
 
@@ -604,59 +656,59 @@ const Room3D = () => {
   const handleOk = () => {
     setShowAlert(false);
   };
-  
+
   return (
     <div className="relative w-full h-full">
-      <div ref={mountRef} className="w-full h-screen" />
+      <div ref={mountRef} className="w-full h-screen cursor-default" />
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
         {roomLayoutUrl ? (
-            <button 
-              onClick={handleUpdateTemplate} 
-              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
-            >
-              Update Template
-            </button>
-          ) : (
-            <button 
-              onClick={handleSaveAsTemplate} 
-              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
-            >
-              Save as Template
-            </button>
+          <button
+            onClick={handleUpdateTemplate}
+            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+          >
+            Update Template
+          </button>
+        ) : (
+          <button
+            onClick={handleSaveAsTemplate}
+            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+          >
+            Save as Template
+          </button>
         )}
         {showAlert && (
-            <AlertPopup
-              title={templateName}
-              text={alertType === 'update' ? 'Template updated successfully!' : 'Template published successfully!'}
-              onClose={handleClose}
-              onOk={handleOk}
-            />
+          <AlertPopup
+            title={templateName}
+            text={alertType === 'update' ? 'Template updated successfully!' : 'Template published successfully!'}
+            onClose={handleClose}
+            onOk={handleOk}
+          />
         )}
-        <button 
-          onClick={handleImportRoom} 
+        <button
+          onClick={handleImportRoom}
           className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
         >
           Import Room
         </button>
-        <button 
-          onClick={handleExportRoom} 
+        <button
+          onClick={handleExportRoom}
           className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
         >
           Export Room
         </button>
-        {showConfirmExport && 
-          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={()=> setShowConfirmExport(false)} />
+        {showConfirmExport &&
+          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={() => setShowConfirmExport(false)} />
         }
-        <button 
-          onClick={() => navigate('/BusinessUserHomepage')} 
+        <button
+          onClick={() => navigate('/BusinessUserHomepage')}
           className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
         >
           Exit
         </button>
       </div>
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
-        <button 
-          onClick={toggleDropdown} 
+        <button
+          onClick={toggleDropdown}
           className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-100"
         >
           Add Objects
@@ -666,65 +718,27 @@ const Room3D = () => {
             <AddObjDropdown handleDragStart={handleDragStart} categoryData={categoryData} objectListData={objectListData} />
           </div>
         )}
-        {showEditButton && (
-          <button 
-            onClick={() => setIsEditMode(!isEditMode)} 
-            className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
-          >
-            {isEditMode ? 'Exit Edit Mode' : 'Edit Objects'}
-          </button>
-        )}
-        {isEditMode && objects.length > 0 && (
-          <div className="flex flex-col space-y-2 mt-1">
-            <button 
-              onClick={handlePreviousObject} 
-              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-1 hover:bg-gray-100 transition duration-100"
-            >
-              Previous Object
-            </button>
-            <button 
-              onClick={handleNextObject} 
-              className="bg-white text-black py-2 px-4 rounded-full shadow-lg mt-2 hover:bg-gray-100 transition duration-100"
-            >
-              Next Object
-            </button>
-          </div>
-        )}
-        {showTransformControls && (
+        {isObjectSelected && (
           <>
-          <button 
-            onClick={() => setMode('translate')} 
-            className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
-          >
-            Move
-          </button>
-          <button 
-            onClick={() => setMode('rotate')} 
-            className="bg-orange-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-orange-700 transition duration-100"
-          >
-            Rotate
-          </button>
-          <button 
-            onClick={() => setMode('scale')} 
-            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
-          >
-            Scale
-          </button>
-          <button 
-            onClick={handleRemove} 
-            className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
-          >
-            Remove
-          </button>
-          </>
-        )}
-        {showDoneButton && (
-          <button 
-              onClick={handleDone} 
-              className="bg-indigo-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-indigo-700 transition duration-100"
+            <button
+              onClick={() => handleModeChange('rotate')}
+              className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
             >
-              Done
-          </button>
+              Rotate
+            </button>
+            <button
+              onClick={() => handleModeChange('scale')}
+              className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            >
+              Scale
+            </button>
+            <button
+              onClick={handleRemove}
+              className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
+            >
+              Remove
+            </button>
+          </>
         )}
       </div>
       {showConfirmSave && (
