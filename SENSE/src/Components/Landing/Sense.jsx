@@ -1,7 +1,21 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import backgroundImage from '../../assets/p2.png';
+import LandingPageAPIUtils from '../SystemAdmin/LandingPageAPIUtils'; // Adjust import path as necessary
 
 const Sense = () => {
+  const { mainParagraph, fetchLandingPageData } = LandingPageAPIUtils({
+    onUpdateSuccess: () => {}, // Define success callback if needed
+    onError: (error) => {
+      console.error('Error fetching data for Sense component:', error);
+      // Handle error as needed (e.g., display error message)
+    }
+  });
+
+  useEffect(() => {
+    // Fetch initial data for Sense component
+    fetchLandingPageData();
+  }, []);
+
   return (
     <div
       name='sense'
@@ -18,7 +32,9 @@ const Sense = () => {
     >
       <div className='text-center mx-auto max-w-screen-lg'>
         <h1 className='text-6xl font-semibold'>SENSE SPACES Planning Tool</h1>
-        <p className='text-justify text-lg max-w-[800px] my-10 md:my-20 leading-relaxed'>Welcome to SENSE Spaces Planning Tool, where you can unleash your creativity and design immersive multi-sensory environments right from your web browser. Whether you’re creating a therapeutic space, an educational environment, or simply looking to enhance your surroundings, our intuitive web application empowers you to bring your vision to life.</p>
+        <p className='text-justify text-lg max-w-[800px] my-10 md:my-20 leading-relaxed'>
+          {mainParagraph}
+        </p>
       </div>
     </div>
   );

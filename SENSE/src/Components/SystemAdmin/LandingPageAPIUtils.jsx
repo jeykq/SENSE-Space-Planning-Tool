@@ -67,8 +67,8 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       setLoading(true);
 
       const storedData = JSON.parse(localStorage.getItem('landingPageData')) || {};
-      
-      // Use the stored data if not provided in updateData
+
+      // Create the update payload with both the stored data and the updateData
       const updatedMainParagraph = updateData.mainParagraph || storedData.mainParagraph;
       const updatedFreePlanFeatures = updateData.freePlanFeatures || storedData.freePlanFeatures;
       const updatedPremiumPlanFeatures = updateData.premiumPlanFeatures || storedData.premiumPlanFeatures;
@@ -92,6 +92,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       );
 
       setLoading(false);
+      onUpdateSuccess();
       console.log('API Response:', updateResponse.data);
 
       // Update local storage with the new data
@@ -105,9 +106,6 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       setMainParagraph(updatedMainParagraph);
       setFreePlanFeatures(updatedFreePlanFeatures);
       setPremiumPlanFeatures(updatedPremiumPlanFeatures);
-
-      // Call the success callback
-      onUpdateSuccess();
 
     } catch (error) {
       setLoading(false);
