@@ -49,8 +49,20 @@ const LoginForm = () => {
         setShowAlert(false);
     };
 
+    const handleCancelLogin = () => {
+        navigate(-1); // Go back in history
+    };
+
     return (
-        <div>
+        <div className="relative">
+            <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none z-10"
+                onClick={handleCancelLogin}
+            >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
             <div className="flex h-screen">
                 <div className="w-1/2 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center" style={{ backgroundImage: `url(${signup})` }}>
                     <h1 className="text-3xl mb-3">Welcome to Sense Spaces Planning Tool</h1>
