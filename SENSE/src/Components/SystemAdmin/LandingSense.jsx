@@ -4,11 +4,16 @@ import LandingPageAPIUtils from './LandingPageAPIUtils';
 import AlertPopup from '../UI/AlertPopup';
 
 const LandingSense = () => {
-  const { mainParagraph, loading, fetchMainParagraph, updateLandingPage } = LandingPageAPIUtils({
+  const {
+    mainParagraph,
+    loading,
+    fetchLandingPageData,
+    updateLandingPage
+  } = LandingPageAPIUtils({
     onUpdateSuccess: () => {
       setSuccessMessage(true); // Show success message
       setEditMode(false); // Exit edit mode after successful update
-      fetchMainParagraph(); // Refresh main paragraph after update
+      fetchLandingPageData(); // Refresh main paragraph after update
     },
     onError: (error) => {
       console.error('Error updating landing page:', error);
@@ -32,6 +37,11 @@ const LandingSense = () => {
     }
   }, [successMessage]);
 
+  useEffect(() => {
+    // Update editedParagraph when mainParagraph changes
+    setEditedParagraph(mainParagraph);
+  }, [mainParagraph]);
+
   const toggleEditMode = () => {
     setEditMode(!editMode);
     setEditedParagraph(mainParagraph); // Reset edited paragraph on toggle
@@ -42,7 +52,12 @@ const LandingSense = () => {
   };
 
   const handleUpdateLandingPage = () => {
-    updateLandingPage(editedParagraph);
+    updateLandingPage({ mainParagraph: editedParagraph });
+  };
+
+  const handleCancelEdit = () => {
+    setEditMode(false);
+    setEditedParagraph(mainParagraph); // Reset edited paragraph when canceling
   };
 
   const handleAlertClose = () => {
@@ -83,15 +98,23 @@ const LandingSense = () => {
             {mainParagraph}
           </p>
         )}
-        <div className="flex justify-center">
+        <div className="flex justify-center space-x-4">
           {editMode ? (
-            <button
-              onClick={handleUpdateLandingPage}
-              className={`bg-red-500 hover:bg-red-700 text-white rounded-full px-4 py-2 my-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
-              disabled={loading}
-            >
-              {loading ? 'Updating...' : 'Update'}
-            </button>
+            <>
+              <button
+                onClick={handleUpdateLandingPage}
+                className={`bg-blue-500 hover:bg-blue-700 text-white rounded-full px-4 py-2 my-2 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={loading}
+              >
+                {loading ? 'Updating...' : 'Update'}
+              </button>
+              <button
+                onClick={handleCancelEdit}
+                className="bg-red-500 hover:bg-red-700 text-white rounded-full px-4 py-2 my-2"
+              >
+                Cancel
+              </button>
+            </>
           ) : (
             <button
               onClick={toggleEditMode}
@@ -107,7 +130,7 @@ const LandingSense = () => {
       {successMessage && (
         <AlertPopup
           title="Success"
-          text="Updated Successful!"
+          text="Updated Successfully!"
           onClose={handleAlertClose}
           onOk={handleAlertOk}
         />

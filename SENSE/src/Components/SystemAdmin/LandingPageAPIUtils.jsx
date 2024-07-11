@@ -4,15 +4,23 @@ import { getHeaders } from '../../../apiUtils';
 
 const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
   const [mainParagraph, setMainParagraph] = useState('');
-  const [freePlan, setFreePlan] = useState('');
+  const [freePlanFeatures, setFreePlanFeatures] = useState([]);
+  const [premiumPlanFeatures, setPremiumPlanFeatures] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchMainParagraph();
-    fetchFreePlan();
+    const storedData = localStorage.getItem('landingPageData');
+    if (storedData) {
+      const { mainParagraph, freePlanFeatures, premiumPlanFeatures } = JSON.parse(storedData);
+      setMainParagraph(mainParagraph);
+      setFreePlanFeatures(freePlanFeatures);
+      setPremiumPlanFeatures(premiumPlanFeatures);
+    } else {
+      fetchLandingPageData();
+    }
   }, []);
 
-  const fetchMainParagraph = async () => {
+  const fetchLandingPageData = async () => {
     try {
       const headers = getHeaders();
       const response = await axios.post(
@@ -21,50 +29,34 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         { headers }
       );
 
-      // Check the response structure
       if (
         response.data &&
         response.data.body &&
         response.data.body.string &&
         response.data.body.string.main_page &&
-        response.data.body.string.main_page.paragraph1
+        response.data.body.string.main_page.paragraph1 &&
+        response.data.body.string.plans
       ) {
         const fetchedParagraph = response.data.body.string.main_page.paragraph1;
+        const plans = response.data.body.string.plans[0];
+        const fetchedFreePlanFeatures = plans.free_plan.description;
+        const fetchedPremiumPlanFeatures = plans.paid_plan.description;
+
         setMainParagraph(fetchedParagraph);
+        setFreePlanFeatures(fetchedFreePlanFeatures);
+        setPremiumPlanFeatures(fetchedPremiumPlanFeatures);
+
+        // Save data to local storage
+        localStorage.setItem('landingPageData', JSON.stringify({
+          mainParagraph: fetchedParagraph,
+          freePlanFeatures: fetchedFreePlanFeatures,
+          premiumPlanFeatures: fetchedPremiumPlanFeatures
+        }));
       } else {
-        throw new Error('Main paragraph data not found in API response');
+        throw new Error('Required data not found in API response');
       }
     } catch (error) {
-      console.error('Error fetching main paragraph:', error);
-      onError(error);
-    }
-  };
-
-  const fetchFreePlan = async () => {
-    try {
-      const headers = getHeaders();
-      const response = await axios.post(
-        'https://api.sensespacesplanningtool.com/landing_page/get',
-        null,
-        { headers }
-      );
-
-      // Check the response structure
-      if (
-        response.data &&
-        response.data.body &&
-        response.data.body.string &&
-        response.data.body.string.plans &&
-        response.data.body.string.plans.free_plan &&
-        response.data.body.string.plans.free_plan.description
-      ) {
-        const fetchedFreePlan = response.data.body.string.plans.free_plan.description;
-        setFreePlan(fetchedFreePlan);
-      } else {
-        throw new Error('Free User plan data not found in API response');
-      }
-    } catch (error) {
-      console.error('Error fetching free plan description:', error);
+      console.error('Error fetching landing page data:', error);
       onError(error);
     }
   };
@@ -74,18 +66,49 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       const headers = getHeaders();
       setLoading(true);
 
+      const storedData = JSON.parse(localStorage.getItem('landingPageData')) || {};
+      
+      // Use the stored data if not provided in updateData
+      const updatedMainParagraph = updateData.mainParagraph || storedData.mainParagraph;
+      const updatedFreePlanFeatures = updateData.freePlanFeatures || storedData.freePlanFeatures;
+      const updatedPremiumPlanFeatures = updateData.premiumPlanFeatures || storedData.premiumPlanFeatures;
+
+      const updatePayload = {
+        landing_page: {
+          main_page: { paragraph1: updatedMainParagraph },
+          plans: [
+            {
+              free_plan: { description: updatedFreePlanFeatures },
+              paid_plan: { description: updatedPremiumPlanFeatures },
+            }
+          ]
+        }
+      };
+
       const updateResponse = await axios.post(
         'https://api.sensespacesplanningtool.com/landing_page/string/update',
-        { landing_page: { main_page: { paragraph1: updateData } } },
+        updatePayload,
         { headers }
       );
 
       setLoading(false);
-      onUpdateSuccess();
       console.log('API Response:', updateResponse.data);
 
-      // After updating, fetch the main paragraph again to ensure synchronization
-      await fetchMainParagraph();
+      // Update local storage with the new data
+      localStorage.setItem('landingPageData', JSON.stringify({
+        mainParagraph: updatedMainParagraph,
+        freePlanFeatures: updatedFreePlanFeatures,
+        premiumPlanFeatures: updatedPremiumPlanFeatures
+      }));
+
+      // After updating, update the state to ensure synchronization
+      setMainParagraph(updatedMainParagraph);
+      setFreePlanFeatures(updatedFreePlanFeatures);
+      setPremiumPlanFeatures(updatedPremiumPlanFeatures);
+
+      // Call the success callback
+      onUpdateSuccess();
+
     } catch (error) {
       setLoading(false);
       onError(error);
@@ -93,7 +116,14 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     }
   };
 
-  return { mainParagraph, freePlan, loading, fetchMainParagraph, updateLandingPage };
+  return {
+    mainParagraph,
+    freePlanFeatures,
+    premiumPlanFeatures,
+    loading,
+    fetchLandingPageData,
+    updateLandingPage
+  };
 };
 
 export default LandingPageAPIUtils;

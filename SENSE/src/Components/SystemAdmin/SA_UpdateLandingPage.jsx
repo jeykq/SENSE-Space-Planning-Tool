@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LandingNavbar from './LandingNavbar';
 import LandingSense from './LandingSense';
-import LandingFreePlan from './LandingFreePlan';
+import LandingPlan from './LandingPlan';
 
 const SA_UpdateLandingPage = () => {
   const [sticky, setSticky] = useState(false);
@@ -41,7 +41,7 @@ const SA_UpdateLandingPage = () => {
       <div className="mt-10">
         <LandingNavbar />
         <LandingSense />
-        <LandingFreePlan />
+        <LandingPlan />
       </div>
     </div>
   );
