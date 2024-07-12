@@ -24,6 +24,7 @@ const BU_ImportObjects = ({ submit }) => {
     const [mtlUrl, setMtlUrl] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [screenshotDataUrl, setScreenshotDataUrl] = useState('');
+    
     let previewUploadUrl;
     let headers;
 
@@ -68,15 +69,14 @@ const BU_ImportObjects = ({ submit }) => {
     
         if (objFile && mtlFile && isObjectNameFilled ) {
             try {
-                const headers = getHeaders(); // Ensure this function correctly retrieves headers with authentication tokens or other necessary data
-    
-                // Prepare the data object to be sent
+                const headers = getHeaders();
+
                 const data = {
                     name: objectName,
                     product_description: { "description.a": productDescription },
-                    category_ids: [objectCat], // Assuming objectCat is a single category ID
-                    tag_ids: selectedTags, // Assuming selectedTags is an array of tag IDs
-                    filenames: [objFileName, mtlFileName] // Assuming objFileName and mtlFileName are the filenames
+                    category_ids: [objectCat],
+                    tag_ids: selectedTags,
+                    filenames: [objFileName, mtlFileName]
                 };
     
                 // Step 1: Import object metadata and get object_id
@@ -86,7 +86,7 @@ const BU_ImportObjects = ({ submit }) => {
                     { headers }
                 );
     
-                const objectId = importResponse.data.body.id; // Extract object ID from response
+                const objectId = importResponse.data.body.id;
                 console.log('Object ID:', objectId);
     
                 // Step 2: Upload .obj file to S3 with dynamic folder path
@@ -99,7 +99,7 @@ const BU_ImportObjects = ({ submit }) => {
                         headers: {
                             'Content-Type': 'application/octet-stream',
                             'Content-Disposition': 'attachment',
-                            ...headers // Include all headers required for this request
+                            ...headers
                         },
                     }
                 );
@@ -117,7 +117,7 @@ const BU_ImportObjects = ({ submit }) => {
                         headers: {
                             'Content-Type': 'application/octet-stream',
                             'Content-Disposition': 'attachment',
-                            ...headers // Include all headers required for this request
+                            ...headers
                         },
                     }
                 );
@@ -127,22 +127,8 @@ const BU_ImportObjects = ({ submit }) => {
                 setObjUrl(objUpdateUrl);
                 setMtlUrl(mtlUpdateUrl);
 
-                // Step 4: Upload screenshot to S3
-                const previewUpdateUrl = importResponse.data.body.object_media.preview; 
-                await axios.put(
-                    previewUpdateUrl,
-                    screenshotDataUrl,
-                    {
-                        headers: {
-                            'Content-Type': 'image/png',
-                            // 'Content-Disposition': 'attachment',
-                            ...headers
-                        },
-                        // responseType: 'blob' // Ensure response is treated as a binary object
-                    }
-                );
-
-                console.log("Uploaded screenshot successfully");
+                // Step 4: Capture screenshot and upload to S3
+                await captureScreenshotAndUpload(previewUploadUrl);
     
                 console.log("Upload complete", importResponse.data);
                 setShowAlert(true);
@@ -188,13 +174,13 @@ const BU_ImportObjects = ({ submit }) => {
                     setObjFile(objFile);
                     setObjFileName(objFileName);
                     setFileContent(content);
-                    setObjUrl(content); // For preview
+                    setObjUrl(content);
                 } else if (fileExtension === 'mtl') {
                     mtlFile = file;
                     mtlFileName = file.name;
                     setMtlFile(mtlFile);
                     setMtlFileName(mtlFileName);
-                    setMtlUrl(content); // For preview
+                    setMtlUrl(content);
                 } else {
                     alert('Only .obj and .mtl files are allowed');
                     fileInputRef.current.value = '';
@@ -202,7 +188,7 @@ const BU_ImportObjects = ({ submit }) => {
                 }
             };
 
-            reader.readAsDataURL(file); // Read the file as a data URL
+            reader.readAsDataURL(file);
         }
 
         if (objFile && mtlFile) {
@@ -223,34 +209,46 @@ const BU_ImportObjects = ({ submit }) => {
 
     const isObjectNameFilled = objectName.trim() !== '';
 
-    
-
-    const captureScreenshotAndUpload = async (dataUrl, previewUploadUrl) => {
+    const captureScreenshotAndUpload = async (previewUploadUrl) => {
         try {
-            // const dataUrl = await captureScreenshot();
-            if (dataUrl) {
-                const response = await axios.put(
-                    previewUploadUrl,
-                    dataUrl,
-                    {
-                        headers: {
-                            'Content-Type': 'image/png',
-                            ...headers
-                        }
+            const canvas = document.querySelector('canvas');
+    
+            await new Promise((resolve) => {
+                let frames = 5;
+                const waitForFrames = () => {
+                    if (frames > 0) {
+                        frames--;
+                        requestAnimationFrame(waitForFrames);
+                    } else {
+                        resolve();
                     }
-                );
+                };
+                requestAnimationFrame(waitForFrames);
+            });
     
-                console.log("Uploaded screenshot successfully", response);
-                setScreenshotDataUrl(dataUrl);
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'Preview.png');
+                await axios.put(previewUploadUrl, blob, {
+                    headers: {
+                        'Content-Type': 'image/png',
+                        'Content-Disposition': 'attachment',
+                        ...headers
+                    },
+                });
     
-            } else {
-                console.error('Failed to capture screenshot.');
-            }
+                console.log("Uploaded screenshot successfully");
+            }, 'image/png');
         } catch (error) {
             console.error('Error capturing or uploading screenshot:', error);
         }
     };
-
+    
+    const handleRenderComplete = async () => {
+        console.log("Render complete, capturing screenshot...");
+        await captureScreenshotAndUpload(previewUploadUrl);
+    };
+    
     return (
         <div>
             <Topbar title="Import Objects" onClick={handleGoBack} />
@@ -361,9 +359,8 @@ const BU_ImportObjects = ({ submit }) => {
                         />
                     </div>
                     <div className="col-span-2 mx-8 -translate-y-2 rounded-md border border-gray-400" style={{ height: '300px', width: '400px' }}>
-                        {/* Render 3D Preview here */}
                         {objUrl && mtlUrl ? (
-                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} onCapture={captureScreenshotAndUpload} previewUploadUrl={previewUploadUrl} />
+                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} onRenderComplete={handleRenderComplete} />
                         ) : (
                             <p>Select .obj and .mtl files to see the preview.</p>
                         )}
