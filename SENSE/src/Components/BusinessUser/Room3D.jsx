@@ -24,6 +24,7 @@ const Room3D = () => {
   const [showConfirmSave, setShowConfirmSave] = useState(false);
   const [isObjectSelected, setIsObjectSelected] = useState(false);
   const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
+  const [showFloorDropdown, setShowFloorDropdown] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
@@ -45,6 +46,9 @@ const Room3D = () => {
   const [alertType, setAlertType] = useState('');
 
   const token = localStorage.getItem('authToken');
+
+  const floorRef = useRef(null);
+  const [wallMaterial, setWallMaterial] = useState(null);
 
   // get list of all categories
   useEffect(() => {
@@ -187,12 +191,14 @@ const Room3D = () => {
     const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
     const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
     const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+    setWallMaterial(wallMaterial);
 
     // Floor
     const floorGeometry = new THREE.PlaneGeometry(roomW, roomD);
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
+    floorRef.current = floor;
 
     // Walls
     const wallGeometry = new THREE.PlaneGeometry(roomW, roomH);
@@ -497,6 +503,12 @@ const Room3D = () => {
 
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
+    setShowFloorDropdown(false);
+  };
+
+  const toggleFloorDropdown = () => {
+    setShowFloorDropdown(!showFloorDropdown);
+    setShowDropdown(false);
   };
 
   const handleRemove = () => {
@@ -541,6 +553,29 @@ const Room3D = () => {
     // Logic to save as draft
     setShowConfirmSave(false);
   };
+
+  const handleWallColorChange = (event) => {
+    const color = event.target.value;
+    if (wallMaterial) {
+      wallMaterial.color.set(color);
+    }
+  };
+
+  const handleFloorChange = (textureUrl) => {
+    const texture = new THREE.TextureLoader().load(textureUrl);
+    floorRef.current.material.map = texture;
+    floorRef.current.material.needsUpdate = true;
+  };
+
+  // List of provided floor textures
+  const floorTextures = [
+    { name: 'Hardwood', url: '/textures/hardwood.png' },
+    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg' },
+    { name: 'Marble', url: '/textures/marble-texture.jpg' },
+    { name: 'White-marble', url: '/textures/white-marble.jpg' },
+    { name: 'Terrazzo', url: '/textures/terrazzo.jpg' },
+    // Add more textures here
+  ];
 
   // Publish Template Functions
   async function convertToGLB(scene) {
@@ -717,6 +752,43 @@ const Room3D = () => {
           <div className="w-[300px]">
             <AddObjDropdown handleDragStart={handleDragStart} categoryData={categoryData} objectListData={objectListData} />
           </div>
+        )}
+        {!showDropdown && !isObjectSelected && (
+          <>
+            <button
+              onClick={() => document.getElementById('wallColorPicker').click()}
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
+            >
+              Change Wall Color
+            </button>
+            <input
+              id="wallColorPicker"
+              type="color"
+              style={{ display: 'none' }}
+              onChange={handleWallColorChange}
+            />
+            <div className="relative">
+              <button
+                onClick={toggleFloorDropdown}
+                className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+              >
+                Change Floor
+              </button>
+              {showFloorDropdown && (
+                <div className="absolute mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-full">
+                  {floorTextures.map((texture) => (
+                    <div
+                      key={texture.url}
+                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                      onClick={() => handleFloorChange(texture.url)}
+                    >
+                      {texture.name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
         )}
         {isObjectSelected && (
           <>
