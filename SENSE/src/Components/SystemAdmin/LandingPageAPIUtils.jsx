@@ -7,16 +7,18 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
   const [freePlanFeatures, setFreePlanFeatures] = useState([]);
   const [premiumPlanFeatures, setPremiumPlanFeatures] = useState([]);
   const [videoLink, setVideoLink] = useState('');
+  const [missionParagraph, setMissionParagraph] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem('landingPageData');
     if (storedData) {
-      const { mainParagraph, freePlanFeatures, premiumPlanFeatures, videoLink } = JSON.parse(storedData);
+      const { mainParagraph, freePlanFeatures, premiumPlanFeatures, videoLink, missionParagraph } = JSON.parse(storedData);
       setMainParagraph(mainParagraph);
       setFreePlanFeatures(freePlanFeatures);
       setPremiumPlanFeatures(premiumPlanFeatures);
       setVideoLink(videoLink);
+      setMissionParagraph(missionParagraph);
     } else {
       fetchLandingPageData();
     }
@@ -38,25 +40,30 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         response.data.body.string.main_page &&
         response.data.body.string.main_page.paragraph1 &&
         response.data.body.string.plans &&
-        response.data.body.string.video_link
+        response.data.body.string.video_link &&
+        response.data.body.string.our_mission &&
+        response.data.body.string.our_mission.paragraph1
       ) {
         const fetchedParagraph = response.data.body.string.main_page.paragraph1;
         const plans = response.data.body.string.plans[0];
         const fetchedFreePlanFeatures = plans.free_plan.description;
         const fetchedPremiumPlanFeatures = plans.paid_plan.description;
         const fetchedVideoLink = response.data.body.string.video_link[0].demo;
+        const fetchedMissionParagraph = response.data.body.string.our_mission.paragraph1;
 
         setMainParagraph(fetchedParagraph);
         setFreePlanFeatures(fetchedFreePlanFeatures);
         setPremiumPlanFeatures(fetchedPremiumPlanFeatures);
         setVideoLink(fetchedVideoLink);
+        setMissionParagraph(fetchedMissionParagraph);
 
         // Save data to local storage
         localStorage.setItem('landingPageData', JSON.stringify({
           mainParagraph: fetchedParagraph,
           freePlanFeatures: fetchedFreePlanFeatures,
           premiumPlanFeatures: fetchedPremiumPlanFeatures,
-          videoLink: fetchedVideoLink
+          videoLink: fetchedVideoLink,
+          missionParagraph: fetchedMissionParagraph
         }));
       } else {
         throw new Error('Required data not found in API response');
@@ -79,6 +86,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       const updatedFreePlanFeatures = updateData.freePlanFeatures || storedData.freePlanFeatures;
       const updatedPremiumPlanFeatures = updateData.premiumPlanFeatures || storedData.premiumPlanFeatures;
       const updatedVideoLink = updateData.videoLink || storedData.videoLink;
+      const updatedMissionParagraph = updateData.missionParagraph || storedData.missionParagraph;
 
       const updatePayload = {
         landing_page: {
@@ -89,9 +97,8 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
               paid_plan: { description: updatedPremiumPlanFeatures },
             }
           ],
-          video_link: [
-            { demo: updatedVideoLink }
-          ]
+          video_link: [{ demo: updatedVideoLink }],
+          our_mission: { paragraph1: updatedMissionParagraph }
         }
       };
 
@@ -110,7 +117,8 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         mainParagraph: updatedMainParagraph,
         freePlanFeatures: updatedFreePlanFeatures,
         premiumPlanFeatures: updatedPremiumPlanFeatures,
-        videoLink: updatedVideoLink
+        videoLink: updatedVideoLink,
+        missionParagraph: updatedMissionParagraph
       }));
 
       // After updating, update the state to ensure synchronization
@@ -118,6 +126,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       setFreePlanFeatures(updatedFreePlanFeatures);
       setPremiumPlanFeatures(updatedPremiumPlanFeatures);
       setVideoLink(updatedVideoLink);
+      setMissionParagraph(updatedMissionParagraph);
 
     } catch (error) {
       setLoading(false);
@@ -131,6 +140,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     freePlanFeatures,
     premiumPlanFeatures,
     videoLink,
+    missionParagraph,
     loading,
     fetchLandingPageData,
     updateLandingPage

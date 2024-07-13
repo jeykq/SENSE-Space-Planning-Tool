@@ -5,7 +5,8 @@ import Plan from './Plan'
 import Reviews from './Reviews'
 import Video from './Video'
 import TemplateSlideshow from './TemplateSlideshow'
-import MissionContact from './MissionContact'
+import OurMission from './OurMission'
+import ContactUs from './ContactUs'
 import Footer from './Footer'
 
 
@@ -18,7 +19,8 @@ const Landing = () => {
       <Reviews/>
       <Video/>
       <TemplateSlideshow/>
-      <MissionContact/>
+      <OurMission/>
+      <ContactUs/>
       <Footer/>
     </div>
   )

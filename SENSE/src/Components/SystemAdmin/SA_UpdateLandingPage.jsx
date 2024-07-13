@@ -4,6 +4,7 @@ import LandingNavbar from './LandingNavbar';
 import LandingSense from './LandingSense';
 import LandingPlan from './LandingPlan';
 import LandingVideo from './LandingVideo';
+import LandingMission from './LandingMission';
 
 const SA_UpdateLandingPage = () => {
   const [sticky, setSticky] = useState(false);
@@ -44,6 +45,7 @@ const SA_UpdateLandingPage = () => {
         <LandingSense />
         <LandingPlan />
         <LandingVideo />
+        <LandingMission />
       </div>
     </div>
   );
