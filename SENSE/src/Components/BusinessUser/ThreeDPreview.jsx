@@ -4,12 +4,13 @@ import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
-const ThreeDPreview = ({ objUrl, mtlUrl, onCapture, previewUploadUrl }) => {
+const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
     const containerRef = useRef(null);
     const sceneRef = useRef(null);
     const rendererRef = useRef(null);
     const cameraRef = useRef(null);
     const controlsRef = useRef(null);
+    const canvasRef = useRef(null);
 
     useEffect(() => {
         if (objUrl && mtlUrl) {
@@ -72,6 +73,9 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onCapture, previewUploadUrl }) => {
                             camera.lookAt(new THREE.Vector3(0, 0, 0));
 
                             animate();
+                            if (onRenderComplete) {
+                                onRenderComplete();
+                            }
                         },
                         undefined,
                         (error) => {
@@ -93,16 +97,6 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onCapture, previewUploadUrl }) => {
 
             animate();
 
-            // Function to capture screenshot and pass it to parent component
-            if (rendererRef.current && sceneRef.current && cameraRef.current) {
-                rendererRef.current.render(sceneRef.current, cameraRef.current);
-                const dataUrl = rendererRef.current.domElement.toDataURL('image/png');
-                console.log("Uploading preview -------------------------------------------");
-                console.log(dataUrl);
-                onCapture(dataUrl, previewUploadUrl); // Call the onCapture function passed from parent component
-            }
-
-            
             return () => {
                 if (rendererRef.current) {
                     rendererRef.current.dispose();
@@ -112,10 +106,11 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onCapture, previewUploadUrl }) => {
                 }
             };
         }
-    }, [objUrl, mtlUrl]);
+    }, [objUrl, mtlUrl, onRenderComplete]);
 
-
-    return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
+    return (
+        <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+    );
 };
 
 export default ThreeDPreview;
