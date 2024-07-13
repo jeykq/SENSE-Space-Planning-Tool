@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import signup from '../../assets/signup.jpg';
 import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
-import { useAuth } from '../../AuthContext';
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -11,7 +10,8 @@ const LoginForm = () => {
     const [password, setPassword] = useState('');
     const [showAlert, setShowAlert] = useState(false);
     const [loginLoading, setLoginLoading] = useState(false);
-    const { login } = useAuth();
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [userRole, setUserRole] = useState(null);
 
     const handleSignIn = async (e) => {
         e.preventDefault();
@@ -24,7 +24,9 @@ const LoginForm = () => {
 
             if (response.status === 200) {
                 const { role, token } = response.data;
-                login(token, role);
+                localStorage.setItem('authToken', token);
+                setIsAuthenticated(true);
+                setUserRole(role);
 
                 if (role === 'FREE_USER') {
                     navigate('/FreeUserHomepage');
