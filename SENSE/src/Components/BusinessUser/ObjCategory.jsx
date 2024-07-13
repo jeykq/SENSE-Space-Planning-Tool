@@ -33,16 +33,16 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                                         <>
                                             <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center hover:bg-gray-300" onMouseEnter={() => handleHover(obj.id)} onMouseLeave={() => setShowInfo(0)} key={obj.id} >
                                                 {/* {console.log(Object.keys(obj.object_files))} */}
-                                                {/* <div
+                                                <div
                                                     draggable
                                                     onDragStart={(event) => handleDragStart(event, Object.keys(obj.object_files)[1], Object.keys(obj.object_files)[0])}
                                                     className="mb-2 cursor-pointer"
-                                                > */}
-                                                <div
+                                                >
+                                                {/* <div
                                                     draggable
                                                     onDragStart={(event) => handleDragStart(event, sofa.obj, sofa.mtl)}
                                                     className="mb-2 cursor-pointer"
-                                                >
+                                                > */}
                                                     {obj.id}
                                                     {/* <ObjPreview objUrl={`/3Dmodels/${Object.keys(obj.object_files)[1]}`} mtlUrl={`/3Dmodels/${Object.keys(obj.object_files)[0]}`}/> */}
                                                 </div>
