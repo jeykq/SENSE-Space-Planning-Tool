@@ -30,6 +30,7 @@ import GiveReview from './Components/ManageAccount/GiveReview';
 import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import BuySubscription from './Components/ManageAccount/BuySubscription';
 import FU_Room3D from './Components/FreeUser/FU_Room3D';
+import PU_Room3D from './Components/PremiumUser/PU_Room3D';
 
 const App = () => {
   return (
@@ -64,6 +65,8 @@ const App = () => {
         <Route path="/GiveReview" element={<GiveReview />} />
         <Route path="/BuySubscription" element={<BuySubscription />} />
         <Route path="/ApplyBusinessUser" element={<ApplyBusinessUser />} />
+        <Route path="/FU_Room3D" element={<FU_Room3D />} />
+        <Route path="/PU_Room3D" element={<PU_Room3D />} />
       </Routes>
     </Router>
   )
