@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import LandingNavbar from './LandingNavbar';
 import LandingSense from './LandingSense';
 import LandingPlan from './LandingPlan';
+import LandingVideo from './LandingVideo';
 
 const SA_UpdateLandingPage = () => {
   const [sticky, setSticky] = useState(false);
@@ -42,6 +43,7 @@ const SA_UpdateLandingPage = () => {
         <LandingNavbar />
         <LandingSense />
         <LandingPlan />
+        <LandingVideo />
       </div>
     </div>
   );

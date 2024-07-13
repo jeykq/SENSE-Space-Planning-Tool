@@ -6,15 +6,17 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
   const [mainParagraph, setMainParagraph] = useState('');
   const [freePlanFeatures, setFreePlanFeatures] = useState([]);
   const [premiumPlanFeatures, setPremiumPlanFeatures] = useState([]);
+  const [videoLink, setVideoLink] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem('landingPageData');
     if (storedData) {
-      const { mainParagraph, freePlanFeatures, premiumPlanFeatures } = JSON.parse(storedData);
+      const { mainParagraph, freePlanFeatures, premiumPlanFeatures, videoLink } = JSON.parse(storedData);
       setMainParagraph(mainParagraph);
       setFreePlanFeatures(freePlanFeatures);
       setPremiumPlanFeatures(premiumPlanFeatures);
+      setVideoLink(videoLink);
     } else {
       fetchLandingPageData();
     }
@@ -35,22 +37,26 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         response.data.body.string &&
         response.data.body.string.main_page &&
         response.data.body.string.main_page.paragraph1 &&
-        response.data.body.string.plans
+        response.data.body.string.plans &&
+        response.data.body.string.video_link
       ) {
         const fetchedParagraph = response.data.body.string.main_page.paragraph1;
         const plans = response.data.body.string.plans[0];
         const fetchedFreePlanFeatures = plans.free_plan.description;
         const fetchedPremiumPlanFeatures = plans.paid_plan.description;
+        const fetchedVideoLink = response.data.body.string.video_link[0].demo;
 
         setMainParagraph(fetchedParagraph);
         setFreePlanFeatures(fetchedFreePlanFeatures);
         setPremiumPlanFeatures(fetchedPremiumPlanFeatures);
+        setVideoLink(fetchedVideoLink);
 
         // Save data to local storage
         localStorage.setItem('landingPageData', JSON.stringify({
           mainParagraph: fetchedParagraph,
           freePlanFeatures: fetchedFreePlanFeatures,
-          premiumPlanFeatures: fetchedPremiumPlanFeatures
+          premiumPlanFeatures: fetchedPremiumPlanFeatures,
+          videoLink: fetchedVideoLink
         }));
       } else {
         throw new Error('Required data not found in API response');
@@ -72,6 +78,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       const updatedMainParagraph = updateData.mainParagraph || storedData.mainParagraph;
       const updatedFreePlanFeatures = updateData.freePlanFeatures || storedData.freePlanFeatures;
       const updatedPremiumPlanFeatures = updateData.premiumPlanFeatures || storedData.premiumPlanFeatures;
+      const updatedVideoLink = updateData.videoLink || storedData.videoLink;
 
       const updatePayload = {
         landing_page: {
@@ -81,6 +88,9 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
               free_plan: { description: updatedFreePlanFeatures },
               paid_plan: { description: updatedPremiumPlanFeatures },
             }
+          ],
+          video_link: [
+            { demo: updatedVideoLink }
           ]
         }
       };
@@ -99,13 +109,15 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       localStorage.setItem('landingPageData', JSON.stringify({
         mainParagraph: updatedMainParagraph,
         freePlanFeatures: updatedFreePlanFeatures,
-        premiumPlanFeatures: updatedPremiumPlanFeatures
+        premiumPlanFeatures: updatedPremiumPlanFeatures,
+        videoLink: updatedVideoLink
       }));
 
       // After updating, update the state to ensure synchronization
       setMainParagraph(updatedMainParagraph);
       setFreePlanFeatures(updatedFreePlanFeatures);
       setPremiumPlanFeatures(updatedPremiumPlanFeatures);
+      setVideoLink(updatedVideoLink);
 
     } catch (error) {
       setLoading(false);
@@ -118,6 +130,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     mainParagraph,
     freePlanFeatures,
     premiumPlanFeatures,
+    videoLink,
     loading,
     fetchLandingPageData,
     updateLandingPage
