@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import backgroundImage from '../../assets/p2.png';
-import LandingPageAPIUtils from '../SystemAdmin/LandingPageAPIUtils'; // Adjust import path as necessary
+import LandingPageAPIUtils from '../SystemAdmin/LandingPageAPIUtils'; 
 
 const Sense = () => {
   const { mainParagraph, fetchLandingPageData } = LandingPageAPIUtils({
     onUpdateSuccess: () => {}, // Define success callback if needed
     onError: (error) => {
       console.error('Error fetching data for Sense component:', error);
-      // Handle error as needed (e.g., display error message)
     }
   });
 
