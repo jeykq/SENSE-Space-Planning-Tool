@@ -30,8 +30,8 @@ const Navbar = () => {
           <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='reviews' smooth={true} offset={-150} duration={500}>Reviews </Link></li>
           <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='video' smooth={true} offset={-80} duration={500}>Demo</Link></li>
           <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='templates' smooth={true} offset={0} duration={500}>Templates</Link></li>
-          <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='missionContact' smooth={true} offset={-100} duration={500}>Our Mission</Link></li>
-          <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='missionContact' smooth={true} offset={0} duration={500}>Contact Us</Link></li>
+          <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='ourMission' smooth={true} offset={-100} duration={500}>Our Mission</Link></li>
+          <li className="py-4 px-2 my-1.5 mx-5 text-base text-nowrap"><Link onClick={() => setSidebarOpen(false)} to='contactUs' smooth={true} offset={0} duration={500}>Contact Us</Link></li>
           <li className="flex items-center px-2 my-1.5 mx-5 text-base text-nowrap"><button onClick={handleClickLogin} className='bg-white text-black rounded-full px-3 py-2 my-2 lg:my-0'>Log In</button></li>
         </ul>
       </div>
