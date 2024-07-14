@@ -143,8 +143,6 @@ const BusinessUserHomepage = () => {
     try {
       const headers = getHeaders();
 
-      await axios.delete(deleteTemplateURL);
-
       await axios.post('https://api.sensespacesplanningtool.com/template/delete',
         { id: deleteTemplateId },
         { headers }
@@ -217,7 +215,7 @@ const BusinessUserHomepage = () => {
   );
 
   const renderConfirmDeletePopup = () => (
-    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-100 bg-gray-900">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-100 bg-gray-00">
       <div className="bg-white rounded-lg p-8">
         <p className="mb-4">{`Template deleted successfully!`}</p>
         <div className="flex justify-center">

@@ -491,13 +491,11 @@ const Room3D = () => {
   };
 
   const handleImportRoom = () => {
-    // Logic to import a room
     navigate("/ImportRoom");
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
   const handleExportRoom = () => {
-    // Logic to export the current room
     setShowConfirmExport(true)
   };
 
