@@ -491,13 +491,11 @@ const Room3D = () => {
   };
 
   const handleImportRoom = () => {
-    // Logic to import a room
     navigate("/ImportRoom");
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
   const handleExportRoom = () => {
-    // Logic to export the current room
     setShowConfirmExport(true)
   };
 
@@ -569,12 +567,13 @@ const Room3D = () => {
 
   // List of provided floor textures
   const floorTextures = [
-    { name: 'Hardwood', url: '/textures/hardwood.png' },
-    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg' },
-    { name: 'Marble', url: '/textures/marble-texture.jpg' },
-    { name: 'White-marble', url: '/textures/white-marble.jpg' },
-    { name: 'Terrazzo', url: '/textures/terrazzo.jpg' },
+    { name: 'Hardwood', url: '/textures/hardwood.png', thumbnailUrl: '/thumbnails/hardwood_thumbnail.png' },
+    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg', thumbnailUrl: '/thumbnails/light_fine_wood_thumbnail.png' },
+    { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
+    { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
+    { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
     // Add more textures here
+  
   ];
 
   // Publish Template Functions
@@ -779,10 +778,11 @@ const Room3D = () => {
                   {floorTextures.map((texture) => (
                     <div
                       key={texture.url}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                      className="flex flex-col items-center px-2 py-1 cursor-pointer hover:bg-gray-100"
                       onClick={() => handleFloorChange(texture.url)}
                     >
-                      {texture.name}
+                      <img src={texture.thumbnailUrl} alt={texture.name} className="h-20 w-20 object-cover mb-2" />
+                      <span className="text-center text-sm">{texture.name}</span>
                     </div>
                   ))}
                 </div>
