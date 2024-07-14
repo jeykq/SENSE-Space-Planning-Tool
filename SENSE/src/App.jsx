@@ -33,6 +33,7 @@ import FU_Room3D from './Components/FreeUser/FU_Room3D';
 import PU_Room3D from './Components/PremiumUser/PU_Room3D';
 import PU_CreateRoom from './Components/PremiumUser/PU_CreateRoom';
 import PU_DrawRoom from './Components/PremiumUser/PU_DrawRoom';
+import PU_SelectTemplate from './Components/PremiumUser/PU_SelectTemplate';
 
 const App = () => {
   return (
@@ -71,6 +72,7 @@ const App = () => {
         <Route path="/PU_Room3D" element={<PU_Room3D />} />
         <Route path="/PU_CreateRoom" element={<PU_CreateRoom />} />
         <Route path="/PU_DrawRoom" element={<PU_DrawRoom />} />
+        <Route path="/PU_SelectTemplate" element={<PU_SelectTemplate />} />
       </Routes>
     </Router>
   )

@@ -1,0 +1,121 @@
+/* PU_SelectTemplate.css */
+
+.select-template-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .select-template-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .select-template-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    max-width: 600px;
+  }
+  
+  .room-name-input-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .select-template-input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+    width: 80%;
+  }
+  
+  .search-button {
+    padding: 10px;
+    margin-left: 10px;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .template-list {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  
+  .template-item {
+    flex: 0 0 auto;
+    width: 150px;
+    height: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .template-item.selected {
+    border-color: #1d4ed8;
+  }
+  
+  .template-thumbnail {
+    width: 100px;
+    height: 100px;
+    background-color: #e0e0e0;
+    margin-bottom: 10px;
+  }
+  
+  .template-info {
+    text-align: center;
+  }
+  
+  .template-name {
+    font-weight: bold;
+  }
+  
+  .template-type {
+    color: #888;
+  }
+  
+  .selected-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
+  }
+  
+  .generate-room-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    background-color: #1d4ed8; /* Tailwind CSS blue-500 */
+    color: white;
+    cursor: pointer;
+  }
+  
+  .generate-room-button:hover {
+    background-color: #1e40af; /* Tailwind CSS blue-700 */
+  }
+  

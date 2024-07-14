@@ -1,19 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
 import Footer from '../Landing/Footer';
 import './PU_CreateRoom.css';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils';
 
 const PU_CreateRoom = () => {
   const [selectedOption, setSelectedOption] = useState('');
+  const [templates, setTemplates] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/template/list',
+          {},
+          { headers }
+        );
+
+        if (!response.data || !response.data.body) {
+          throw new Error('No template names data returned');
+        }
+
+        const sortedTemplates = response.data.body.sort((a, b) => a.id - b.id);
+        setTemplates(sortedTemplates);
+      } catch (error) {
+        console.error('Error fetching template names:', error);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
 
   const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
   };
 
   const handleTemplateClick = () => {
-    console.log('Template clicked');
+    navigate('/PU_SelectTemplate', { state: { templates } });
   };
 
   const handleDrawClick = () => {
