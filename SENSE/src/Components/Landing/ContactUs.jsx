@@ -1,6 +1,24 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import LandingPageAPIUtils from '../SystemAdmin/LandingPageAPIUtils';
 
 const ContactUs = () => {
+  const {
+    contactEmail,
+    contactPhone,
+    contactAddress,
+    fetchLandingPageData,
+  } = LandingPageAPIUtils({
+    onUpdateSuccess: () => {},
+    onError: (error) => {
+      console.error('Error fetching contact data:', error);
+    },
+  });
+
+  useEffect(() => {
+    // Fetch initial data for ContactUs component
+    fetchLandingPageData();
+  }, []);
+
   return (
     <div name='contactUs' className='text-black text-center mx-auto max-w-screen-lg p-6'>
       <div className='bg-white shadow-lg rounded-lg p-10'>
@@ -11,15 +29,15 @@ const ContactUs = () => {
         <ul className='text-lg space-y-4'>
           <li className='flex items-center justify-center'>
             <span className='mr-4'>📧</span>
-            <a href='mailto:fypgp42@gmail.com' className='text-blue-600 hover:underline'>fypgp42@gmail.com</a>
+            <a href={`mailto:${contactEmail}`} className='text-blue-600 hover:underline'>{contactEmail}</a>
           </li>
           <li className='flex items-center justify-center'>
             <span className='mr-4'>📞</span>
-            <a href='tel:+6577712987' className='text-blue-600 hover:underline'>+65 777-129-87</a>
+            <a href={`tel:${contactPhone}`} className='text-blue-600 hover:underline'>{contactPhone}</a>
           </li>
           <li className='flex items-center justify-center'>
             <span className='mr-4'>📍</span>
-            461 Clementi Rd, Singapore 599491
+            {contactAddress}
           </li>
         </ul>
       </div>
