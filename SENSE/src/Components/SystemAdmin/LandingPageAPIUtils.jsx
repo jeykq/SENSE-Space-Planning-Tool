@@ -8,17 +8,26 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
   const [premiumPlanFeatures, setPremiumPlanFeatures] = useState([]);
   const [videoLink, setVideoLink] = useState('');
   const [missionParagraph, setMissionParagraph] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactAddress, setContactAddress] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const storedData = localStorage.getItem('landingPageData');
     if (storedData) {
-      const { mainParagraph, freePlanFeatures, premiumPlanFeatures, videoLink, missionParagraph } = JSON.parse(storedData);
+      const {
+        mainParagraph, freePlanFeatures, premiumPlanFeatures, videoLink, missionParagraph,
+        contactEmail, contactPhone, contactAddress
+      } = JSON.parse(storedData);
       setMainParagraph(mainParagraph);
       setFreePlanFeatures(freePlanFeatures);
       setPremiumPlanFeatures(premiumPlanFeatures);
       setVideoLink(videoLink);
       setMissionParagraph(missionParagraph);
+      setContactEmail(contactEmail);
+      setContactPhone(contactPhone);
+      setContactAddress(contactAddress);
     } else {
       fetchLandingPageData();
     }
@@ -42,7 +51,8 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         response.data.body.string.plans &&
         response.data.body.string.video_link &&
         response.data.body.string.our_mission &&
-        response.data.body.string.our_mission.paragraph1
+        response.data.body.string.our_mission.paragraph1 &&
+        response.data.body.string.contact
       ) {
         const fetchedParagraph = response.data.body.string.main_page.paragraph1;
         const plans = response.data.body.string.plans[0];
@@ -50,12 +60,18 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         const fetchedPremiumPlanFeatures = plans.paid_plan.description;
         const fetchedVideoLink = response.data.body.string.video_link[0].demo;
         const fetchedMissionParagraph = response.data.body.string.our_mission.paragraph1;
+        const fetchedContactEmail = response.data.body.string.contact.email;
+        const fetchedContactPhone = response.data.body.string.contact.phone;
+        const fetchedContactAddress = response.data.body.string.contact.address;
 
         setMainParagraph(fetchedParagraph);
         setFreePlanFeatures(fetchedFreePlanFeatures);
         setPremiumPlanFeatures(fetchedPremiumPlanFeatures);
         setVideoLink(fetchedVideoLink);
         setMissionParagraph(fetchedMissionParagraph);
+        setContactEmail(fetchedContactEmail);
+        setContactPhone(fetchedContactPhone);
+        setContactAddress(fetchedContactAddress);
 
         // Save data to local storage
         localStorage.setItem('landingPageData', JSON.stringify({
@@ -63,7 +79,10 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
           freePlanFeatures: fetchedFreePlanFeatures,
           premiumPlanFeatures: fetchedPremiumPlanFeatures,
           videoLink: fetchedVideoLink,
-          missionParagraph: fetchedMissionParagraph
+          missionParagraph: fetchedMissionParagraph,
+          contactEmail: fetchedContactEmail,
+          contactPhone: fetchedContactPhone,
+          contactAddress: fetchedContactAddress
         }));
       } else {
         throw new Error('Required data not found in API response');
@@ -87,6 +106,9 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       const updatedPremiumPlanFeatures = updateData.premiumPlanFeatures || storedData.premiumPlanFeatures;
       const updatedVideoLink = updateData.videoLink || storedData.videoLink;
       const updatedMissionParagraph = updateData.missionParagraph || storedData.missionParagraph;
+      const updatedContactEmail = updateData.contactEmail || storedData.contactEmail;
+      const updatedContactPhone = updateData.contactPhone || storedData.contactPhone;
+      const updatedContactAddress = updateData.contactAddress || storedData.contactAddress;
 
       const updatePayload = {
         landing_page: {
@@ -98,7 +120,12 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
             }
           ],
           video_link: [{ demo: updatedVideoLink }],
-          our_mission: { paragraph1: updatedMissionParagraph }
+          our_mission: { paragraph1: updatedMissionParagraph },
+          contact: {
+            email: updatedContactEmail,
+            phone: updatedContactPhone,
+            address: updatedContactAddress
+          }
         }
       };
 
@@ -118,7 +145,10 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         freePlanFeatures: updatedFreePlanFeatures,
         premiumPlanFeatures: updatedPremiumPlanFeatures,
         videoLink: updatedVideoLink,
-        missionParagraph: updatedMissionParagraph
+        missionParagraph: updatedMissionParagraph,
+        contactEmail: updatedContactEmail,
+        contactPhone: updatedContactPhone,
+        contactAddress: updatedContactAddress
       }));
 
       // After updating, update the state to ensure synchronization
@@ -127,6 +157,9 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       setPremiumPlanFeatures(updatedPremiumPlanFeatures);
       setVideoLink(updatedVideoLink);
       setMissionParagraph(updatedMissionParagraph);
+      setContactEmail(updatedContactEmail);
+      setContactPhone(updatedContactPhone);
+      setContactAddress(updatedContactAddress);
 
     } catch (error) {
       setLoading(false);
@@ -141,6 +174,9 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     premiumPlanFeatures,
     videoLink,
     missionParagraph,
+    contactEmail,
+    contactPhone,
+    contactAddress,
     loading,
     fetchLandingPageData,
     updateLandingPage
