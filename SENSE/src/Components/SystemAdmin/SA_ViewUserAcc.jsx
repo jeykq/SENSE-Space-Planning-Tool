@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
 import Topbar from '../BusinessUser/Topbar';
+import AlertPopup from '../UI/AlertPopup'; // Import AlertPopup component
 
 const SA_ViewUserAccount = () => {
   const { id } = useParams();
@@ -11,16 +12,19 @@ const SA_ViewUserAccount = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [jobIndustryMapping, setJobIndustryMapping] = useState({});
+  const [previousRole, setPreviousRole] = useState('');
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
+  // Function to go back
   const handleGoBack = () => {
     navigate(-1);
   };
 
+  // Fetch user details and job industries on component mount
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
-        const headers = getHeaders(); // Assuming you have a function to get headers
+        const headers = getHeaders();
         if (!headers) {
           setError('Token not found');
           setLoading(false);
@@ -44,6 +48,19 @@ const SA_ViewUserAccount = () => {
         }
 
         setUserDetails(user);
+
+        // Retrieve previousRole from localStorage if available
+        const storedPreviousRole = localStorage.getItem('previousRole');
+        if (storedPreviousRole) {
+          setPreviousRole(storedPreviousRole);
+        }
+
+        // Set previous role if current role is FREE_USER or PREMIUM_USER
+        if (user.role === 'FREE_USER' || user.role === 'PREMIUM_USER') {
+          setPreviousRole(user.role);
+          // Store initial previousRole in localStorage
+          localStorage.setItem('previousRole', user.role);
+        }
       } catch (error) {
         console.error('Error fetching user details:', error.message);
         setError(error.message);
@@ -60,8 +77,8 @@ const SA_ViewUserAccount = () => {
         } else {
           const headers = getHeaders();
           const response = await axios.post(
-            'https://api.sensespacesplanningtool.com/job_industry/list', 
-            {}, 
+            'https://api.sensespacesplanningtool.com/job_industry/list',
+            {},
             { headers }
           );
 
@@ -78,7 +95,7 @@ const SA_ViewUserAccount = () => {
           setJobIndustryMapping(jobIndustryMap);
         }
       } catch (error) {
-        console.error('Error fetching job industries:', error);
+        console.error('Error fetching job industries:', error.message);
         setError(error.message);
       }
     };
@@ -87,6 +104,54 @@ const SA_ViewUserAccount = () => {
     fetchJobIndustries();
   }, [id]);
 
+  // Toggle user role between previous and BUSINESS_USER
+  const handleToggleRole = () => {
+    setUserDetails(prevDetails => {
+      let newRole;
+      if (prevDetails.role === 'BUSINESS_USER') {
+        newRole = previousRole;
+      } else {
+        // Update previousRole if current role is FREE_USER or PREMIUM_USER
+        if (prevDetails.role === 'FREE_USER' || prevDetails.role === 'PREMIUM_USER') {
+          setPreviousRole(prevDetails.role);
+          // Store updated previousRole in localStorage
+          localStorage.setItem('previousRole', prevDetails.role);
+        }
+        newRole = 'BUSINESS_USER';
+      }
+      return { ...prevDetails, role: newRole };
+    });
+  };
+
+  // Save updated user role
+  const handleSave = async () => {
+    try {
+      const headers = getHeaders();
+      const updateData = {
+        user_id: parseInt(id, 10),
+        role: userDetails.role,
+      };
+
+      await axios.post(
+        'https://api.sensespacesplanningtool.com/user/update/role',
+        updateData,
+        { headers }
+      );
+
+      setIsAlertVisible(true); // Show success alert
+      setTimeout(() => setIsAlertVisible(false), 3000);
+    } catch (error) {
+      console.error('Error updating user role:', error.message);
+      setError(error.message);
+    }
+  };
+
+  // Close alert handler
+  const handleAlertClose = () => {
+    setIsAlertVisible(false);
+  };
+
+  // JSX to render loading, error, or user details
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -94,6 +159,13 @@ const SA_ViewUserAccount = () => {
   if (error) {
     return <div>Error: {error}</div>;
   }
+
+  // Determine which roles should be available in the dropdown
+  const availableRoles = [];
+  if (previousRole !== 'BUSINESS_USER') {
+    availableRoles.push(previousRole);
+  }
+  availableRoles.push('BUSINESS_USER');
 
   return (
     <div>
@@ -129,16 +201,32 @@ const SA_ViewUserAccount = () => {
               </div>
               <div className="mb-4 flex items-center justify-center">
                 <label className="block text-gray-700 text-base font-bold mb-2 mr-1.5">User Type</label>
-                <span className="input-value bg-gray-100 rounded ml-2 w-auto py-2 px-3 border shadow text-gray-700 block">{userDetails.role}</span>
+                <select
+                  className="ml-2 px-4 py-2 rounded bg-gray-200 text-gray-800"
+                  value={userDetails.role}
+                  onChange={e => setUserDetails({ ...userDetails, role: e.target.value })}
+                >
+                  {availableRoles.map(role => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
               </div>
               <div className="flex items-center justify-center">
-              <button 
-  className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-200 transition-colors duration-300 hover:bg-gray-400 hover:text-white"
->
-  Save
-</button>
+                <button 
+                  className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-200 transition-colors duration-300 hover:bg-gray-400 hover:text-white"
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
               </div>
-
+              {isAlertVisible && (
+                <AlertPopup
+                  title="Success"
+                  text="User Role Updated Successfully!"
+                  onClose={handleAlertClose}
+                  onOk={handleAlertClose} // Close on OK
+                />
+              )}
             </div>
           </div>
         </div>
