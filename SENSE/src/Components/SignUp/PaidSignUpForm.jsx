@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import signup from '../../assets/signup.jpg';
-import scanpay from '../../assets/scanpay.png';
+import visa from '../../assets/visa.png';
+import debit from '../../assets/debit.png';
+import ucb from '../../assets/ucb.jpeg';
 import AlertPopup from '../UI/AlertPopup';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,8 +17,32 @@ const PaidSignUpForm = () => {
   const [industry, setIndustry] = useState('');
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState({});
+  const [billingCountry, setBillingCountry] = useState('Singapore'); // Default to Singapore
   const [industryList, setIndustryList] = useState([]);
   const navigate = useNavigate();
+
+  const countryList = [
+    'Singapore',
+    'United States',
+    'Canada',
+    'United Kingdom',
+    'Australia',
+    'India',
+    'Germany',
+    'France',
+    'China',
+    'Japan',
+    'Brazil',
+    'Russia',
+    'South Africa',
+    'Mexico',
+    'Argentina',
+    'Italy',
+    'Spain',
+    'South Korea',
+    'Indonesia',
+    'Saudi Arabia',
+  ];
 
   useEffect(() => {
     const fetchIndustryList = async () => {
@@ -106,18 +132,18 @@ const PaidSignUpForm = () => {
   };
 
   return (
-    <div className="flex h-screen relative">
+    <div className="flex h-full relative overflow-hidden">
       <button 
         onClick={handleClose} 
-        style={{ position: 'absolute', top: '10px', right: '10px', fontSize: '20px', cursor: 'pointer' }}
+        style={{ position: 'absolute', top: '10px', right: '20px', fontSize: '25px', cursor: 'pointer' }}
       >
         &times;
       </button>
       <div className="w-1/2 flex flex-col items-center justify-center p-12 bg-no-repeat bg-cover bg-center" style={{ backgroundImage: `url(${signup})` }}>
         <h1 className="text-3xl mb-3">Welcome to Sense Spaces Planning Tool</h1>
       </div>
-      <div className="w-1/2 py-16 px-12 flex items-center justify-center">
-        <div>
+      <div className="w-1/2 py-10 mt-10 px-12 flex items-center justify-center overflow-auto" style={{paddingBottom: '50px'}}>
+        <div className="w-full">
           <h2 className="text-3xl mb-4 text-center">Sign Up Premium</h2>
           <form onSubmit={handleSubmit}>
             <div className="grid grid-cols-2 gap-5">
@@ -161,26 +187,51 @@ const PaidSignUpForm = () => {
               </span>
             </div>
 
-            <div className="flex flex-col items-center mt-5">
+            <div className="flex flex-col mt-5 h-48 overflow-y-auto">
               <div>
-                <h3>$ Payment instructions:</h3>
+                <h3>Payment Method</h3>
               </div>
-              <img src={scanpay} alt="scanpay" style={{width: '120px', height: '140px'}} />
+              <div className="relative w-full mt-2">
+                <input type="text" placeholder="1234 1234 1234 1234" className="border border-gray-400 py-1 px-2 w-full rounded" required />
+                <div className="absolute top-0 right-0 flex items-center mt-2 mr-2">
+                  <img src={visa} alt="visa" className="w-10 h-6 ml-1" />
+                  <img src={debit} alt="debit" className="w-10 h-6 ml-1" />
+                  <img src={ucb} alt="ucb" className="w-10 h-6 ml-1" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-5 w-full my-2">
+                <input type="text" placeholder="MM/YY" className="border border-gray-400 py-1 px-2 w-full rounded" required />
+                <input type="text" placeholder="CVC" className="border border-gray-400 py-1 px-2 w-full rounded" required />
+              </div>
+              <input type="text" placeholder="Full Name on Card" className="border border-gray-400 py-1 px-2 w-full rounded" required />
+
+              <select
+                className="border border-gray-400 py-1 px-2 w-full mt-2 rounded"
+                value={billingCountry}
+                onChange={(e) => setBillingCountry(e.target.value)}
+                required
+              >
+                {countryList.map((country) => (
+                  <option key={country} value={country}>
+                    {country}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            <button className="w-full bg-blue-500 py-3 text-white mt-5 rounded">Sign Up</button>
-            {errors.general && <p style={{ color: 'red' }} className="text-sm mt-3">{errors.general}</p>}
+            {errors.general && <p style={{ color: 'red' }} className="text-sm">{errors.general}</p>}
+            
+            <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-5 w-full">
+              Sign Up
+            </button>
           </form>
         </div>
       </div>
-      {showAlert && (
-        <AlertPopup
-          title="Sign up successful!"
-          text="Your account has been created successfully."
-          onClose={() => setShowAlert(false)}
-          onOk={handleOK}
-        />
-      )}
+      {showAlert && <AlertPopup 
+        title="Success"
+        text="Sign up successful!" 
+        onClose={handleOK}
+        onOk={handleOK} />}
     </div>
   );
 };

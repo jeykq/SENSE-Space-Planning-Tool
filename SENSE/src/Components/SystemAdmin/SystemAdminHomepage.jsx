@@ -96,7 +96,7 @@ const SystemAdminHomepage = () => {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      <div className="mt-20 mx-5 flex items-center pt-8 pl-5">
+      <div className="mt-10 mx-5 flex items-center pt-8 pl-5">
         <p className="text-lg font-medium">Search Users</p>
         <div className="ml-4">
           <SearchBar handleSearch={handleSearch} />
