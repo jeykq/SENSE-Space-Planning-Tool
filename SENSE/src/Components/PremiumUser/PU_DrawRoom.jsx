@@ -32,7 +32,7 @@ const PU_DrawRoom = () => {
 
   return (
     <>
-      <Topbar title="Create New Template" onClick={handleGoBack} />
+      <Topbar title="Premium Users: Create A New Template" onClick={handleGoBack} />
       <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="template_name">Template name</label>

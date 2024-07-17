@@ -57,7 +57,7 @@ const PU_CreateRoom = () => {
 
   return (
     <div className="create-room-page">
-      <Topbar title="Create Room" onClick={handleGoBack} />
+      <Topbar title="Premium Users：Create Room" onClick={handleGoBack} />
       <div className="create-room-container">
         <label className="create-room-label">Who are you creating the room for?</label>
         <div className="col-span-2 mb-2 relative"></div>
