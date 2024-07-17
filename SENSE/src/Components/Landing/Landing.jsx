@@ -3,6 +3,7 @@ import Navbar from './Navbar'
 import Sense from './Sense'
 import Plan from './Plan'
 import Reviews from './Reviews'
+import UserJobIndustryChart from './UserJobIndustryChart'
 import Video from './Video'
 import TemplateSlideshow from './TemplateSlideshow'
 import OurMission from './OurMission'
@@ -17,6 +18,7 @@ const Landing = () => {
       <Sense/>
       <Plan/>
       <Reviews/>
+      <UserJobIndustryChart/>
       <Video/>
       <TemplateSlideshow/>
       <OurMission/>
