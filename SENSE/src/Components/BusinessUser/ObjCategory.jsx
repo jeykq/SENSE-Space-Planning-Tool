@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import ObjPreview from './ObjPreview';
 
 const ObjCategory = ({ name, catId, objectListData }) => {
-    const handleDragStart = (event, modelPath, materialPath) => {
+    const handleDragStart = (event, id, modelPath, materialPath) => {
+        event.dataTransfer.setData('id', id);
         event.dataTransfer.setData('modelPath', modelPath);
         event.dataTransfer.setData('materialPath', materialPath);
     };
@@ -10,9 +11,11 @@ const ObjCategory = ({ name, catId, objectListData }) => {
     const [showInfo, setShowInfo] = useState(0);
 
     const matchingObj = objectListData?.body?.filter(obj => obj.category_ids?.includes(catId));
+    console.log(matchingObj);
 
     const handleHover = (id) => {
         setShowInfo(id);
+        console.log(id);
     };
 
     return (
@@ -34,7 +37,7 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                                             <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center hover:bg-gray-300" onMouseEnter={() => handleHover(obj.id)} onMouseLeave={() => setShowInfo(0)} key={obj.id} >
                                                 <div
                                                     draggable
-                                                    onDragStart={(event) => handleDragStart(event, Object.keys(obj.object_files)[1], Object.keys(obj.object_files)[0])}
+                                                    onDragStart={(event) => handleDragStart(event, obj.id, Object.keys(obj.object_files)[1], Object.keys(obj.object_files)[0])}
                                                     className="mb-2 cursor-pointer"
                                                 >
                                                     {/* {obj.id} */}

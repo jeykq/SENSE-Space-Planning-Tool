@@ -268,37 +268,39 @@ const Room3D = () => {
     }
 
     // Load 3D Model
-    const loadModel = (modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
+    const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
+        
+      const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
+    
       const mtlLoader = new MTLLoader();
-      mtlLoader.setPath('/3Dmodels/');
+      mtlLoader.setPath(s3URL);
       mtlLoader.load(materialPath, (materials) => {
         materials.preload();
-
+    
         // Ensure that materials are not transparent and have full opacity
         for (let materialName in materials.materials) {
           const material = materials.materials[materialName];
           material.transparent = false;
           material.opacity = 1.0;
         }
-
+    
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
-        objLoader.setPath('/3Dmodels/');
+        objLoader.setPath(s3URL);
         objLoader.load(modelPath, (object) => {
-
           // Calculate the bounding box of the loaded object
           const boundingBox = new THREE.Box3().setFromObject(object);
           const size = boundingBox.getSize(new THREE.Vector3());
-
+    
           // Calculate the scaling factor to fit the object within the room
           const maxDimension = Math.max(size.x, size.y, size.z);
           const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
           object.scale.set(scale, scale, scale);
-
+    
           // Recalculate the bounding box after scaling
           const scaledBoundingBox = new THREE.Box3().setFromObject(object);
           const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
-
+    
           // Adjust the position of the object to fit within the room bounds
           const adjustedPosition = {
             x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
@@ -308,10 +310,10 @@ const Room3D = () => {
           object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
           object.userData.selectable = true; // Set selectable on the parent group
           scene.add(object);
-
+    
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-
+    
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
           console.error('Error loading model:', error);
@@ -319,7 +321,7 @@ const Room3D = () => {
       }, undefined, (error) => {
         console.error('Error loading materials:', error);
       });
-    };
+    };    
 
     const onMouseDown = (event) => {
       if (isTransformingRef.current) return; // Ignore if interacting with transform controls
@@ -440,8 +442,11 @@ const Room3D = () => {
     // Drag and Drop Logic
     const handleDrop = (event) => {
       event.preventDefault();
+      
+      const id = event.dataTransfer.getData('id');
       const modelPath = event.dataTransfer.getData('modelPath');
       const materialPath = event.dataTransfer.getData('materialPath');
+
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -458,7 +463,7 @@ const Room3D = () => {
         Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
 
-      loadModel(modelPath, materialPath, pos);
+      loadModel(id, modelPath, materialPath, pos);
       setShowDropdown(false);
     };
 
