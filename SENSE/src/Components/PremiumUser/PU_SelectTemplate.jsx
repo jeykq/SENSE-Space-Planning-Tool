@@ -31,7 +31,7 @@ const PU_SelectTemplate = () => {
 
   return (
     <div className="select-template-page">
-      <Topbar title="Create Room" onClick={handleGoBack} />
+      <Topbar title="Premium Users: Create Room" onClick={handleGoBack} />
       <div className="select-template-container">
         <div className="select-template-form">
           <label>Room Name</label>
