@@ -20,7 +20,7 @@ const ObjCategory = ({ name, catId, objectListData }) => {
             {matchingObj?.length > 0 &&
                 <div onClick={() => setIsExpand(!expand)} className="flex bg-gray-200 px-3 py-2 rounded-lg mb-2 cursor-pointer">
                     <div>{name}</div>
-                    <div className="text-gray-400 ml-auto">(cat_id:{catId})</div>
+                    {/* <div className="text-gray-400 ml-auto">(cat_id:{catId})</div> */}
                 </div>
             }
             {expand &&
@@ -32,21 +32,16 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                                     {matchingObj.map((obj) => (
                                         <>
                                             <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center hover:bg-gray-300" onMouseEnter={() => handleHover(obj.id)} onMouseLeave={() => setShowInfo(0)} key={obj.id} >
-                                                {/* {console.log(Object.keys(obj.object_files))} */}
                                                 <div
                                                     draggable
                                                     onDragStart={(event) => handleDragStart(event, Object.keys(obj.object_files)[1], Object.keys(obj.object_files)[0])}
                                                     className="mb-2 cursor-pointer"
                                                 >
-                                                {/* <div
-                                                    draggable
-                                                    onDragStart={(event) => handleDragStart(event, sofa.obj, sofa.mtl)}
-                                                    className="mb-2 cursor-pointer"
-                                                > */}
-                                                    {obj.id}
+                                                    {/* {obj.id} */}
+                                                    <img src={obj?.object_media?.preview} className="w-20 h-20" />
                                                     {/* <ObjPreview objUrl={`/3Dmodels/${Object.keys(obj.object_files)[1]}`} mtlUrl={`/3Dmodels/${Object.keys(obj.object_files)[0]}`}/> */}
                                                 </div>
-                                                <div className="mt-auto mb-1 text-sm w-full break-words px-1">
+                                                <div className="mt-auto mb-1 text-sm w-full break-words px-1 h-[45px] flex items-center justify-center">
                                                     {obj.name}
                                                 </div>
                                                 {/* {showInfo == obj.id && 

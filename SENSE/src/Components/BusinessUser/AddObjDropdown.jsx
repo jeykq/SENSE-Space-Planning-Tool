@@ -29,7 +29,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                 <ObjCategory name={cat.name} catId={cat.id} key={cat.id} objectListData={objectListData} />
             ))}
             {/* testing item preview start */}
-            <div className="grid grid-cols-3 gap-2 p-2">
+            {/* <div className="grid grid-cols-3 gap-2 p-2">
                 <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center" >
                     <div
                         draggable
@@ -42,11 +42,11 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         testing_table_preview
                     </div>
                 </div>
-            </div>
+            </div> */}
             {/* testing end */}
 
             {/* testing second item preview start */}
-            <div className="grid grid-cols-3 gap-2 p-2">
+            {/* <div className="grid grid-cols-3 gap-2 p-2">
                 <div className="bg-gray-200 rounded-md aspect-square flex flex-col text-center" >
                     <div
                         draggable
@@ -59,7 +59,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         design_chair_preview
                     </div>
                 </div>
-            </div>
+            </div> */}
             {/* testing end */}
 
         </div>
