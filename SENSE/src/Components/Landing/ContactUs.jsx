@@ -22,7 +22,7 @@ const ContactUs = () => {
   return (
     <div name='contactUs' className='text-black text-center mx-auto max-w-screen-lg p-6'>
       <div className='bg-white shadow-lg rounded-lg p-10'>
-        <h1 className='text-4xl font-semibold mb-10 text-blue-700'>Contact Us</h1>
+        <h1 className='text-4xl font-semibold mb-10 text-black'>Contact Us</h1>
         <p className='text-lg my-10 leading-relaxed'>
           For inquiries, feedback, or assistance, please feel free to contact us using the following methods:
         </p>

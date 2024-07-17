@@ -16,7 +16,7 @@ const OurMission = () => {
 
   return (
     <div name='ourMission' className='text-black text-center mx-auto max-w-screen-lg p-6'>
-      <h1 className='text-4xl font-semibold mb-10 text-blue-700'>Our Mission</h1>
+      <h1 className='text-4xl font-semibold mb-10 text-black'>Our Mission</h1>
       <p className='text-lg text-justify max-w-[800px] mt-10 md:mb-10 leading-relaxed mx-auto'>
         {missionParagraph}
       </p>
