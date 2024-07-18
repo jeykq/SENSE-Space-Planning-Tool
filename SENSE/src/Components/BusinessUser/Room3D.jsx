@@ -48,6 +48,7 @@ const Room3D = () => {
   const token = localStorage.getItem('authToken');
 
   const floorRef = useRef(null);
+  const arrowHelperRef = useRef(null);
   const [wallMaterial, setWallMaterial] = useState(null);
 
   // get list of all categories
@@ -228,6 +229,19 @@ const Room3D = () => {
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
+    // Arrow Helper for Selected Object
+    const arrowHelper = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0), // Direction
+      new THREE.Vector3(0, 0, 0), // Origin
+      1, // Length
+      0xff0000, // Color
+      0.2, // Head Length
+      0.2 // Head Width
+    );
+    scene.add(arrowHelper);
+    arrowHelper.visible = false;
+    arrowHelperRef.current = arrowHelper;
+
     // Orbit Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -384,6 +398,12 @@ const Room3D = () => {
         newPosition.z = Math.max(-roomD / 2, Math.min(roomD / 2, newPosition.z));
 
         intersectedRef.current.position.copy(newPosition);
+
+        // Move the arrow above the selected object
+        const arrowHelper = arrowHelperRef.current;
+        arrowHelper.position.copy(newPosition);
+        const objectBoundingBox = new THREE.Box3().setFromObject(intersectedRef.current);
+        arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
       } else {
         const rect = mount.getBoundingClientRect();
         mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -521,6 +541,7 @@ const Room3D = () => {
       selectedObjectRef.current = null;
       setIsObjectSelected(false);
       transformControlsRef.current.detach();
+      arrowHelperRef.current.visible = false; // Hide the arrow when the object is removed
       setCurrentMode(null); // Reset current mode
     }
   };
@@ -543,12 +564,20 @@ const Room3D = () => {
       transformControlsRef.current.setMode(currentMode);
       transformControlsRef.current.attach(object);
     }
+
+    // Move the arrow above the selected object
+    const arrowHelper = arrowHelperRef.current;
+    arrowHelper.position.copy(object.position);
+    const objectBoundingBox = new THREE.Box3().setFromObject(object);
+    arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
+    arrowHelper.visible = true; // Make the arrow visible
   };
 
   const deselectObject = () => {
     setIsObjectSelected(false);
     selectedObjectRef.current = null;
     transformControlsRef.current.detach(); // Detach transform controls
+    arrowHelperRef.current.visible = false; // Hide the arrow
     setCurrentMode(null); // Reset current mode
   };
 
