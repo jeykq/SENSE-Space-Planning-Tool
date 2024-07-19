@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
+import { saveAs } from 'file-saver';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
@@ -35,6 +36,7 @@ const BU_Room3D = () => {
   const intersectedRef = useRef(null);
   const transformControlsRef = useRef(null);
   const isTransformingRef = useRef(false); // Reference state to track if TransformControl is active
+  const fileInputRef = useRef(null);
 
   const [categoryData, setCategoryData] = useState(null);
   const [objectListData, setObjectListData] = useState(null);
@@ -515,13 +517,96 @@ const BU_Room3D = () => {
     setShowConfirmSave(true);
   };
 
+  // Import Room functions
   const handleImportRoom = () => {
-    navigate("/ImportRoom");
+    fileInputRef.current.click();
   };
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+      console.log('File content:', fileContent);
+
+      loadGLB(fileContent);
+
+      if (file.name.endsWith('.json') || file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
+        loadGLB(fileContent);
+      } else {
+        alert('Unsupported file format');
+      }
+    };
+
+    if (file.name.endsWith('.json')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const loadGLB = (data) => {
+    try {
+      const loader = new GLTFLoader();
+      loader.parse(data, '', (gltf) => {
+        sceneRef.current.add(gltf.scene);
+      }, undefined, (error) => {
+        console.error('Error loading GLB:', error);
+      });
+    } catch (error) {
+      console.error('Error parsing GLB:', error);
+    }
+  };
+
+  // Export Room functions
   const [showConfirmExport, setShowConfirmExport] = useState(false);
+
   const handleExportRoom = () => {
-    setShowConfirmExport(true)
+    const scene = sceneRef.current;
+
+    if (!scene) {
+      console.error('No scene found.');
+      return;
+    }
+
+    console.log(scene);
+
+    const exporter = new GLTFExporter();
+
+    exporter.parse(
+      scene,
+      function (result) {
+        if (result instanceof ArrayBuffer) {
+          saveArrayBuffer(result, 'RoomModel.glb');
+        } else if (result instanceof Object) {
+          saveJSON(result, 'RoomModel.json');
+        } else {
+          console.error('Unexpected result format:', result);
+        }
+      },
+      {
+        binary: false
+      }
+    );
+  };
+
+  function saveArrayBuffer(buffer, filename) {
+    save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
+  }
+
+  function saveJSON(data, filename) {
+    save(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), filename);
+  }
+
+  const link = document.createElement('a');
+  document.body.appendChild(link);
+
+  function save(blob, filename) {
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
   };
 
   const toggleDropdown = () => {
@@ -614,7 +699,6 @@ const BU_Room3D = () => {
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
 
-    // Export scene to GLB format
     return new Promise((resolve, reject) => {
       exporter.parse(scene, (glb) => {
         resolve(glb);
@@ -752,6 +836,13 @@ const BU_Room3D = () => {
             onOk={handleOk}
           />
         )}
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+          accept=".json,.glb,.gltf"
+        />
         <button
           onClick={handleImportRoom}
           className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
