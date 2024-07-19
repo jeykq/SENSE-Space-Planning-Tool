@@ -13,7 +13,7 @@ const BusinessUserHomepage = () => {
   const handleClickCreateTemplate = () => navigate('/CreateTemplate');
   const swiperContainer1 = useRef(null);
   const swiperContainer2 = useRef(null);
-  const dropdownRef = useRef(null); // Add ref for dropdown
+  const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
@@ -23,7 +23,9 @@ const BusinessUserHomepage = () => {
   const [error, setError] = useState(null);
   const [confirmDeletePopup, setConfirmDeletePopup] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [refreshTemplates, setRefreshTemplates] = useState(false); // State for triggering template refresh
+  const [refreshTemplates, setRefreshTemplates] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
+  const [searchType, setSearchType] = useState("name"); // State for search type
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -72,53 +74,10 @@ const BusinessUserHomepage = () => {
     fetchTemplateNames();
   }, [refreshTemplates]);
 
-  useEffect(() => {
-    const initializeSwiper = () => {
-      if (swiperContainer2.current) {
-        new Swiper(swiperContainer2.current, {
-          slidesPerView: 'auto',
-          spaceBetween: 20,
-        });
-      }
-      if (swiperContainer1.current) {
-        new Swiper(swiperContainer1.current, {
-          slidesPerView: 'auto',
-          spaceBetween: 20,
-        });
-      }
-    };
-
-    if (roomTypes.length > 0 && swiperContainer2.current) {
-      initializeSwiper();
-    }
-
-    const handleScroll = () => {
-      if (showDropdown) {
-        const rect = swiperContainer2.current.getBoundingClientRect();
-        setDropdownPosition({ x: rect.left + window.scrollX, y: rect.bottom + window.scrollY });
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [showDropdown, roomTypes]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-
-    return () => {
-      document.removeEventListener('click', handleClickOutside);
-    };
-  }, []);
+  const handleSearch = (query, type) => {
+    setSearchQuery(query);
+    setSearchType(type);
+  };
 
   const toggleDropdown = (event, templateId, url) => {
     event.stopPropagation();
@@ -234,9 +193,19 @@ const BusinessUserHomepage = () => {
     return roomType ? capitalizeFirstLetter(roomType.name) : 'Unknown Category';
   };
 
+  const filteredTemplates = templateNames.filter(template => {
+    if (searchType === 'name') {
+      return template.name.toLowerCase().includes(searchQuery.toLowerCase());
+    } else if (searchType === 'category') {
+      const roomTypeName = getRoomTypeName(template.room_type_id).toLowerCase();
+      return roomTypeName.includes(searchQuery.toLowerCase());
+    }
+    return false;
+  });
+
   return (
     <div>
-      <Navbar />
+      <Navbar handleSearch={handleSearch} />
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
         <div className={"mt-20 ml-5"}>
@@ -252,7 +221,7 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {templateNames.map((template) => (
+              {filteredTemplates.map((template) => (
                 <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
                   <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>

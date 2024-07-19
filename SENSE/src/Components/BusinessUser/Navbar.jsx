@@ -13,7 +13,7 @@ const Navbar = ({ handleSearch }) => {
   const [sticky, setSticky] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
-  
+
   useEffect(() => {
     const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
@@ -31,7 +31,7 @@ const Navbar = ({ handleSearch }) => {
 
   const confirmLogout = async () => {
     const token = localStorage.getItem('authToken');
-    
+
     if (!token) {
       navigate('/login');
       return;
@@ -41,7 +41,7 @@ const Navbar = ({ handleSearch }) => {
       'Content-Type': 'application/json',
       'sense-token': token
     };
-    
+
     try {
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/logout',
@@ -53,7 +53,7 @@ const Navbar = ({ handleSearch }) => {
         localStorage.removeItem('authToken');
         navigate('/');
       }
-      
+
     } catch (error) {
       console.error('Logout failed:', error);
     }
