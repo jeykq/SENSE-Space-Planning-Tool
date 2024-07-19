@@ -142,7 +142,7 @@ const BusinessUserHomepage = () => {
         room_layout: roomLayoutUrl 
       } } = template;
   
-    navigate('/Room3D', {
+    navigate('/BU_Room3D', {
       state: {
         templateName,
         roomType,

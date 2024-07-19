@@ -13,7 +13,7 @@ import SaveDialogPopup from '../UI/SaveDialogPopup';
 import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
 
-const Room3D = () => {
+const BU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
@@ -858,4 +858,4 @@ const Room3D = () => {
   );
 };
 
-export default Room3D;
+export default BU_Room3D;

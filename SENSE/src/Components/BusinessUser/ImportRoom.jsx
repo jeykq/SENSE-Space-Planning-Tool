@@ -37,7 +37,7 @@ const ImportRoomForm = ({ submit }) => {
     };
 
     const handleGoBack = () => {
-        navigate('/Room3D'); 
+        navigate(-1); 
     };
 
     const handleImportClick = () => {
