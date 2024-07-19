@@ -12,7 +12,7 @@ const CreateTemplate = () => {
 
   const handleCreateTemplate = () => {
     if (templateName && roomType && roomLength && roomWidth && roomHeight) {
-      navigate('/Room3D', { 
+      navigate('/BU_Room3D', { 
         state: { 
           templateName, 
           roomType,

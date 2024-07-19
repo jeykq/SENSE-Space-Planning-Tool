@@ -2,10 +2,12 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
+import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import AddObjDropdown from '../BusinessUser/AddObjDropdown';
+import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
 import AlertPopup from '../UI/AlertPopup';
@@ -15,30 +17,24 @@ const PU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { template, roomName } = location.state || {};
-  const roomLayoutUrl = template?.room_layout?.room_layout;
-  const templateName = template?.name;
-  const roomType = template?.room_type_id;
-  const roomLength = template?.dimension.length;
-  const roomWidth = template?.dimension.width;
-  const roomHeight = template?.dimension.height;
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
   const [showConfirmSave, setShowConfirmSave] = useState(false);
   const [isObjectSelected, setIsObjectSelected] = useState(false);
-  const [currentMode, setCurrentMode] = useState(null);
+  const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const [showFloorDropdown, setShowFloorDropdown] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
-  const sceneRef = useRef(new THREE.Scene());
+  const sceneRef = useRef(null);
   const raycasterRef = useRef(new THREE.Raycaster());
   const mouseRef = useRef(new THREE.Vector2());
   const dragOffsetRef = useRef(new THREE.Vector3());
   const planeRef = useRef(new THREE.Plane());
   const intersectedRef = useRef(null);
   const transformControlsRef = useRef(null);
-  const isTransformingRef = useRef(false);
+  const isTransformingRef = useRef(false); // Reference state to track if TransformControl is active
 
   const [categoryData, setCategoryData] = useState(null);
   const [objectListData, setObjectListData] = useState(null);
@@ -52,8 +48,10 @@ const PU_Room3D = () => {
   const token = localStorage.getItem('authToken');
 
   const floorRef = useRef(null);
+  const arrowHelperRef = useRef(null);
   const [wallMaterial, setWallMaterial] = useState(null);
 
+  // get list of all categories
   useEffect(() => {
     const token = localStorage.getItem('authToken');
 
@@ -75,17 +73,18 @@ const PU_Room3D = () => {
     )
       .then(response => {
         setCategoryData(response.data);
-        setCatError(null);
+        setCatError(null); // Reset error state if the request is successful
       })
       .catch(err => {
         setCatError(err.message || 'Something went wrong');
-        setCategoryData(err.message);
+        setCategoryData(err.message); // Reset response state if the request fails
       })
       .finally(() => {
         setCatLoading(false);
       });
   }, [navigate]);
 
+  // get list of all objects
   useEffect(() => {
     const fetchObjData = async () => {
       const token = localStorage.getItem('authToken');
@@ -111,8 +110,8 @@ const PU_Room3D = () => {
         setObjListError(null);
       } catch (err) {
         setObjListError(err.message || 'Something went wrong');
-        setObjectListData(null);
-        console.error('API Error for ' + name, err);
+        setObjectListData(null); // Clear object list data if the request fails
+        console.error('API Error for ' + name, err); // Log the error for debugging
       } finally {
         setObjListLoading(false);
       }
@@ -129,25 +128,33 @@ const PU_Room3D = () => {
       return;
     }
 
-    let scene = sceneRef.current;
+    // Scene
+    let scene = new THREE.Scene();
     scene.background = new THREE.Color(0xdfefff);
+    sceneRef.current = scene;
 
+    // Camera
     let camera = new THREE.PerspectiveCamera(75, mount.clientWidth / mount.clientHeight, 0.1, 1000);
     camera.position.set(5, 5, 15);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
 
+    // Renderer
     let renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.setClearColor(0xdfefff);
     mount.appendChild(renderer.domElement);
 
+    // Lighting
+    // Ambient Light
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
     scene.add(ambientLight);
 
+    // Hemisphere Light
     const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x444444, 0.7);
     hemisphereLight.position.set(0, 1, 0);
     scene.add(hemisphereLight);
 
+    // Directional Light
     const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
     directionalLight.position.set(0, 10, 10);
     directionalLight.castShadow = true;
@@ -157,10 +164,12 @@ const PU_Room3D = () => {
     directionalLight.shadow.camera.far = 500;
     scene.add(directionalLight);
 
+    // Point Light
     const pointLight = new THREE.PointLight(0xffffff, 1);
     pointLight.position.set(5, 5, 5);
     scene.add(pointLight);
 
+    // Spot Light
     const spotLight = new THREE.SpotLight(0xffffff, 1);
     spotLight.position.set(15, 20, 10);
     spotLight.angle = Math.PI / 6;
@@ -170,22 +179,29 @@ const PU_Room3D = () => {
     spotLight.castShadow = true;
     scene.add(spotLight);
 
-    const roomW = roomWidth || 12;
-    const roomH = roomHeight || 5;
-    const roomD = roomLength || 12;
+    // Debug: log the room dimensions
+    console.log("Room dimensions:", roomLength, roomWidth, roomHeight);
 
+    // Room Dimensions
+    const roomW = roomWidth || 12; // Default to 12 if roomWidth is not provided
+    const roomH = roomHeight || 5; // Default to 5 if roomHeight is not provided
+    const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
+
+    // Materials
     const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
     const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
     const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
     const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
     setWallMaterial(wallMaterial);
 
+    // Floor
     const floorGeometry = new THREE.PlaneGeometry(roomW, roomD);
     const floor = new THREE.Mesh(floorGeometry, floorMaterial);
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
     floorRef.current = floor;
 
+    // Walls
     const wallGeometry = new THREE.PlaneGeometry(roomW, roomH);
 
     const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
@@ -213,6 +229,20 @@ const PU_Room3D = () => {
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
+    // Arrow Helper for Selected Object
+    const arrowHelper = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0), // Direction
+      new THREE.Vector3(0, 0, 0), // Origin
+      1, // Length
+      0xff0000, // Color
+      0.2, // Head Length
+      0.2 // Head Width
+    );
+    scene.add(arrowHelper);
+    arrowHelper.visible = false;
+    arrowHelperRef.current = arrowHelper;
+
+    // Orbit Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.25;
@@ -220,6 +250,7 @@ const PU_Room3D = () => {
     controls.maxPolarAngle = Math.PI / 2;
     controlsRef.current = controls;
 
+    // Transform Controls
     const transformControls = new TransformControls(camera, renderer.domElement);
     transformControlsRef.current = transformControls;
     transformControls.addEventListener('change', () => renderer.render(scene, camera));
@@ -227,35 +258,94 @@ const PU_Room3D = () => {
       controls.enabled = !event.value;
     });
     transformControls.addEventListener('mouseDown', () => {
-      isTransformingRef.current = true;
+      isTransformingRef.current = true; // Set transforming flag
     });
     transformControls.addEventListener('mouseUp', () => {
-      isTransformingRef.current = false;
+      isTransformingRef.current = false; // Reset transforming flag
     });
     scene.add(transformControls);
 
-    if (roomLayoutUrl) {
-      const loader = new GLTFLoader();
+    // View Template from roomLayoutUrl
+    if (roomLayoutUrl != null) {
       fetch(roomLayoutUrl)
         .then(response => response.arrayBuffer())
         .then(data => {
+          const loader = new GLTFLoader();
           loader.parse(data, '', (glb) => {
             scene.add(glb.scene);
-            console.log("Template loaded:", glb.scene);
+            console.log("Model loaded:", glb.scene);
           });
         })
         .catch(error => {
-          console.error('Error loading template:', error);
+          console.error('Error loading GLB:', error);
         });
     }
 
+    // Load 3D Model
+    const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
+        
+      const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
+    
+      const mtlLoader = new MTLLoader();
+      mtlLoader.setPath(s3URL);
+      mtlLoader.load(materialPath, (materials) => {
+        materials.preload();
+    
+        // Ensure that materials are not transparent and have full opacity
+        for (let materialName in materials.materials) {
+          const material = materials.materials[materialName];
+          material.transparent = false;
+          material.opacity = 1.0;
+        }
+    
+        const objLoader = new OBJLoader();
+        objLoader.setMaterials(materials);
+        objLoader.setPath(s3URL);
+        objLoader.load(modelPath, (object) => {
+          // Calculate the bounding box of the loaded object
+          const boundingBox = new THREE.Box3().setFromObject(object);
+          const size = boundingBox.getSize(new THREE.Vector3());
+    
+          // Calculate the scaling factor to fit the object within the room
+          const maxDimension = Math.max(size.x, size.y, size.z);
+          const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
+          object.scale.set(scale, scale, scale);
+    
+          // Recalculate the bounding box after scaling
+          const scaledBoundingBox = new THREE.Box3().setFromObject(object);
+          const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
+    
+          // Adjust the position of the object to fit within the room bounds
+          const adjustedPosition = {
+            x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
+            y: Math.max(0, position.y),  // Keep objects above the floor
+            z: Math.max(-roomD / 2 + scaledSize.z / 2, Math.min(roomD / 2 - scaledSize.z / 2, position.z))
+          };
+          object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
+          object.userData.selectable = true; // Set selectable on the parent group
+          scene.add(object);
+    
+          // Add object to the list
+          setObjects((prevObjects) => [...prevObjects, object]);
+    
+          console.log('Model loaded and added to scene:', object);
+        }, undefined, (error) => {
+          console.error('Error loading model:', error);
+        });
+      }, undefined, (error) => {
+        console.error('Error loading materials:', error);
+      });
+    };    
+
     const onMouseDown = (event) => {
-      if (isTransformingRef.current) return;
+      if (isTransformingRef.current) return; // Ignore if interacting with transform controls
 
       event.preventDefault();
       const rect = mount.getBoundingClientRect();
       mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       mouseRef.current.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      console.log('Mouse down at:', mouseRef.current);
 
       raycasterRef.current.setFromCamera(mouseRef.current, camera);
       const intersects = raycasterRef.current.intersectObjects(scene.children, true);
@@ -263,12 +353,13 @@ const PU_Room3D = () => {
       if (intersects.length > 0) {
         let firstIntersected = intersects[0].object;
 
+        // Traverse up to the selectable parent
         while (firstIntersected && !firstIntersected.userData.selectable && firstIntersected.parent) {
           firstIntersected = firstIntersected.parent;
         }
 
         if (firstIntersected && firstIntersected.userData.selectable) {
-          controls.enabled = false;
+          controls.enabled = false; // Disable controls
           selectObject(firstIntersected);
           planeRef.current.setFromNormalAndCoplanarPoint(
             camera.getWorldDirection(planeRef.current.normal),
@@ -301,11 +392,18 @@ const PU_Room3D = () => {
         raycasterRef.current.ray.intersectPlane(planeRef.current, intersectPoint);
         const newPosition = intersectPoint.sub(dragOffsetRef.current);
 
+        // Clamp the new position within the room bounds and fix the y position
         newPosition.x = Math.max(-roomW / 2, Math.min(roomW / 2, newPosition.x));
-        newPosition.y = intersectedRef.current.position.y;
+        newPosition.y = intersectedRef.current.position.y; // Keep y position fixed
         newPosition.z = Math.max(-roomD / 2, Math.min(roomD / 2, newPosition.z));
 
         intersectedRef.current.position.copy(newPosition);
+
+        // Move the arrow above the selected object
+        const arrowHelper = arrowHelperRef.current;
+        arrowHelper.position.copy(newPosition);
+        const objectBoundingBox = new THREE.Box3().setFromObject(intersectedRef.current);
+        arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
       } else {
         const rect = mount.getBoundingClientRect();
         mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -317,6 +415,7 @@ const PU_Room3D = () => {
         if (intersects.length > 0) {
           let firstIntersected = intersects[0].object;
 
+          // Traverse up to the selectable parent
           while (firstIntersected && !firstIntersected.userData.selectable && firstIntersected.parent) {
             firstIntersected = firstIntersected.parent;
           }
@@ -336,7 +435,7 @@ const PU_Room3D = () => {
       if (intersectedRef.current) {
         console.log('Object released:', intersectedRef.current);
         intersectedRef.current = null;
-        controls.enabled = true;
+        controls.enabled = true; // Re-enable controls
       }
     };
 
@@ -344,6 +443,7 @@ const PU_Room3D = () => {
     mount.addEventListener('mousemove', onMouseMove);
     mount.addEventListener('mouseup', onMouseUp);
 
+    // Render Loop
     const animate = () => {
       requestAnimationFrame(animate);
       controls.update();
@@ -351,6 +451,7 @@ const PU_Room3D = () => {
     };
     animate();
 
+    // Handle Resize
     const handleResize = () => {
       renderer.setSize(mount.clientWidth, mount.clientHeight);
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -358,10 +459,14 @@ const PU_Room3D = () => {
     };
     window.addEventListener('resize', handleResize);
 
+    // Drag and Drop Logic
     const handleDrop = (event) => {
       event.preventDefault();
+      
+      const id = event.dataTransfer.getData('id');
       const modelPath = event.dataTransfer.getData('modelPath');
       const materialPath = event.dataTransfer.getData('materialPath');
+
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -371,13 +476,14 @@ const PU_Room3D = () => {
       const distance = -camera.position.z / dir.z;
       let pos = camera.position.clone().add(dir.multiplyScalar(distance));
 
+      // Clamp the initial drop position within the room bounds
       pos = new THREE.Vector3(
         Math.max(-roomW / 2, Math.min(roomW / 2, pos.x)),
         0,
         Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
 
-      loadModel(modelPath, materialPath, pos);
+      loadModel(id, modelPath, materialPath, pos);
       setShowDropdown(false);
     };
 
@@ -397,7 +503,7 @@ const PU_Room3D = () => {
       mount.removeEventListener('mousemove', onMouseMove);
       mount.removeEventListener('mouseup', onMouseUp);
     };
-  }, [roomLayoutUrl, roomWidth, roomHeight, roomLength]);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -435,7 +541,8 @@ const PU_Room3D = () => {
       selectedObjectRef.current = null;
       setIsObjectSelected(false);
       transformControlsRef.current.detach();
-      setCurrentMode(null);
+      arrowHelperRef.current.visible = false; // Hide the arrow when the object is removed
+      setCurrentMode(null); // Reset current mode
     }
   };
 
@@ -452,20 +559,30 @@ const PU_Room3D = () => {
     setIsObjectSelected(true);
     console.log('Object selected:', object);
 
+    // If a mode is currently selected, attach the transform controls
     if (currentMode) {
       transformControlsRef.current.setMode(currentMode);
       transformControlsRef.current.attach(object);
     }
+
+    // Move the arrow above the selected object
+    const arrowHelper = arrowHelperRef.current;
+    arrowHelper.position.copy(object.position);
+    const objectBoundingBox = new THREE.Box3().setFromObject(object);
+    arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
+    arrowHelper.visible = true; // Make the arrow visible
   };
 
   const deselectObject = () => {
     setIsObjectSelected(false);
     selectedObjectRef.current = null;
-    transformControlsRef.current.detach();
-    setCurrentMode(null);
+    transformControlsRef.current.detach(); // Detach transform controls
+    arrowHelperRef.current.visible = false; // Hide the arrow
+    setCurrentMode(null); // Reset current mode
   };
 
   const handleSaveAsDraft = () => {
+    // Logic to save as draft
     setShowConfirmSave(false);
   };
 
@@ -482,17 +599,22 @@ const PU_Room3D = () => {
     floorRef.current.material.needsUpdate = true;
   };
 
+  // List of provided floor textures
   const floorTextures = [
-    { name: 'Hardwood', url: '/textures/hardwood.png' },
-    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg' },
-    { name: 'Marble', url: '/textures/marble-texture.jpg' },
-    { name: 'White-marble', url: '/textures/white-marble.jpg' },
-    { name: 'Terrazzo', url: '/textures/terrazzo.jpg' },
+    { name: 'Hardwood', url: '/textures/hardwood.png', thumbnailUrl: '/thumbnails/hardwood_thumbnail.png' },
+    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg', thumbnailUrl: '/thumbnails/light_fine_wood_thumbnail.png' },
+    { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
+    { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
+    { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
+    // Add more textures here
+  
   ];
 
+  // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
 
+    // Export scene to GLB format
     return new Promise((resolve, reject) => {
       exporter.parse(scene, (glb) => {
         resolve(glb);
@@ -564,6 +686,7 @@ const PU_Room3D = () => {
     setShowConfirmSave(false);
   };
 
+  // Update Template Function
   const handleUpdateTemplate = async (e) => {
     e.preventDefault();
 
@@ -611,7 +734,7 @@ const PU_Room3D = () => {
             onClick={handleUpdateTemplate}
             className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
-            Save Room
+            Update Template
           </button>
         ) : (
           <button
@@ -629,7 +752,12 @@ const PU_Room3D = () => {
             onOk={handleOk}
           />
         )}
-       
+        <button
+          onClick={handleImportRoom}
+          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
+        >
+          Import Room
+        </button>
         <button
           onClick={handleExportRoom}
           className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
@@ -684,10 +812,11 @@ const PU_Room3D = () => {
                   {floorTextures.map((texture) => (
                     <div
                       key={texture.url}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                      className="flex flex-col items-center px-2 py-1 cursor-pointer hover:bg-gray-100"
                       onClick={() => handleFloorChange(texture.url)}
                     >
-                      {texture.name}
+                      <img src={texture.thumbnailUrl} alt={texture.name} className="h-20 w-20 object-cover mb-2" />
+                      <span className="text-center text-sm">{texture.name}</span>
                     </div>
                   ))}
                 </div>

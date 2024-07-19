@@ -7,7 +7,7 @@ import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { GLTFExporter } from 'three/examples/jsm/exporters/GLTFExporter';
 import { TransformControls } from 'three/examples/jsm/controls/TransformControls';
-import AddObjDropdown from '../BusinessUser/AddObjDropdown';
+import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
 import AlertPopup from '../UI/AlertPopup';
@@ -48,6 +48,7 @@ const FU_Room3D = () => {
   const token = localStorage.getItem('authToken');
 
   const floorRef = useRef(null);
+  const arrowHelperRef = useRef(null);
   const [wallMaterial, setWallMaterial] = useState(null);
 
   // get list of all categories
@@ -228,6 +229,19 @@ const FU_Room3D = () => {
     rightWall.rotation.y = -Math.PI / 2;
     scene.add(rightWall);
 
+    // Arrow Helper for Selected Object
+    const arrowHelper = new THREE.ArrowHelper(
+      new THREE.Vector3(0, -1, 0), // Direction
+      new THREE.Vector3(0, 0, 0), // Origin
+      1, // Length
+      0xff0000, // Color
+      0.2, // Head Length
+      0.2 // Head Width
+    );
+    scene.add(arrowHelper);
+    arrowHelper.visible = false;
+    arrowHelperRef.current = arrowHelper;
+
     // Orbit Controls
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -268,37 +282,39 @@ const FU_Room3D = () => {
     }
 
     // Load 3D Model
-    const loadModel = (modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
+    const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
+        
+      const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
+    
       const mtlLoader = new MTLLoader();
-      mtlLoader.setPath('/3Dmodels/');
+      mtlLoader.setPath(s3URL);
       mtlLoader.load(materialPath, (materials) => {
         materials.preload();
-
+    
         // Ensure that materials are not transparent and have full opacity
         for (let materialName in materials.materials) {
           const material = materials.materials[materialName];
           material.transparent = false;
           material.opacity = 1.0;
         }
-
+    
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
-        objLoader.setPath('/3Dmodels/');
+        objLoader.setPath(s3URL);
         objLoader.load(modelPath, (object) => {
-
           // Calculate the bounding box of the loaded object
           const boundingBox = new THREE.Box3().setFromObject(object);
           const size = boundingBox.getSize(new THREE.Vector3());
-
+    
           // Calculate the scaling factor to fit the object within the room
           const maxDimension = Math.max(size.x, size.y, size.z);
           const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
           object.scale.set(scale, scale, scale);
-
+    
           // Recalculate the bounding box after scaling
           const scaledBoundingBox = new THREE.Box3().setFromObject(object);
           const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
-
+    
           // Adjust the position of the object to fit within the room bounds
           const adjustedPosition = {
             x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
@@ -308,10 +324,10 @@ const FU_Room3D = () => {
           object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
           object.userData.selectable = true; // Set selectable on the parent group
           scene.add(object);
-
+    
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-
+    
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
           console.error('Error loading model:', error);
@@ -319,7 +335,7 @@ const FU_Room3D = () => {
       }, undefined, (error) => {
         console.error('Error loading materials:', error);
       });
-    };
+    };    
 
     const onMouseDown = (event) => {
       if (isTransformingRef.current) return; // Ignore if interacting with transform controls
@@ -382,6 +398,12 @@ const FU_Room3D = () => {
         newPosition.z = Math.max(-roomD / 2, Math.min(roomD / 2, newPosition.z));
 
         intersectedRef.current.position.copy(newPosition);
+
+        // Move the arrow above the selected object
+        const arrowHelper = arrowHelperRef.current;
+        arrowHelper.position.copy(newPosition);
+        const objectBoundingBox = new THREE.Box3().setFromObject(intersectedRef.current);
+        arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
       } else {
         const rect = mount.getBoundingClientRect();
         mouseRef.current.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -440,8 +462,11 @@ const FU_Room3D = () => {
     // Drag and Drop Logic
     const handleDrop = (event) => {
       event.preventDefault();
+      
+      const id = event.dataTransfer.getData('id');
       const modelPath = event.dataTransfer.getData('modelPath');
       const materialPath = event.dataTransfer.getData('materialPath');
+
       const rect = mount.getBoundingClientRect();
       const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
       const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
@@ -458,7 +483,7 @@ const FU_Room3D = () => {
         Math.max(-roomD / 2, Math.min(roomD / 2, pos.z))
       );
 
-      loadModel(modelPath, materialPath, pos);
+      loadModel(id, modelPath, materialPath, pos);
       setShowDropdown(false);
     };
 
@@ -491,13 +516,11 @@ const FU_Room3D = () => {
   };
 
   const handleImportRoom = () => {
-    // Logic to import a room
     navigate("/ImportRoom");
   };
 
   const [showConfirmExport, setShowConfirmExport] = useState(false);
   const handleExportRoom = () => {
-    // Logic to export the current room
     setShowConfirmExport(true)
   };
 
@@ -518,6 +541,7 @@ const FU_Room3D = () => {
       selectedObjectRef.current = null;
       setIsObjectSelected(false);
       transformControlsRef.current.detach();
+      arrowHelperRef.current.visible = false; // Hide the arrow when the object is removed
       setCurrentMode(null); // Reset current mode
     }
   };
@@ -540,12 +564,20 @@ const FU_Room3D = () => {
       transformControlsRef.current.setMode(currentMode);
       transformControlsRef.current.attach(object);
     }
+
+    // Move the arrow above the selected object
+    const arrowHelper = arrowHelperRef.current;
+    arrowHelper.position.copy(object.position);
+    const objectBoundingBox = new THREE.Box3().setFromObject(object);
+    arrowHelper.position.y = objectBoundingBox.max.y + 2; // Adjust the arrow height above the object
+    arrowHelper.visible = true; // Make the arrow visible
   };
 
   const deselectObject = () => {
     setIsObjectSelected(false);
     selectedObjectRef.current = null;
     transformControlsRef.current.detach(); // Detach transform controls
+    arrowHelperRef.current.visible = false; // Hide the arrow
     setCurrentMode(null); // Reset current mode
   };
 
@@ -569,12 +601,13 @@ const FU_Room3D = () => {
 
   // List of provided floor textures
   const floorTextures = [
-    { name: 'Hardwood', url: '/textures/hardwood.png' },
-    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg' },
-    { name: 'Marble', url: '/textures/marble-texture.jpg' },
-    { name: 'White-marble', url: '/textures/white-marble.jpg' },
-    { name: 'Terrazzo', url: '/textures/terrazzo.jpg' },
+    { name: 'Hardwood', url: '/textures/hardwood.png', thumbnailUrl: '/thumbnails/hardwood_thumbnail.png' },
+    { name: 'Light-wood', url: '/textures/light_fine_wood.jpg', thumbnailUrl: '/thumbnails/light_fine_wood_thumbnail.png' },
+    { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
+    { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
+    { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
     // Add more textures here
+  
   ];
 
   // Publish Template Functions
@@ -779,10 +812,11 @@ const FU_Room3D = () => {
                   {floorTextures.map((texture) => (
                     <div
                       key={texture.url}
-                      className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                      className="flex flex-col items-center px-2 py-1 cursor-pointer hover:bg-gray-100"
                       onClick={() => handleFloorChange(texture.url)}
                     >
-                      {texture.name}
+                      <img src={texture.thumbnailUrl} alt={texture.name} className="h-20 w-20 object-cover mb-2" />
+                      <span className="text-center text-sm">{texture.name}</span>
                     </div>
                   ))}
                 </div>
