@@ -116,6 +116,31 @@ const FreeUserHomepage = () => {
     return false;
   });
 
+  const viewTemplate = (template) => {
+    const { 
+      name: templateName, 
+      room_type_id: roomType, 
+      dimension: { 
+        length: roomLength, 
+        width: roomWidth, 
+        height: roomHeight 
+      }, 
+      room_layout: { 
+        room_layout: roomLayoutUrl 
+      } } = template;
+
+    navigate('/FU_CreateRoom', {
+      state: {
+        templateName,
+        roomType,
+        roomLength: parseFloat(roomLength),
+        roomWidth: parseFloat(roomWidth),
+        roomHeight: parseFloat(roomHeight),
+        roomLayoutUrl
+      }
+    });
+  };
+
   return (
     <div>
       <Navbar handleSearch={handleSearch} />

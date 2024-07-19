@@ -63,6 +63,10 @@ const Navbar = () => {
     }
   };
 
+  const handleCreateRoomClick = () => {
+    navigate('/FU_CreateRoom');
+  };
+
   return (
     <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
       <img src={logo} alt="Logo" className='logo w-20 mx-2' />
@@ -80,7 +84,10 @@ const Navbar = () => {
             <Link onClick={() => setSidebarOpen(false)} to='Favourited' smooth={true} offset={0} duration={500}>Favourited</Link>
           </li>
           <li className="flex items-center px-2 ml-1 my-1.5 mx-1 lg:mx-1 text base text-nowrap">
-            <button className="bg-white hover:bg-purple-700 text-white font-bold py-2 px-4 rounded" style={{ borderRadius: "6px", backgroundColor: 'rgb(124 58 237)' }}>
+            <button className="bg-white hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
+              style={{ borderRadius: "6px", backgroundColor: 'rgb(124 58 237)' }}
+              onClick={handleCreateRoomClick}
+            >
               Create a room
             </button>
           </li>

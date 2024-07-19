@@ -34,6 +34,9 @@ import PU_Room3D from './Components/PremiumUser/PU_Room3D';
 import PU_CreateRoom from './Components/PremiumUser/PU_CreateRoom';
 import PU_DrawRoom from './Components/PremiumUser/PU_DrawRoom';
 import PU_SelectTemplate from './Components/PremiumUser/PU_SelectTemplate';
+import FU_CreateRoom from './Components/FreeUser/FU_CreateRoom';
+import FU_DrawRoom from './Components/FreeUser/FU_DrawRoom';
+import FU_SelectTemplate from './Components/FreeUser/FU_SelectTemplate';
 
 const App = () => {
   return (
@@ -69,10 +72,14 @@ const App = () => {
         <Route path="/BuySubscription" element={<BuySubscription />} />
         <Route path="/ApplyBusinessUser" element={<ApplyBusinessUser />} />
         <Route path="/FU_Room3D" element={<FU_Room3D />} />
+        <Route path="/FU_CreateRoom" element={<FU_CreateRoom />} />
+        <Route path="/FU_DrawRoom" element={<FU_DrawRoom />} />
+        <Route path="/FU_SelectTemplate" element={<FU_SelectTemplate />} />
         <Route path="/PU_Room3D" element={<PU_Room3D />} />
         <Route path="/PU_CreateRoom" element={<PU_CreateRoom />} />
         <Route path="/PU_DrawRoom" element={<PU_DrawRoom />} />
         <Route path="/PU_SelectTemplate" element={<PU_SelectTemplate />} />
+        
       </Routes>
     </Router>
   )
