@@ -145,9 +145,12 @@ const FreeUserHomepage = () => {
     <div>
       <Navbar handleSearch={handleSearch} />
 
-      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
+      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontWeight: "500" }}>
         <div className={"mt-20 ml-5"}>
-          <p style={{ marginRight: '10px' }}>Room Templates</p>
+          <p style={{ marginRight: '10px', fontSize: "25px" }}>Room Templates</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
+          <FU_SearchBar handleSearch={handleSearch} />
         </div>
       </div>
 
@@ -174,13 +177,13 @@ const FreeUserHomepage = () => {
         </div>
       </div>
 
-      <hr style={{ border: "1px solid black" }} />
+      <hr style={{ border: "1px solid black", margin: "20px 0" }} />
 
-      <div style={{ paddingLeft: "20px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
-        <div className={"mt-5 ml-5"}>
-          <p style={{ marginRight: '10px', fontSize: "25px" }}>Recent Designs</p>
+      <div style={{ paddingTop: "10px", paddingLeft: "20px", fontWeight: "500" }}>
+        <div className={"mt-0 ml-5"}>
+          <p style={{ marginRight: '10px', fontSize: "25px"}}>Recent Designs</p>
         </div>
-        <div style={{ fontSize: "20px", marginLeft: '30px', display: 'flex', alignItems: 'center', marginTop: '15px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
           <FU_SearchBar handleSearch={handleSearch} />
         </div>
       </div>
