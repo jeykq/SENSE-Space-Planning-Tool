@@ -10,7 +10,6 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
     const rendererRef = useRef(null);
     const cameraRef = useRef(null);
     const controlsRef = useRef(null);
-    const canvasRef = useRef(null);
 
     useEffect(() => {
         if (objUrl && mtlUrl) {

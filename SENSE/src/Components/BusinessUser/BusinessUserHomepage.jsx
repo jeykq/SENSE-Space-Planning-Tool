@@ -28,6 +28,21 @@ const BusinessUserHomepage = () => {
   const [searchType, setSearchType] = useState("name"); // State for search type
 
   useEffect(() => {
+
+    if (swiperContainer1.current) {
+      new Swiper(swiperContainer2.current, {
+        slidesPerView: 4,
+        spaceBetween: 30,
+      });
+    }
+
+    if (swiperContainer2.current) {
+      new Swiper(swiperContainer2.current, {
+        slidesPerView: 4,
+        spaceBetween: 30,
+      });
+    }
+
     const fetchRoomTypes = async () => {
       try {
         const headers = getHeaders();
@@ -121,9 +136,9 @@ const BusinessUserHomepage = () => {
     setShowDeleteConfirmation(false);
   };
 
-  const handleCategoryClick = (category) => {
+  const handleCategoryClick = (category, roomType) => {
     if (category === 'view') {
-      navigate('/BU_ViewObjects');
+      navigate('/BU_ViewObjects', { state: { roomType } });
     } else if (category === 'import') {
       navigate('/BU_ImportObjects');
     }
@@ -221,20 +236,24 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {filteredTemplates.map((template) => (
-                <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
-                  <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
-                    <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                    <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p>{template.name}</p>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <p>{getRoomTypeName(template.room_type_id)}</p>
+              {filteredTemplates.map((template) => {
+                const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
+                console.log('Screenshot URL:', screenshotURL); 
+                return (
+                  <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
+                    <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                      <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                      <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                        <p>{template.name}</p>
+                      </div>
+                      <div style={{ textAlign: 'center' }}>
+                        <p>{getRoomTypeName(template.room_type_id)}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
@@ -264,7 +283,7 @@ const BusinessUserHomepage = () => {
               {roomTypes.map((roomType, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div className="overlay">
-                    <div className="option" onClick={() => handleCategoryClick('view')}>View Objects</div>
+                    <div className="option" onClick={() => handleCategoryClick('view', roomType.name)}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>

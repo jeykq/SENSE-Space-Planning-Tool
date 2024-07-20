@@ -708,14 +708,14 @@ const BU_Room3D = () => {
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-
+  
       const glbData = await convertToGLB(sceneRef.current);
-
+  
       const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
         method: 'POST',
         headers: {
@@ -732,12 +732,13 @@ const BU_Room3D = () => {
           "room_type_id": roomType
         }),
       });
-
+  
       if (response.ok) {
         const responseData = await response.json();
         const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-
+  
         if (TemplateURL) {
+          // Upload the GLB file
           await axios.put(
             TemplateURL,
             glbData,
@@ -748,11 +749,15 @@ const BU_Room3D = () => {
               },
             }
           );
-
+  
+          const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
+  
+          await captureScreenshotAndUpload(screenshotURL);
+  
           if (response.status >= 200 && response.status < 300) {
             setAlertType('save');
             setShowAlert(true);
-            console.log('Template successfully published!');
+            console.log('Template and screenshot successfully published!');
           } else {
             console.error('Template uploading failed:', response);
           }
@@ -766,9 +771,42 @@ const BU_Room3D = () => {
     } catch (error) {
       console.error('Error converting to GLB or uploading:', error);
     }
-
+  
     setShowConfirmSave(false);
   };
+
+  const captureScreenshotAndUpload = async (previewUploadUrl) => {
+    try {
+      const canvas = document.querySelector('canvas');
+  
+      await new Promise((resolve) => {
+        let frames = 5;
+        const waitForFrames = () => {
+          if (frames > 0) {
+            frames--;
+            requestAnimationFrame(waitForFrames);
+          } else {
+            resolve();
+          }
+        };
+        requestAnimationFrame(waitForFrames);
+      });
+  
+      canvas.toBlob(async (blob) => {
+        await axios.put(previewUploadUrl, blob, {
+          headers: {
+            'Content-Type': 'image/png',
+            'Content-Disposition': 'attachment',
+          },
+        });
+  
+        console.log("Uploaded screenshot successfully");
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error capturing or uploading screenshot:', error);
+    }
+  };
+  
 
   // Update Template Function
   const handleUpdateTemplate = async (e) => {
