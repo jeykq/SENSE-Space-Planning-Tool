@@ -4,6 +4,7 @@ import LandingNavbar from './LandingNavbar';
 import LandingSense from './LandingSense';
 import LandingPlan from './LandingPlan';
 import LandingVideo from './LandingVideo';
+import LandingTemplate from './LandingTemplate';
 import LandingMission from './LandingMission';
 import LandingContact from './LandingContact';
 
@@ -42,10 +43,11 @@ const SA_UpdateLandingPage = () => {
 
       {/* Adding enough margin-top to ensure LandingNavbar is not overlapped */}
       <div className="mt-10">
-        <LandingNavbar />
+        {/* <LandingNavbar /> */}
         <LandingSense />
         <LandingPlan />
         <LandingVideo />
+        <LandingTemplate />
         <LandingMission />
         <LandingContact />
       </div>

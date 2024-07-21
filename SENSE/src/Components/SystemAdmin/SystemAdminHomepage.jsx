@@ -5,6 +5,7 @@ import SearchBar from "./SearchBar";
 import Footer from "../Landing/Footer";
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
+import ConfirmDialogPopup from '../UI/ConfirmDialog';
 
 const SystemAdminHomepage = () => {
   const [accountDetails, setAccountDetails] = useState([]);
@@ -14,6 +15,9 @@ const SystemAdminHomepage = () => {
   const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [accountsPerPage] = useState(7); // Number of accounts per page
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null); // Track the current user being suspended/unsuspended
+  const [showSuspendedAccounts, setShowSuspendedAccounts] = useState(false); // Manage suspended accounts view
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -72,14 +76,48 @@ const SystemAdminHomepage = () => {
 
   // Handle view action (optional)
   const handleView = (userId) => {
-    // navigate(`/viewuser/${userId}`);
     console.log("View button clicked for user:", userId);
   };
 
   const handleSuspend = (userId) => {
-    // Define the action to perform when "Suspend" button is clicked
-    // For example, suspend the user's account
-    console.log("Suspend button clicked for user:", userId);
+    setCurrentUser(userId);
+    setShowConfirmDialog(true);
+  };
+
+  const confirmSuspend = async () => {
+    if (!currentUser) return;
+
+    try {
+      const headers = getHeaders();
+      if (!headers) {
+        setError('Token not found');
+        return;
+      }
+
+      const user = accountDetails.find(user => user.id === currentUser);
+      const updatedStatus = !user.is_active;
+
+      const response = await axios.post(
+        'https://api.sensespacesplanningtool.com/user/update/is_active',
+        { id: currentUser, is_active: updatedStatus },
+        { headers }
+      );
+
+      if (response.data) {
+        const updatedAccounts = accountDetails.map(user =>
+          user.id === currentUser ? { ...user, is_active: updatedStatus } : user
+        );
+
+        setAccountDetails(updatedAccounts);
+        setFilteredAccounts(updatedAccounts);
+      }
+
+      setShowConfirmDialog(false);
+      setCurrentUser(null);
+    } catch (error) {
+      console.error('Error suspending user:', error);
+      setError(error.message);
+    }
   };
 
   // Filter by role function
@@ -90,6 +128,15 @@ const SystemAdminHomepage = () => {
       const filtered = accountDetails.filter(user => user.role === role);
       setFilteredAccounts(filtered);
     }
+    setShowSuspendedAccounts(false); // Reset the suspended accounts view
+    setCurrentPage(1); // Reset to first page after filtering
+  };
+
+  // Filter suspended accounts function
+  const filterSuspendedAccounts = () => {
+    const suspendedAccounts = accountDetails.filter(user => !user.is_active);
+    setFilteredAccounts(suspendedAccounts);
+    setShowSuspendedAccounts(true);
     setCurrentPage(1); // Reset to first page after filtering
   };
 
@@ -110,7 +157,8 @@ const SystemAdminHomepage = () => {
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-purple-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('FREE_USER')}>Free User</button>
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-orange-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-indigo-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
-          <button className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
+          <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
+          <button className="px-4 py-2 text-sm font-bold text-white bg-gray-500 rounded hover:bg-gray-600 focus:bg-gray-600 focus:outline-none" onClick={filterSuspendedAccounts}>Suspended Accounts</button>
         </div>
 
         {searchResults.length === 0 && searchTerm.length > 0 ? (
@@ -141,7 +189,12 @@ const SystemAdminHomepage = () => {
                     >
                       View
                     </Link>
-                    <button className="px-4 py-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-red-600" onClick={() => handleSuspend(user.id)}>Suspend</button>
+                    <button
+                      className={`px-4 py-2 text-sm font-bold text-white rounded ${user.is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-orange-500 hover:bg-red-600 focus:bg-orange-600 focus:outline-none'}`}
+                      onClick={() => handleSuspend(user.id)}
+                    >
+                      {user.is_active ? 'Suspend' : 'Unsuspend'}
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -151,13 +204,22 @@ const SystemAdminHomepage = () => {
 
         {/* Pagination */}
         <ul className="flex justify-center mt-5 list-none">
-          {Array.from({ length: Math.ceil(searchTerm.length > 0 ? searchResults.length / accountsPerPage : filteredAccounts.length / accountsPerPage) }, (_, index) => (
+          {Array.from({ length: Math.ceil((searchTerm.length > 0 ? searchResults.length : filteredAccounts.length) / accountsPerPage) }, (_, index) => (
             <li key={index} className="mx-1 cursor-pointer">
               <button onClick={() => paginate(index + 1)} className="px-3 py-1 rounded bg-gray-200 hover:bg-gray-300 focus:bg-gray-300">{index + 1}</button>
             </li>
           ))}
         </ul>
       </div>
+
+      {showConfirmDialog && (
+        <ConfirmDialogPopup
+          title={`Confirm ${currentUser && accountDetails.find(user => user.id === currentUser).is_active ? 'Suspend' : 'Unsuspend'} Account`}
+          text={`Are you sure you want to ${currentUser && accountDetails.find(user => user.id === currentUser).is_active ? 'suspend' : 'unsuspend'} this user account?`}
+          onConfirm={confirmSuspend}
+          onClose={() => setShowConfirmDialog(false)}
+        />
+      )}
 
       <Footer />
     </div>
