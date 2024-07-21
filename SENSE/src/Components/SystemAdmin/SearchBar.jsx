@@ -3,20 +3,21 @@ import React, { useState } from "react";
 const SearchBar = ({ handleSearch }) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleSearch(searchTerm); // Pass the current search term to the parent component
+  const handleInputChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    handleSearch(value); // Pass the current search term to the parent component in real-time
   };
 
   return (
     <div style={{ display: "flex", alignItems: "center" }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "center" }}>
+      <form onSubmit={(e) => e.preventDefault()} style={{ display: "flex", alignItems: "center" }}>
         <input
           type="text"
           placeholder="Search for users..."
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{ borderRadius: "20px", padding: "5px 10px", marginRight: "5px" ,borderWidth: "1px"}}
+          onChange={handleInputChange}
+          style={{ borderRadius: "20px", padding: "5px 10px", marginRight: "5px", borderWidth: "1px" }}
         />
         <button type="submit" style={{ border: "none", borderRadius: "40px", background: "white", cursor: "pointer", padding: "5px 10px" }}>
           <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
