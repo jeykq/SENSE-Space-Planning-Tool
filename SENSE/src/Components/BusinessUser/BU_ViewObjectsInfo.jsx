@@ -13,7 +13,7 @@ const BU_ViewObjectsInfo = () => {
   const [editedProductDescription, setEditedProductDescription] = useState(productDescription);
 
   const handleEditClick = () => {
-    setIsEditing(!isEditing); // Toggle editing mode
+    setIsEditing(!isEditing);
   };
 
   const handleSaveClick = () => {
@@ -22,16 +22,15 @@ const BU_ViewObjectsInfo = () => {
     setObjectCategory(editedObjectCategory);
     setProductDescription(editedProductDescription);
     
-    setIsEditing(false); // Exit editing mode
+    setIsEditing(false);
   };
 
   const handleCancelClick = () => {
-    // Reset edited values to original
     setEditedProductName(productName);
     setEditedObjectCategory(objectCategory);
     setEditedProductDescription(productDescription);
 
-    setIsEditing(false); // Exit editing mode
+    setIsEditing(false);
   };
 
   return (
@@ -39,7 +38,6 @@ const BU_ViewObjectsInfo = () => {
       <Navbar />
 
       <div>
-        {/* Conditionally render title based on editing mode */}
         {isEditing ? (
           <h2 style={{ textAlign: "center" }}>Edit Object Information</h2>
         ) : (

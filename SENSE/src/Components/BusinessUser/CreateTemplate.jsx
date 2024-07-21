@@ -1,10 +1,13 @@
+import axios from 'axios';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getHeaders } from '../../../apiUtils';
 import Topbar from '../BusinessUser/Topbar';
 
 const CreateTemplate = () => {
   const navigate = useNavigate();
   const [templateName, setTemplateName] = useState('');
+  const [isTemplateValid, setIsTemplateValid] = useState(null);
   const [roomType, setRoomType] = useState('');
   const [roomLength, setRoomLength] = useState('');
   const [roomWidth, setRoomWidth] = useState('');
@@ -26,6 +29,45 @@ const CreateTemplate = () => {
     }
   };
 
+  const TemplateNameCheck = async (template) => {
+    try {
+      const headers = getHeaders();
+      const response = await axios.post(
+        'https://api.sensespacesplanningtool.com/template/list',
+        {},
+        { headers }
+      );
+
+      let isTemplateExists = false;
+
+      response.data.body.forEach(item => {
+        const templateName = item.name;
+        console.log(templateName);
+
+        if (templateName == template) {
+          isTemplateExists = true;
+          console.log("Match found");
+        } else {
+          console.log("No matches found");
+        }
+      });
+
+      return isTemplateExists;
+
+    } catch (error) {
+      console.error('Error fetching template names:', error);
+      return false;
+    }
+  };
+
+  const handleTemplateNameChange = async (e) => {
+    const newTemplateName = e.target.value;
+    setTemplateName(newTemplateName);
+
+    const valid = await TemplateNameCheck(newTemplateName);
+    setIsTemplateValid(valid);
+  };
+
   const handleGoBack = () => {
     navigate('/BusinessUserHomepage'); 
   };
@@ -42,9 +84,14 @@ const CreateTemplate = () => {
             type="text" 
             className="border border-gray-400 py-2 px-2 w-72 text-center" 
             value={templateName}
-            onChange={(e) => setTemplateName(e.target.value)} 
+            onChange={handleTemplateNameChange}
             required 
           />
+          {isTemplateValid !== null && (
+            <p style={{ color: 'red', textAlign: 'center' }}>
+              {isTemplateValid ? 'Matching template name found' : 'Template name is valid'}
+            </p>
+          )}
         </div>
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="room_type">Room type</label>
@@ -87,7 +134,7 @@ const CreateTemplate = () => {
             type="text" 
             className="border border-gray-400 py-1 w-72 text-center" 
             value={roomWidth}
-            onChange={(e) => setRoomWidth(e.target.value)} 
+            onChange={(e) => setRoomWidth(e.target.value)}
             required 
           />
         </div>
