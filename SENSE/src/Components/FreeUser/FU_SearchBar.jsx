@@ -23,10 +23,11 @@ const FU_SearchBar = ({ handleSearch }) => {
           type="text"
           placeholder="Search..."
           onChange={handleSearchChange}
+          className="border"
           style={{ borderRadius: "5px", padding: "8px 5px", marginRight: "5px", width: "250px" }}
         />
         <label style={{ marginRight: "20px", color: "black", padding: "20px 10px", borderRadius: "2px" }}>Filter by:</label>
-        <select onChange={handleTypeChange} value={searchType} style={{ borderRadius: "2px", padding: "5px 5px", marginRight: "5px" }}>
+        <select className="border rounded text-gray-500" onChange={handleTypeChange} value={searchType} style={{padding: "5px 5px", marginRight: "5px" }}>
           <option value="name">Name</option>
           <option value="category">Category</option>
         </select>
