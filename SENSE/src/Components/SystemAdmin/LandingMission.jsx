@@ -71,7 +71,7 @@ const LandingMission = () => {
 
   return (
     <div name='ourMission' className='text-black text-center mx-auto max-w-screen-lg p-6'>
-      <h1 className='text-4xl font-semibold mb-10 text-blue-700'>Our Mission</h1>
+      <h1 className='text-4xl font-semibold mb-10 text-black'>Our Mission</h1>
       {editMode ? (
         <textarea
           className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-transparent text-black border-b-2 border-white p-2'
