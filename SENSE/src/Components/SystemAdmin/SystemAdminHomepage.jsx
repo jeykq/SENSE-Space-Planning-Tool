@@ -158,7 +158,7 @@ const SystemAdminHomepage = () => {
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-orange-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('PREMIUM_USER')}>Premium User</button>
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-indigo-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('BUSINESS_USER')}>Business User</button>
           <button className="px-4 py-2 mr-2 text-sm font-bold text-white bg-red-500 rounded hover:bg-blue-600 focus:bg-blue-600 focus:outline-none" onClick={() => filterByRole('SYS_ADMIN')}>System Admin</button>
-          <button className="px-4 py-2 text-sm font-bold text-white bg-gray-500 rounded hover:bg-gray-600 focus:bg-gray-600 focus:outline-none" onClick={filterSuspendedAccounts}>Suspended Accounts</button>
+          <button className="ml-10 px-4 py-2 text-sm font-bold text-white bg-gray-500 rounded hover:bg-gray-600 focus:bg-gray-600 focus:outline-none" onClick={filterSuspendedAccounts}>Suspended Accounts</button>
         </div>
 
         {searchResults.length === 0 && searchTerm.length > 0 ? (
