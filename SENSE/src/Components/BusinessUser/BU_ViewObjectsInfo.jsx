@@ -1,96 +1,139 @@
-import React, { useState } from "react";
-import Navbar from "./Navbar";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
+import Topbar from '../BusinessUser/Topbar';
 import Footer from "../Landing/Footer";
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils';
 
 const BU_ViewObjectsInfo = () => {
-  const [productName, setProductName] = useState("Product Name");
-  const [objectCategory, setObjectCategory] = useState("Object Category");
-  const [productDescription, setProductDescription] = useState("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer aliquam lobortis est, nec ullamcorper metus. Duis nec nisl id nisi eleifend viverra. Nulla facilisi.");
-  const [isEditing, setIsEditing] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [tagsList, setTags] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [tagName, setTagNames] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
 
-  const [editedProductName, setEditedProductName] = useState(productName);
-  const [editedObjectCategory, setEditedObjectCategory] = useState(objectCategory);
-  const [editedProductDescription, setEditedProductDescription] = useState(productDescription);
+  let productDesc;
 
-  const handleEditClick = () => {
-    setIsEditing(!isEditing);
+  const { name, categoryID, description, tags, objURL } = location.state || {};
+  productDesc = description["description.a"];
+  console.log(objURL);
+  
+  const fetchCategoriesAndTags = async () => {
+    try {
+      const headers = getHeaders();
+      const categoriesResponse = await axios.post('https://api.sensespacesplanningtool.com/category/list', {}, { headers });
+      const tagsResponse = await axios.post('https://api.sensespacesplanningtool.com/tag/list', {}, { headers });
+  
+      const categories = categoriesResponse.data.body;
+      const tagList = tagsResponse.data.body;
+  
+      setCategories(categories);
+      setTags(tagList);
+  
+      const category = categories.find(cat => cat.id === categoryID[0]);
+      const categoryName = category ? category.name : 'Unknown Category';
+      console.log('Category Name:', categoryName);
+      setCategoryName(categoryName);
+
+      const tagNames = tags.map(tagID => {
+        const tag = tagList.find(t => t.id === tagID);
+        return tag ? tag.name : 'Unknown Tag';
+      });
+  
+      console.log('Tag Names:', tagNames);
+      setTagNames(tagNames);
+  
+    } catch (error) {
+      console.error('Error fetching categories and tags:', error);
+    }
   };
 
-  const handleSaveClick = () => {
-    // Save the edited values
-    setProductName(editedProductName);
-    setObjectCategory(editedObjectCategory);
-    setProductDescription(editedProductDescription);
-    
-    setIsEditing(false);
-  };
+  const updateObjectInfo = () => {
+    navigate('/BU_UpdateObjectInfo', {
+      state: {
+        name,
+        categoryID,
+        productDesc,
+        tags,
+        objURL
+      }
+    });
+  }
 
-  const handleCancelClick = () => {
-    setEditedProductName(productName);
-    setEditedObjectCategory(objectCategory);
-    setEditedProductDescription(productDescription);
-
-    setIsEditing(false);
-  };
+  useEffect(() => {
+    fetchCategoriesAndTags();
+  }, []);
 
   return (
     <div>
-      <Navbar />
+      <Topbar title="View Object Information" onClick={() => navigate(-1)} />
 
-      <div>
-        {isEditing ? (
-          <h2 style={{ textAlign: "center" }}>Edit Object Information</h2>
-        ) : (
-          <h2 style={{ textAlign: "center" }}>Object Information</h2>
-        )}
-      </div>
-
-      <div style={{ paddingTop: "100px", paddingLeft: "50px", paddingRight: "50px" }} className="justify-center">
-        <div style={{ border: "1px solid #ccc", padding: "20px", borderRadius: "10px", textAlign: "center", maxWidth: "600px", margin: "0 auto", background: isEditing ? "none" : "#f0f0f0" }}>
-          {/* Render editable fields when in editing mode */}
-          {isEditing ? (
-            <div>
-              <label htmlFor="productName"><strong>Product Name:</strong></label>
-              <input type="text" id="productName" value={editedProductName} onChange={(e) => setEditedProductName(e.target.value)} />
-              <br />
-              <label htmlFor="objectCategory"><strong>Object Category:</strong></label>
-              <select id="objectCategory" value={editedObjectCategory} onChange={(e) => setEditedObjectCategory(e.target.value)}>
-                <option value="Category 1">Category 1</option>
-                <option value="Category 2">Category 2</option>
-                <option value="Category 3">Category 3</option>
-              </select>
-              <br />
-              <label htmlFor="productDescription"><strong>Product Description:</strong></label>
-              <textarea
-                id="productDescription"
-                value={editedProductDescription}
-                onChange={(e) => setEditedProductDescription(e.target.value)}
-                style={{ width: "100%", minHeight: "100px" }}
+      <div className="mt-8 flex flex-col items-center">
+        <form className="w-3/4">
+          <div className="grid grid-cols-4 gap-4">
+            <div className="col-span-1 text-right self-center font-semibold">
+              <label htmlFor="objectName">Object Name:</label>
+            </div>
+            <div className="col-span-3">
+              <input
+                type="text"
+                className="border border-gray-400 w-full py-1 px-2 rounded"
+                value={name}
+                required
               />
             </div>
-          ) : (
-            <div>
-              {/* Display non-editable fields when not in editing mode */}
-              <div style={{ background: "#fff", padding: "10px", borderRadius: "5px", marginBottom: "10px" }}>
-                <p><strong>Product Name:</strong> {productName}</p>
-                <p><strong>Object Category:</strong> {objectCategory}</p>
-                <p><strong>Product Description:</strong> {productDescription}</p>
-              </div>
+            <div className="col-span-1 text-right self-center font-semibold">
+              <label htmlFor="objectCat">Category:</label>
             </div>
-          )}
-
-          {/* Render edit button */}
-          {isEditing ? (
-            <div>
-              <button style={{ marginRight: "10px", backgroundColor: "#4CAF50", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer" }} onClick={handleSaveClick}>Save</button>
-              <button style={{ backgroundColor: "#f44336", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer" }} onClick={handleCancelClick}>Cancel</button>
+            <div className="col-span-3">
+              <input
+                type="text"
+                className="border border-gray-400 w-full py-1 px-2 rounded"
+                value={categoryName}
+                required
+              />
             </div>
-          ) : (
-            <button style={{ backgroundColor: "#008CBA", color: "white", border: "none", borderRadius: "5px", padding: "10px 20px", cursor: "pointer", marginTop: "10px" }} onClick={handleEditClick}>Edit</button>
-          )}
-        </div>
+            <div className="col-span-1 text-right self-center font-semibold">
+              <label htmlFor="tags">Tags:</label>
+            </div>
+            <div className="col-span-3">
+              <input
+                type="text"
+                className="border border-gray-400 w-full py-1 px-2 rounded"
+                value={tagName.join(', ')}
+                required
+              />
+            </div>
+            <div className="col-span-2 flex justify-center">
+              <span className="self-end font-semibold">Product Description</span>
+            </div>
+            <div className="col-span-2 flex justify-center">
+              <span className="self-end font-semibold">Object Preview</span>
+            </div>
+            <div className="col-span-2 mx-8 -translate-y-4">
+              <textarea
+                className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
+                value={productDesc}
+                placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                rows="4"
+              />
+            </div>
+            <div className="col-span-2 mx-8 -translate-y-4 rounded-md border border-gray-400">
+              <img src={objURL} style={{ width: '100%', height: '100%', borderRadius: '10px', objectFit: 'cover' }} />
+            </div>
+            <div className="col-span-4 flex justify-center">
+              <button
+                className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
+                onClick={() => updateObjectInfo()}
+              >
+                Update
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
-
+        
       <Footer />
     </div>
   );
