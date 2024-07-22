@@ -31,6 +31,11 @@ const TemplateSlideshow = () => {
 
   if (!loaded || loading) return <div>Loading...</div>; // Display loading indicator while data is fetched
 
+  const extractFilename = (url) => {
+    const parts = url.split('/');
+    return parts[parts.length - 1].split('.')[0];
+  };
+  
   return (
     <div name="templates" className='flex items-center justify-center flex-col h-screen'>
       <h1 className='text-black text-4xl text-center m-20 font-semibold'>Templates</h1>
@@ -48,7 +53,10 @@ const TemplateSlideshow = () => {
           <SwiperSlide key={key}>
             <div className='flex flex-col mb-20 gap-6 group relative shadow-lg text-white rounded-xl px-6 py-8 h-[210px] w-[190px] lg:h-[350px] lg:w-[300px] overflow-hidden cursor-pointer'>
               <div className='absolute inset-0 bg-cover bg-center' style={{backgroundImage: `url(${imageUrl})`}}></div>
-              <div className='absolute inset-0 bg-black opacity-10 group-hover:opacity-50'></div>
+              <div className='absolute inset-0 bg-black opacity-10 group-hover:opacity-10'></div>
+             
+                <h1 className='text-xl lg:text-2xl absolute bottom-5 left-5 w-[35px] h-[35px] text-blue-300 group-hover:text-blue-500'>{extractFilename(imageUrl)}</h1>
+              
               <a href="#" className='absolute top-[60%] flex items-center justify-center space-x-2 text-white opacity-0 hover:opacity-100'>
                 <span className='text-sm md:text-base font-medium'>View More</span>
                 <RxArrowTopRight />
