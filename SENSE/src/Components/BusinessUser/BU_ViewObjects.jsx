@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-<<<<<<< Updated upstream
-import { useLocation } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-=======
 import { useNavigate, useLocation } from 'react-router-dom';
->>>>>>> Stashed changes
 import axios from 'axios'; 
 import Topbar from '../BusinessUser/Topbar';
 import Footer from "../Landing/Footer";
 
 const BU_ViewObjects = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { roomType } = location.state || {};
   const [objects, setObjects] = useState([]);
 
@@ -52,6 +46,7 @@ const BU_ViewObjects = () => {
   const viewObjectInfo = (object) => {
     console.log(object);
 
+    const id = object.id;
     const name = object.name;
     const categoryID = object.category_ids;
     const description = object.product_description;
@@ -60,6 +55,7 @@ const BU_ViewObjects = () => {
 
     navigate('/BU_ViewObjectsInfo', {
       state: {
+        id,
         name,
         categoryID,
         description,
