@@ -10,15 +10,16 @@ import PremiumUserHomepage from './Components/PremiumUser/PremiumUserHomepage';
 import SystemAdminHomepage from './Components/SystemAdmin/SystemAdminHomepage';
 import CreateTemplate from './Components/BusinessUser/CreateTemplate';
 import ViewTemplates from './Components/BusinessUser/ViewTemplates';
-import BU_Room3D from './Components/BusinessUser/BU_Room3D';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
+import BU_Room3D from './Components/BusinessUser/BU_Room3D';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
 import BU_UpdateObjectInfo from './Components/BusinessUser/BU_UpdateObjectInfo';
+import BU_ImportObjects from './Components/BusinessUser/BU_ImportObjects';
+import BU_ChangeUserType from './Components/BusinessUser/BU_ChangeUserType';
 import ViewAccount from './Components/ManageAccount/ViewAccount';
 import UpdateAccount from './Components/ManageAccount/UpdateAccount';
 import ChangePassword from './Components/ManageAccount/ChangePassword';
-import BU_ImportObjects from './Components/BusinessUser/BU_ImportObjects';
 import ThreeDPreview from './Components/BusinessUser/ThreeDPreview';
 import SA_ViewUserAccount from './Components/SystemAdmin/SA_ViewUserAcc';
 import SA_ManageSignUpPage from './Components/SystemAdmin/SA_ManageSignUpPage';
@@ -52,12 +53,13 @@ const App = () => {
         <Route path="/SystemAdminHomepage" element={<SystemAdminHomepage />} />
         <Route path="/CreateTemplate" element={<CreateTemplate />} />
         <Route path="/ViewTemplates" element={<ViewTemplates />} />
-        <Route path="/BU_Room3D" element={<BU_Room3D />} />
         <Route path="/ImportRoom" element={<ImportRoom />} />
+        <Route path="/BU_Room3D" element={<BU_Room3D />} />
         <Route path="/BU_ViewObjects" element={<BU_ViewObjects />} />
         <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo />} />
         <Route path="/BU_ImportObjects" element={<BU_ImportObjects />} />
         <Route path="/BU_UpdateObjectInfo" element={<BU_UpdateObjectInfo />} />
+        <Route path="/BU_ChangeUserType" element={<BU_ChangeUserType />} />
         <Route path="/viewaccount" element={<ViewAccount />} />
         <Route path="/updateaccount" element={<UpdateAccount />} />
         <Route path="/ChangePassword" element={<ChangePassword />} />

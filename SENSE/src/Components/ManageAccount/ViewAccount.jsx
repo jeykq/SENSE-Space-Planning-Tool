@@ -51,6 +51,10 @@ const ViewAccount = () => {
     navigate('/editpreferences');
   };
 
+  const handleChangeUserType = () => {
+    navigate('/BU_ChangeUserType');
+  };
+
   useEffect(() => {
     const headers = getHeaders(); // Get headers using the function
 
@@ -241,7 +245,7 @@ const ViewAccount = () => {
           {accountDetails.role.includes("BUSINESS_USER") && (
             <>
               <button 
-                onClick={handleEditClick}
+                onClick={handleChangeUserType}
                 style={buttonStyle}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={handleMouseLeave}>
