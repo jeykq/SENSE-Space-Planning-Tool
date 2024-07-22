@@ -74,20 +74,6 @@ const SA_ManageTagsPage = () => {
     setEditedTagName(''); // Clear edited name
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const headers = getHeaders(); 
-      await axios.post(
-        `https://api.sensespacesplanningtool.com/tag/delete/${id}`,
-        {},
-        { headers }
-      );
-      fetchTags(); // Refresh tags after deletion
-    } catch (error) {
-      console.error('Error deleting tag:', error);
-      setError('Failed to delete tag.');
-    }
-  };
 
   const handleChange = (e) => {
     setEditedTagName(e.target.value);
@@ -150,7 +136,7 @@ const SA_ManageTagsPage = () => {
             {!showAddInput && (
               <button
                 onClick={handleAdd}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-orange-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
               >
                 Add
               </button>
@@ -194,7 +180,7 @@ const SA_ManageTagsPage = () => {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                          className="bg-gray-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
                         >
                           Cancel
                         </button>
@@ -207,12 +193,7 @@ const SA_ManageTagsPage = () => {
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={() => handleDelete(tag.id)}
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                          Delete
-                        </button>
+                        
                       </>
                     )}
                   </td>

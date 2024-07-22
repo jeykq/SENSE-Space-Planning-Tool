@@ -74,20 +74,7 @@ const SA_ManageObjCategoriesPage = () => {
     setEditedCategoryName(''); // Clear edited name
   };
 
-  const handleDelete = async (id) => {
-    try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
-      await axios.post(
-        `https://api.sensespacesplanningtool.com/category/delete/${id}`,
-        {},
-        { headers }
-      );
-      fetchObjCategories(); // Refresh Obj Categories after deletion
-    } catch (error) {
-      console.error('Error deleting Obj Category:', error);
-      setError('Failed to delete Obj Category.');
-    }
-  };
+  
 
   const handleChange = (e) => {
     setEditedCategoryName(e.target.value);
@@ -150,7 +137,7 @@ const SA_ManageObjCategoriesPage = () => {
             {!showAddInput && (
               <button
                 onClick={handleAdd}
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                className="bg-orange-500  hover:bg-red-600 focus:bg-red-600 focus:outline-none text-white font-bold py-2 px-4 ml-5 rounded"
               >
                 Add
               </button>
@@ -194,7 +181,7 @@ const SA_ManageObjCategoriesPage = () => {
                         </button>
                         <button
                           onClick={handleCancelEdit}
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                          className="bg-gray-500  hover:bg-red-600 focus:bg-red-600 focus:outline-none text-white font-bold py-2 px-4 rounded"
                         >
                           Cancel
                         </button>
@@ -207,12 +194,7 @@ const SA_ManageObjCategoriesPage = () => {
                         >
                           Edit
                         </button>
-                        <button
-                          onClick={() => handleDelete(category.id)}
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
-                        >
-                          Delete
-                        </button>
+                       
                       </>
                     )}
                   </td>
