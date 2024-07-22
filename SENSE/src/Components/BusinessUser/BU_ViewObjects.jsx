@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; 
-import Navbar from "./Navbar";
+import Topbar from '../BusinessUser/Topbar';
 import Footer from "../Landing/Footer";
 
 const BU_ViewObjects = () => {
   const location = useLocation();
   const { roomType } = location.state || {};
   const [objects, setObjects] = useState([]);
+
+  const navigate = useNavigate();
+    const handleGoBack = () => {
+        navigate(-1);
+    };
 
   const fetchObjData = async () => {
     const token = localStorage.getItem('authToken');
@@ -40,10 +46,9 @@ const BU_ViewObjects = () => {
 
   return (
     <div>
-      <Navbar />
-
-      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
-        <div className={"mt-20 ml-5"}>
+      <Topbar title="View Objects" onClick={handleGoBack} />
+      <div style={{ paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
+        <div className={"mt-10 ml-5"}>
           {roomType && <p>{roomType}</p>}
         </div>
       </div>
