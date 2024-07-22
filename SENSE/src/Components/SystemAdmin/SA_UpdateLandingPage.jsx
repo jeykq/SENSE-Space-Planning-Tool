@@ -32,7 +32,7 @@ const SA_UpdateLandingPage = () => {
         </div>
         <div className="flex-1 flex justify-center">
           {/* Pass down the go back function */}
-          <button className="bg-red-500 hover:bg-red-700 text-white rounded px-4 py-2 my-2">Update Landing Page</button>
+          <div className="text-xl font-semibold  text-white  px-4 py-2 my-2">Update Landing Page</div>
         </div>
         <div className="flex-1 flex justify-end">
           <button onClick={handleGoBack} className="text-white text-xl px-4">

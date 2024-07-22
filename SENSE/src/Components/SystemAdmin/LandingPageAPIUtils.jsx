@@ -30,6 +30,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
       setContactPhone(contactPhone);
       setContactAddress(contactAddress);
       setImages(images);
+     
     } else {
       fetchLandingPageData();
     }
@@ -98,6 +99,52 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     } catch (error) {
       console.error('Error fetching landing page data:', error);
       onError(error);
+    }
+  };
+
+  const updateLandingPageImage = async (imageKey, imgFile, newImgKey) => {
+    try {
+      const headers = getHeaders();
+      setLoading(true);
+
+      // Delete the old image
+      await axios.post(
+        'https://api.sensespacesplanningtool.com/landing_page/file/delete',
+        { filename: imageKey },
+        { headers }
+      );
+
+      // Get the upload URL for the new image
+      const createResponse = await axios.post(
+        'https://api.sensespacesplanningtool.com/landing_page/file/create',
+        {filename: newImgKey},
+        { headers }
+      );
+
+      const imgUpdateUrl = createResponse.data.body;
+
+      // Upload the new image to S3
+      await axios.put(
+        imgUpdateUrl,
+        imgFile,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            'Content-Disposition': 'attachment',
+            ...headers
+          },
+        }
+      );
+
+      // Refresh the landing page data
+      await fetchLandingPageData();
+
+      setLoading(false);
+      onUpdateSuccess();
+    } catch (error) {
+      setLoading(false);
+      onError(error);
+      console.error('Error updating landing page image:', error);
     }
   };
 
@@ -188,7 +235,8 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
     images,
     loading,
     fetchLandingPageData,
-    updateLandingPage
+    updateLandingPage,
+    updateLandingPageImage
   };
 };
 
