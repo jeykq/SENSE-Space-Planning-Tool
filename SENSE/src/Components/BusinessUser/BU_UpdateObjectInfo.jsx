@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
-import ThreeDPreview from './ThreeDPreview';
 import AlertPopup from '../UI/AlertPopup'; 
 import { getHeaders } from '../../../apiUtils'; 
 
@@ -21,10 +20,18 @@ const BU_UpdateObjectInfo = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { id, name, categoryID, productDesc, tags, objURL } = location.state || {};
+    const { 
+        id, 
+        name, 
+        categoryID, 
+        productDesc, 
+        tags, 
+        objURL } = location.state || {};
 
     useEffect(() => {
         setObjectName(name);
+        setObjectCat(categoryID[0] || '');  // set initial category ID
+        setSelectedTags(tags || []);  // set initial tags
         setProductDescription(productDesc);
         fetchCategoriesAndTags();
     }, []);
@@ -73,9 +80,12 @@ const BU_UpdateObjectInfo = () => {
             const headers = getHeaders();
             const data = {
                 id: id,
-                name: name,
+                name: objectName,
                 category_ids: [parseInt(objectCat)],
-                tag_ids: selectedTags
+                tag_ids: selectedTags,
+                product_description: {
+                    "description.a": productDescription
+                }
             };
 
             const response = await axios.post('https://api.sensespacesplanningtool.com/object/update', data, { headers });
@@ -88,7 +98,7 @@ const BU_UpdateObjectInfo = () => {
 
     const handleCloseAlert = () => {
         setShowAlert(false);
-        navigate('/BusinessUserHomepage');
+        navigate(-1);
     };
 
     return (
@@ -169,7 +179,7 @@ const BU_UpdateObjectInfo = () => {
                         <div className="col-span-4 flex justify-center">
                             <button
                                 type="submit"
-                                className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
+                                className="max-w-min text-nowrap bg-blue-500 px-8 py-2 mb-2 text-white mt-5 uppercase rounded"
                             >
                                 Update
                             </button>
@@ -178,7 +188,8 @@ const BU_UpdateObjectInfo = () => {
                 </form>
                 {showAlert && (
                     <AlertPopup
-                        title="Object has been updated successfully!"
+                        title="Success"
+                        text="Object Information has been updated successfully!"
                         onClose={handleCloseAlert}
                         onOk={handleCloseAlert}
                     />

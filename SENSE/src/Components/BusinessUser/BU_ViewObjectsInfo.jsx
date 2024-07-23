@@ -15,9 +15,18 @@ const BU_ViewObjectsInfo = () => {
 
   let productDesc;
 
-  const { id, name, categoryID, description, tags, objURL } = location.state || {};
+  const { 
+    id, 
+    name, 
+    categoryID, 
+    description, 
+    tags, 
+    objURL } = location.state || {};
   productDesc = description["description.a"];
   console.log(id);
+  
+
+  
   
   const fetchCategoriesAndTags = async () => {
     try {
@@ -127,7 +136,7 @@ const BU_ViewObjectsInfo = () => {
                               onClick = {() => updateObjectInfo()}
                               className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
                           >
-                              Update
+                              Edit
                           </button>
                       </div>
                   </div>
