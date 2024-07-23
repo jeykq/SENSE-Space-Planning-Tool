@@ -606,9 +606,11 @@ const FU_Room3D = () => {
     { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
     { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
     { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
-    // Add more textures here
-  
   ];
+
+  const handleChangeRoomDimensions = () => {
+    navigate('/FU_ChangeRoomDimensions')
+  };
 
   // Publish Template Functions
   async function convertToGLB(scene) {
@@ -741,7 +743,7 @@ const FU_Room3D = () => {
             onClick={handleSaveAsTemplate}
             className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
-            Save as Template
+            Save Room
           </button>
         )}
         {showAlert && (
@@ -752,21 +754,6 @@ const FU_Room3D = () => {
             onOk={handleOk}
           />
         )}
-        <button
-          onClick={handleImportRoom}
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
-        >
-          Import Room
-        </button>
-        <button
-          onClick={handleExportRoom}
-          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
-        >
-          Export Room
-        </button>
-        {showConfirmExport &&
-          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={() => setShowConfirmExport(false)} />
-        }
         <button
           onClick={() => navigate('/FreeUserHomepage')}
           className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
@@ -822,6 +809,12 @@ const FU_Room3D = () => {
                 </div>
               )}
             </div>
+            <button
+              onClick={handleChangeRoomDimensions}
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+            >
+              Change Dimension
+            </button>
           </>
         )}
         {isObjectSelected && (
