@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
+import { saveAs } from 'file-saver';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
@@ -35,6 +36,7 @@ const PU_Room3D = () => {
   const intersectedRef = useRef(null);
   const transformControlsRef = useRef(null);
   const isTransformingRef = useRef(false); // Reference state to track if TransformControl is active
+  const fileInputRef = useRef(null);
 
   const [categoryData, setCategoryData] = useState(null);
   const [objectListData, setObjectListData] = useState(null);
@@ -515,13 +517,96 @@ const PU_Room3D = () => {
     setShowConfirmSave(true);
   };
 
+  // Import Room functions
   const handleImportRoom = () => {
-    navigate("/ImportRoom");
+    fileInputRef.current.click();
   };
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+      console.log('File content:', fileContent);
+
+      loadGLB(fileContent);
+
+      if (file.name.endsWith('.json') || file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
+        loadGLB(fileContent);
+      } else {
+        alert('Unsupported file format');
+      }
+    };
+
+    if (file.name.endsWith('.json')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const loadGLB = (data) => {
+    try {
+      const loader = new GLTFLoader();
+      loader.parse(data, '', (gltf) => {
+        sceneRef.current.add(gltf.scene);
+      }, undefined, (error) => {
+        console.error('Error loading GLB:', error);
+      });
+    } catch (error) {
+      console.error('Error parsing GLB:', error);
+    }
+  };
+
+  // Export Room functions
   const [showConfirmExport, setShowConfirmExport] = useState(false);
+
   const handleExportRoom = () => {
-    setShowConfirmExport(true)
+    const scene = sceneRef.current;
+
+    if (!scene) {
+      console.error('No scene found.');
+      return;
+    }
+
+    console.log(scene);
+
+    const exporter = new GLTFExporter();
+
+    exporter.parse(
+      scene,
+      function (result) {
+        if (result instanceof ArrayBuffer) {
+          saveArrayBuffer(result, 'RoomModel.glb');
+        } else if (result instanceof Object) {
+          saveJSON(result, 'RoomModel.json');
+        } else {
+          console.error('Unexpected result format:', result);
+        }
+      },
+      {
+        binary: false
+      }
+    );
+  };
+
+  function saveArrayBuffer(buffer, filename) {
+    save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
+  }
+
+  function saveJSON(data, filename) {
+    save(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), filename);
+  }
+
+  const link = document.createElement('a');
+  document.body.appendChild(link);
+
+  function save(blob, filename) {
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
   };
 
   const toggleDropdown = () => {
@@ -606,15 +691,16 @@ const PU_Room3D = () => {
     { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
     { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
     { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
-    // Add more textures here
-  
   ];
+
+  const handleChangeRoomDimensions = () => {
+    navigate('/PU_ChangeRoomDimensions')
+  };
 
   // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
 
-    // Export scene to GLB format
     return new Promise((resolve, reject) => {
       exporter.parse(scene, (glb) => {
         resolve(glb);
@@ -624,14 +710,14 @@ const PU_Room3D = () => {
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-
+  
       const glbData = await convertToGLB(sceneRef.current);
-
+  
       const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
         method: 'POST',
         headers: {
@@ -648,12 +734,13 @@ const PU_Room3D = () => {
           "room_type_id": roomType
         }),
       });
-
+  
       if (response.ok) {
         const responseData = await response.json();
         const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-
+  
         if (TemplateURL) {
+          // Upload the GLB file
           await axios.put(
             TemplateURL,
             glbData,
@@ -664,11 +751,15 @@ const PU_Room3D = () => {
               },
             }
           );
-
+  
+          const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
+  
+          await captureScreenshotAndUpload(screenshotURL);
+  
           if (response.status >= 200 && response.status < 300) {
             setAlertType('save');
             setShowAlert(true);
-            console.log('Template successfully published!');
+            console.log('Template and screenshot successfully published!');
           } else {
             console.error('Template uploading failed:', response);
           }
@@ -682,9 +773,42 @@ const PU_Room3D = () => {
     } catch (error) {
       console.error('Error converting to GLB or uploading:', error);
     }
-
+  
     setShowConfirmSave(false);
   };
+
+  const captureScreenshotAndUpload = async (previewUploadUrl) => {
+    try {
+      const canvas = document.querySelector('canvas');
+  
+      await new Promise((resolve) => {
+        let frames = 5;
+        const waitForFrames = () => {
+          if (frames > 0) {
+            frames--;
+            requestAnimationFrame(waitForFrames);
+          } else {
+            resolve();
+          }
+        };
+        requestAnimationFrame(waitForFrames);
+      });
+  
+      canvas.toBlob(async (blob) => {
+        await axios.put(previewUploadUrl, blob, {
+          headers: {
+            'Content-Type': 'image/png',
+            'Content-Disposition': 'attachment',
+          },
+        });
+  
+        console.log("Uploaded screenshot successfully");
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error capturing or uploading screenshot:', error);
+    }
+  };
+  
 
   // Update Template Function
   const handleUpdateTemplate = async (e) => {
@@ -752,6 +876,13 @@ const PU_Room3D = () => {
             onOk={handleOk}
           />
         )}
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+          accept=".json,.glb,.gltf"
+        />
         <button
           onClick={handleImportRoom}
           className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
@@ -822,6 +953,12 @@ const PU_Room3D = () => {
                 </div>
               )}
             </div>
+            <button
+              onClick={handleChangeRoomDimensions}
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+            >
+              Change Dimension
+            </button>
           </>
         )}
         {isObjectSelected && (

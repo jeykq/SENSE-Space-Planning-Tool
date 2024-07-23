@@ -12,6 +12,7 @@ import CreateTemplate from './Components/BusinessUser/CreateTemplate';
 import ViewTemplates from './Components/BusinessUser/ViewTemplates';
 import ImportRoom from './Components/BusinessUser/ImportRoom';
 import BU_Room3D from './Components/BusinessUser/BU_Room3D';
+import BU_ChangeRoomDimensions from './Components/BusinessUser/BU_ChangeRoomDimensions';
 import BU_ViewObjects from './Components/BusinessUser/BU_ViewObjects';
 import BU_ViewObjectsInfo from './Components/BusinessUser/BU_ViewObjectsInfo';
 import BU_UpdateObjectInfo from './Components/BusinessUser/BU_UpdateObjectInfo';
@@ -31,7 +32,9 @@ import GiveReview from './Components/ManageAccount/GiveReview';
 import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import BuySubscription from './Components/ManageAccount/BuySubscription';
 import FU_Room3D from './Components/FreeUser/FU_Room3D';
+import FU_ChangeRoomDimensions from './Components/FreeUser/FU_ChangeRoomDimensions';
 import PU_Room3D from './Components/PremiumUser/PU_Room3D';
+import PU_ChangeRoomDimensions from './Components/PremiumUser/PU_ChangeRoomDimensions';
 import PU_CreateRoom from './Components/PremiumUser/PU_CreateRoom';
 import PU_DrawRoom from './Components/PremiumUser/PU_DrawRoom';
 import PU_SelectTemplate from './Components/PremiumUser/PU_SelectTemplate';
@@ -55,6 +58,7 @@ const App = () => {
         <Route path="/ViewTemplates" element={<ViewTemplates />} />
         <Route path="/ImportRoom" element={<ImportRoom />} />
         <Route path="/BU_Room3D" element={<BU_Room3D />} />
+        <Route path="/BU_ChangeRoomDimensions" element={<BU_ChangeRoomDimensions />} />
         <Route path="/BU_ViewObjects" element={<BU_ViewObjects />} />
         <Route path="/BU_ViewObjectsInfo" element={<BU_ViewObjectsInfo />} />
         <Route path="/BU_ImportObjects" element={<BU_ImportObjects />} />
@@ -74,10 +78,12 @@ const App = () => {
         <Route path="/BuySubscription" element={<BuySubscription />} />
         <Route path="/ApplyBusinessUser" element={<ApplyBusinessUser />} />
         <Route path="/FU_Room3D" element={<FU_Room3D />} />
+        <Route path="/FU_ChangeRoomDimensions" element={<FU_ChangeRoomDimensions />} />
         <Route path="/FU_CreateRoom" element={<FU_CreateRoom />} />
         <Route path="/FU_DrawRoom" element={<FU_DrawRoom />} />
         <Route path="/FU_SelectTemplate" element={<FU_SelectTemplate />} />
         <Route path="/PU_Room3D" element={<PU_Room3D />} />
+        <Route path="/PU_ChangeRoomDimensions" element={<PU_ChangeRoomDimensions />} />
         <Route path="/PU_CreateRoom" element={<PU_CreateRoom />} />
         <Route path="/PU_DrawRoom" element={<PU_DrawRoom />} />
         <Route path="/PU_SelectTemplate" element={<PU_SelectTemplate />} />

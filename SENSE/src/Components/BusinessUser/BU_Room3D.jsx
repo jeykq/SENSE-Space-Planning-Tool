@@ -693,6 +693,10 @@ const BU_Room3D = () => {
     { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
   ];
 
+  const handleChangeRoomDimensions = () => {
+    navigate('/BU_ChangeRoomDimensions')
+  };
+
   // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
@@ -949,6 +953,12 @@ const BU_Room3D = () => {
                 </div>
               )}
             </div>
+            <button
+              onClick={handleChangeRoomDimensions}
+              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+            >
+              Change Dimension
+            </button>
           </>
         )}
         {isObjectSelected && (
