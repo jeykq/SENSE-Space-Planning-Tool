@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import signup from '../../assets/signup.jpg';
 import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
+import { TailSpin } from 'react-loader-spinner'
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -82,9 +83,24 @@ const LoginForm = () => {
                                 <a href="/ChangePassword" className="text-sm text-slate-500 hover:underline">Forget Password?</a>
                             </div>
                             {loginLoading ? (
-                                <button type="submit" className="w-full bg-slate-300 py-3 text-white mt-5 max-w-[400px]" disabled>Logging in...</button>
+                                <button type="submit" className="w-full bg-slate-300 py-3 text-white mt-5 max-w-[400px]" disabled>
+                                    <div className="flex items-center justify-center">
+                                        <TailSpin
+                                            visible={true}
+                                            height="24"
+                                            width="24"
+                                            color="#fff"
+                                            ariaLabel="tail-spin-loading"
+                                            radius="1"
+                                            wrapperStyle={{}}
+                                            wrapperClass=""
+                                        />
+                                    </div>
+                                </button>
                             ) : (
-                                <button type="submit" className="w-full bg-blue-500 py-3 text-white mt-5 max-w-[400px] rounded">Log In</button>
+                                <button type="submit" className="w-full bg-blue-500 py-3 text-white mt-5 max-w-[400px] rounded">
+                                    Log In
+                                </button>
                             )}
                             
                         </form>
