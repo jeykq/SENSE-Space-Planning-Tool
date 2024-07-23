@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import BusinessUserTopbar from '../BusinessUser/Topbar';
+import FreeUserTopbar from '../FreeUser/Topbar';
+import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
-import AlertPopup from '../UI/AlertPopup'; 
+import AlertPopup from '../UI/AlertPopup';
 
 const UpdateAccount = () => {
   const navigate = useNavigate();
@@ -12,6 +14,7 @@ const UpdateAccount = () => {
   const [email, setEmail] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [industry, setIndustry] = useState('');
+  const [role, setRole] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
@@ -47,6 +50,7 @@ const UpdateAccount = () => {
         setEmail(accountDetails.email);
         setDateOfBirth(accountDetails.dob.split('T')[0]); // Format date to YYYY-MM-DD
         setIndustry(accountDetails.job_industry_id);
+        setRole(accountDetails.role);
       } catch (error) {
         console.error('Error fetching account details:', error);
         setError(error.message);
@@ -100,6 +104,18 @@ const UpdateAccount = () => {
     { value: '0', label: 'Others' },
   ];
 
+  const renderTopbar = () => {
+    if (role.includes("BUSINESS_USER")) {
+      return <BusinessUserTopbar title="Update Account Details" onClick={handleGoBack} />;
+    } else if (role === "FREE_USER" || role === "SYS_ADMIN") {
+      return <FreeUserTopbar title="Update Account Details" onClick={handleGoBack} />;
+    } else if (role === "PREMIUM_USER") {
+      return <PremiumUserTopbar title="Update Account Details" onClick={handleGoBack} />;
+    } else {
+      return null;
+    }
+  };
+
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -110,7 +126,7 @@ const UpdateAccount = () => {
 
   return (
     <div>
-      <Topbar title="Update Account Details" onClick={handleGoBack} />
+      {renderTopbar()}
       <div className="flex flex-col items-center justify-center mt-5">
         <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#EDEFF7' }}>
           <h2 className="text-3xl text-center mb-4">Account Information</h2>
@@ -146,20 +162,20 @@ const UpdateAccount = () => {
                 </div>
               </div>
               <div className="flex items-center justify-center">
-              <button 
-                className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded  transition-colors duration-300"
-                style={{ backgroundColor: '#cfd2e3' }}
-                onMouseEnter={(e) => { 
-                  e.target.style.backgroundColor = '#c5cbeb';
-                  e.target.style.color = '#6c6d70';
-                 }}
-                onMouseLeave={(e) => { 
-                  e.target.style.backgroundColor = '#cfd2e3';
-                  e.target.style.color = '#333';
-                }}
-              >
-                Save
-              </button>
+                <button 
+                  className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded transition-colors duration-300"
+                  style={{ backgroundColor: '#cfd2e3' }}
+                  onMouseEnter={(e) => { 
+                    e.target.style.backgroundColor = '#c5cbeb';
+                    e.target.style.color = '#6c6d70';
+                  }}
+                  onMouseLeave={(e) => { 
+                    e.target.style.backgroundColor = '#cfd2e3';
+                    e.target.style.color = '#333';
+                  }}
+                >
+                  Save
+                </button>
               </div>
             </form>
           </div>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/BULogo.png';
 
 interface TopbarProps {
   title: string;
@@ -19,7 +19,8 @@ const Topbar = ({ title, onClick }: TopbarProps) => {
         <img
             src={logo}
             alt="logo"
-            className='logo w-20 mx-2 cursor-pointer'
+            className='logo mx-2 cursor-pointer'
+            style={{ width: '100px' }}
             onClick={handleLogoClick}
           />
       </div>

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import BusinessUserTopbar from '../BusinessUser/Topbar';
+import Topbar from '../FreeUser/Topbar';
+import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
-import { getHeaders } from '../../../apiUtils'; 
-import { text } from '@fortawesome/fontawesome-svg-core';
+import { getHeaders } from '../../../apiUtils';
 
 const ViewAccount = () => {
   const navigate = useNavigate();
@@ -193,7 +194,11 @@ const ViewAccount = () => {
   if (loading) {
     return (
       <>
-        <Topbar title="My Profile" onClick={handleGoBack} />
+        {accountDetails && accountDetails.role === "BUSINESS_USER" && <BusinessUserTopbar title="My Profile" onClick={handleGoBack} />}
+        {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="My Profile" onClick={handleGoBack} />}
+        {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}
+        {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="My Profile" onClick={handleGoBack} />}
+
         <div>Loading...</div>
       </>
     );
@@ -205,7 +210,11 @@ const ViewAccount = () => {
 
   return (
     <div>
-      <Topbar title="My Profile" onClick={handleGoBack} />
+      {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="My Profile" onClick={handleGoBack} />}
+      {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="My Profile" onClick={handleGoBack} />}
+      {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}
+      {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="My Profile" onClick={handleGoBack} />}
+
       <div className="flex flex-col items-center mt-10">
         <div>
           <div style={fieldContainerStyle}>

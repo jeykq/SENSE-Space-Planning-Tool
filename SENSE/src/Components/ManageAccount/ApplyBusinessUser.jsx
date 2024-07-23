@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../FreeUser/Topbar';
+import FreeUserTopbar from '../FreeUser/Topbar';
+import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 
@@ -13,6 +14,7 @@ const ApplyBusinessUser = () => {
     const [companyInfo, setCompanyInfo] = useState('');
     const [businessUseCase, setBusinessUseCase] = useState('');
     const [showPopup, setShowPopup] = useState(false);
+    const [role, setRole] = useState('');
 
     useEffect(() => {
         const headers = getHeaders(); // Get headers using the function
@@ -33,6 +35,7 @@ const ApplyBusinessUser = () => {
                 setFirstName(accountDetails.first_name);
                 setLastName(accountDetails.last_name);
                 setEmail(accountDetails.email);
+                setRole(accountDetails.role); 
             } catch (error) {
                 console.error('Error fetching account details:', error);
             }
@@ -49,9 +52,19 @@ const ApplyBusinessUser = () => {
         navigate('/viewaccount');
     };
 
+    const renderTopbar = () => {
+        if (role === 'PREMIUM_USER') {
+            return <PremiumUserTopbar title="Apply for Business User" onClick={handleGoBack} />;
+        } else if (role === 'FREE_USER') {
+            return <FreeUserTopbar title="Apply for Business User" onClick={handleGoBack} />;
+        } else {
+            return null;
+        }
+    };
+
     return (
         <>
-            <Topbar title="Apply for Business User" onClick={handleGoBack} />
+            {renderTopbar()}
             <div style={styles.container}>
                 <h1 style={styles.title}>Fill in an application</h1>
                 <form

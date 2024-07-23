@@ -1,12 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../FreeUser/Topbar';
+import FreeUserTopbar from '../FreeUser/Topbar';
+import PremiumUserTopbar from '../PremiumUser/Topbar';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 
 const GiveReview = () => {
     const navigate = useNavigate();
     const [rating, setRating] = useState(0);
     const [review, setReview] = useState('');
     const [showPopup, setShowPopup] = useState(false);
+    const [role, setRole] = useState('');
+
+    useEffect(() => {
+        const headers = getHeaders(); // Get headers using the function
+
+        const fetchUserRole = async () => {
+            try {
+                const response = await axios.post(
+                    'https://api.sensespacesplanningtool.com/user/get',
+                    {},
+                    { headers }
+                );
+
+                if (!response.data) {
+                    throw new Error('No data returned');
+                }
+
+                const userDetails = response.data.body;
+                setRole(userDetails.role); // Assuming the role is part of the response data
+            } catch (error) {
+                console.error('Error fetching user details:', error);
+            }
+        };
+
+        fetchUserRole();
+    }, []);
 
     const handleRating = (rate) => {
         setRating(rate);
@@ -26,9 +55,19 @@ const GiveReview = () => {
         navigate('/viewaccount'); 
     };
 
+    const renderTopbar = () => {
+        if (role === 'PREMIUM_USER') {
+            return <PremiumUserTopbar title="Give a review" onClick={handleGoBack} />;
+        } else if (role === 'FREE_USER') {
+            return <FreeUserTopbar title="Give a review" onClick={handleGoBack} />;
+        } else {
+            return null;
+        }
+    };
+
     return (
       <>
-        <Topbar title="Give a review" onClick={handleGoBack} />
+        {renderTopbar()}
         <div style={styles.container}>
             <div style={styles.reviewSection}>
                 <p style={styles.subtitle}>Leave us a review</p>

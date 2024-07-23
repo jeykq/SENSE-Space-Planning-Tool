@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import BusinessUserTopbar from '../BusinessUser/Topbar';
+import FreeUserTopbar from '../FreeUser/Topbar';
+import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
 import AlertPopup from '../UI/AlertPopup';
@@ -8,6 +10,7 @@ import AlertPopup from '../UI/AlertPopup';
 const ChangePassword = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
+  const [role, setRole] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,7 +20,7 @@ const ChangePassword = () => {
   const [isAlertVisible, setIsAlertVisible] = useState(false);
 
   useEffect(() => {
-    const fetchEmail = async () => {
+    const fetchEmailAndRole = async () => {
       try {
         const headers = getHeaders();
         const response = await axios.post(
@@ -30,7 +33,9 @@ const ChangePassword = () => {
           throw new Error('No data returned');
         }
 
-        setEmail(response.data.body.email);
+        const { email, role } = response.data.body;
+        setEmail(email);
+        setRole(role);
       } catch (error) {
         console.error('Error fetching email details:', error);
         setAlertMessage('Error fetching email details');
@@ -39,7 +44,7 @@ const ChangePassword = () => {
       }
     };
 
-    fetchEmail();
+    fetchEmailAndRole();
   }, []);
 
   const handleSubmit = async (e) => {
@@ -99,9 +104,25 @@ const ChangePassword = () => {
     }
   };
 
+  const handleGoBack = () => {
+    navigate(-1);
+  };
+
+  const renderTopbar = () => {
+    if (role.includes("BUSINESS_USER")) {
+      return <BusinessUserTopbar title="Change Password" onClick={handleGoBack} />;
+    } else if (role === "FREE_USER" || role === "SYS_ADMIN") {
+      return <FreeUserTopbar title="Change Password" onClick={handleGoBack} />;
+    } else if (role === "PREMIUM_USER") {
+      return <PremiumUserTopbar title="Change Password" onClick={handleGoBack} />;
+    } else {
+      return null;
+    }
+  };
+
   return (
     <div>
-      <Topbar title="Change Password" onClick={() => navigate(-1)} />
+      {renderTopbar()}
       <div className="flex flex-col items-center justify-center mt-5">
         <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#EDEFF7' }}>
           <h2 className="text-3xl text-center mb-4">Change Password</h2>
