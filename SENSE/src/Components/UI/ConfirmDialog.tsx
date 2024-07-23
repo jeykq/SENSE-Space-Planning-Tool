@@ -17,7 +17,7 @@ const ConfirmDialogPopup = ({ title, text, onClose, onConfirm }: ConfirmDialogPo
                 <span className="absolute top-0 right-0 p-4">
                     <button
                         onClick={() => onClose()}
-                        className={`focus:outline-none focus:border-none hover:bg-gray-300 hover:bg-opacity-25 py-1 px-2 inline-flex items-center`}
+                        className={`focus:outline-none focus:border-none hover:bg-gray-300 hover:bg-opacity-25 py-0.5 px-2 inline-flex justify-center items-center rounded`}
                     >x
                     </button>
                 </span>
