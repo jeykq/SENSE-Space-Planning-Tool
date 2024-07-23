@@ -21,7 +21,7 @@ const SA_ManageObjCategoriesPage = () => {
 
   const fetchObjCategories = async () => {
     try {
-      const headers = getHeaders(); // Assuming getHeaders provides necessary headers
+      const headers = getHeaders(); 
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/category/list',
         {},

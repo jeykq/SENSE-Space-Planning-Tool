@@ -2,9 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
 import SearchBar from './SearchBar';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/BULogo.png';
 import ConfirmDialogPopup from '../UI/ConfirmDialog';
 import ProfileDropdown from './ProfileDropdown';
 
@@ -61,7 +60,7 @@ const Navbar = ({ handleSearch }) => {
 
   return (
     <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
-      <img src={logo} alt="" className='logo w-20 mx-2'/>
+      <img src={logo} alt="" className='logo mx-2' style={{ width: '100px' }}/>
       <div className={`h-screen w-52 lg:w-auto lg:max-h-20 bg-black bg-opacity-100 lg:bg-opacity-100 translate-y-[375px] lg:translate-y-0 ${sidebarOpen ? 'translate-x-4 sticky right-0 top-0' : 'translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100'} duration-100 lg:translate-x-0 px-4`}>
         <ul className="flex flex-col lg:flex-row mb-4 mt-20 lg:mt-1">
           <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap">
