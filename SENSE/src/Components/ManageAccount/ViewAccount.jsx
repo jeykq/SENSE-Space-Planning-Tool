@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
 import axios from 'axios';
-import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
+import { getHeaders } from '../../../apiUtils'; 
+import { text } from '@fortawesome/fontawesome-svg-core';
 
 const ViewAccount = () => {
   const navigate = useNavigate();
@@ -56,7 +57,7 @@ const ViewAccount = () => {
   };
 
   useEffect(() => {
-    const headers = getHeaders(); // Get headers using the function
+    const headers = getHeaders(); 
 
     if (!headers) {
       setError('Token not found');
@@ -140,15 +141,15 @@ const ViewAccount = () => {
   const labelStyle = {
     fontWeight: "bold",
     marginRight: "10px",
-    minWidth: "150px" // Ensure labels have a minimum width to align values
+    minWidth: "150px" 
   };
 
   const valueStyle = {
-    backgroundColor: "#ccc5c5",
+    backgroundColor: "#EDEFF7",
     padding: "10px",
     borderRadius: "5px",
     display: "inline-block",
-    flexGrow: 1 // Ensure values take the remaining space
+    flexGrow: 1 
   };
 
   const buttonContainerStyle = {
@@ -156,31 +157,31 @@ const ViewAccount = () => {
     flexWrap: "wrap",
     justifyContent: "space-between",
     width: "100%",
-    maxWidth: "600px", // Set a max width to align buttons properly
+    maxWidth: "600px", 
     marginTop: "0px"
   };
 
   const buttonStyle = {
-    backgroundColor: '#ccc5c5',
+    backgroundColor: '#dde0ed',
     color: '#333',
     fontWeight: 'bold',
     padding: '10px 20px',
     borderRadius: '5px',
-    flex: '1 1 48%', // Ensure buttons take equal space and allow wrapping
-    margin: '5px', // Add space between buttons
-    transition: 'background-color 0.3s, color 0.3s', // Add transition for smooth color change
+    flex: '1 1 48%', 
+    margin: '5px', 
+    transition: 'background-color 0.3s, color 0.3s', 
   };
 
   // Function to handle mouse enter event
   const handleMouseEnter = (event) => {
-    event.target.style.backgroundColor = '#a39d9d'; // Change background color on hover
-    event.target.style.color = '#fff'; // Change text color on hover
+    event.target.style.backgroundColor = '#c5cbeb'; 
+    event.target.style.color = '#6c6d70'; 
   };
 
   // Function to handle mouse leave event
   const handleMouseLeave = (event) => {
-    event.target.style.backgroundColor = '#ccc5c5'; // Restore background color on mouse leave
-    event.target.style.color = '#333'; // Restore text color on mouse leave
+    event.target.style.backgroundColor = '#dde0ed'; 
+    event.target.style.color = '#333'; 
   };
 
   const hrStyle = {

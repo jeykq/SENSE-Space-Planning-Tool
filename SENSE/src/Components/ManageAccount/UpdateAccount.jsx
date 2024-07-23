@@ -112,7 +112,7 @@ const UpdateAccount = () => {
     <div>
       <Topbar title="Update Account Details" onClick={handleGoBack} />
       <div className="flex flex-col items-center justify-center mt-5">
-        <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#d1caca' }}>
+        <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#EDEFF7' }}>
           <h2 className="text-3xl text-center mb-4">Account Information</h2>
           <div className="flex-grow flex items-center justify-center p-4">
             <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -147,14 +147,14 @@ const UpdateAccount = () => {
               </div>
               <div className="flex items-center justify-center">
               <button 
-                className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-300 transition-colors duration-300"
-                style={{ backgroundColor: '#b7b1b1' }}
+                className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded  transition-colors duration-300"
+                style={{ backgroundColor: '#cfd2e3' }}
                 onMouseEnter={(e) => { 
-                  e.target.style.backgroundColor = '#a39d9d';
-                  e.target.style.color = '#fff';
+                  e.target.style.backgroundColor = '#c5cbeb';
+                  e.target.style.color = '#6c6d70';
                  }}
                 onMouseLeave={(e) => { 
-                  e.target.style.backgroundColor = '#b7b1b1';
+                  e.target.style.backgroundColor = '#cfd2e3';
                   e.target.style.color = '#333';
                 }}
               >
