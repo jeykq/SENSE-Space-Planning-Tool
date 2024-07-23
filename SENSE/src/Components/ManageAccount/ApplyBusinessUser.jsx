@@ -15,6 +15,7 @@ const ApplyBusinessUser = () => {
     const [businessUseCase, setBusinessUseCase] = useState('');
     const [showPopup, setShowPopup] = useState(false);
     const [role, setRole] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const headers = getHeaders(); // Get headers using the function
@@ -44,8 +45,19 @@ const ApplyBusinessUser = () => {
         fetchAccountDetails();
     }, []);
 
-    const handleFormSubmit = () => {
+    const handleFormSubmit = (event) => {
+        event.preventDefault();
+
+        if (!contact || !companyInfo || !businessUseCase) {
+            setErrorMessage('Please fill out all fields.');
+            return;
+        }
+
+        setErrorMessage('');
         setShowPopup(true);
+
+        // Submit the form
+        event.target.submit();
     };
 
     const handleGoBack = () => {
@@ -135,6 +147,7 @@ const ApplyBusinessUser = () => {
                             style={styles.textarea}
                         />
                     </div>
+                    {errorMessage && <p style={styles.error}>{errorMessage}</p>}
                     <button type="submit" style={styles.button}>
                         Apply
                     </button>
@@ -241,6 +254,10 @@ const styles = {
         border: 'none',
         borderRadius: '5px',
         cursor: 'pointer'
+    },
+    error: {
+        color: 'red',
+        marginBottom: '10px'
     },
     popup: {
         position: 'absolute',

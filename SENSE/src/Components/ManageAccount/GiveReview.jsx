@@ -34,7 +34,26 @@ const GiveReview = () => {
             }
         };
 
+        const fetchUserRatingAndReview = async () => {
+            try {
+                const response = await axios.post(
+                    'https://api.sensespacesplanningtool.com/user/get/rating',
+                    {},
+                    { headers }
+                );
+
+                if (response.data) {
+                    const { rating, review } = response.data.body;
+                    setRating(rating);
+                    setReview(review);
+                }
+            } catch (error) {
+                console.error('Error fetching user rating and review:', error);
+            }
+        };
+
         fetchUserRole();
+        fetchUserRatingAndReview();
     }, []);
 
     const handleRating = (rate) => {
@@ -45,10 +64,20 @@ const GiveReview = () => {
         setReview(event.target.value);
     };
 
-    const handleSubmit = () => {
-        // Handle the submit action here
-        console.log('Review submitted:', { rating, review });
-        setShowPopup(true); // Show popup on submit
+    const handleSubmit = async () => {
+        const headers = getHeaders(); // Get headers using the function
+
+        try {
+            await axios.post(
+                'https://api.sensespacesplanningtool.com/user/update/rating',
+                { rating, review },
+                { headers }
+            );
+
+            setShowPopup(true); // Show popup on submit
+        } catch (error) {
+            console.error('Error submitting review:', error);
+        }
     };
 
     const handleGoBack = () => {
