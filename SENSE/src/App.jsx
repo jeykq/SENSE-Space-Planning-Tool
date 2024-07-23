@@ -31,6 +31,7 @@ import SA_UpdateLandingPage from './Components/SystemAdmin/SA_UpdateLandingPage'
 import GiveReview from './Components/ManageAccount/GiveReview';
 import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import BuySubscription from './Components/ManageAccount/BuySubscription';
+import ViewSubscription from './Components/ManageAccount/ViewSubscription';
 import FU_Room3D from './Components/FreeUser/FU_Room3D';
 import FU_ChangeRoomDimensions from './Components/FreeUser/FU_ChangeRoomDimensions';
 import PU_Room3D from './Components/PremiumUser/PU_Room3D';
@@ -65,6 +66,7 @@ const App = () => {
         <Route path="/BU_UpdateObjectInfo" element={<BU_UpdateObjectInfo />} />
         <Route path="/BU_ChangeUserType" element={<BU_ChangeUserType />} />
         <Route path="/viewaccount" element={<ViewAccount />} />
+        <Route path="/ViewSubscription" element={<ViewSubscription />} />
         <Route path="/updateaccount" element={<UpdateAccount />} />
         <Route path="/ChangePassword" element={<ChangePassword />} />
         <Route path="/ThreeDPreview" element={<ThreeDPreview />} />

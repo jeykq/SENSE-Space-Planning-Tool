@@ -46,7 +46,7 @@ const ViewAccount = () => {
   };
 
   const handleViewSubscription = () => {
-    navigate('/viewsubscription');
+    navigate('/ViewSubscription');
   };
 
   const handleEditPreferences = () => {
