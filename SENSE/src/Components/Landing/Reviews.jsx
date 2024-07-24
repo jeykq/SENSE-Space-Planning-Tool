@@ -1,10 +1,49 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import userImage from '../../assets/user.jpeg';
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils'; // Import the getHeaders function
 
 const Reviews = () => {
+    const [reviews, setReviews] = useState([]);
+
+    useEffect(() => {
+        const fetchReviews = async () => {
+            try {
+                const response = await axios.post(
+                    'https://api.sensespacesplanningtool.com/user/list',
+                    {},
+                    { headers: getHeaders() }
+                );
+
+                const filteredReviews = response.data.body
+                    .filter(user => user.review && user.rating)
+                    .sort((a, b) => b.last_review_timestamp - a.last_review_timestamp || b.rating - a.rating)
+                    .slice(0, 10); // Get the top 10 reviews
+
+                setReviews(filteredReviews);
+            } catch (error) {
+                console.error('Error fetching reviews:', error.message);
+            }
+        };
+
+        fetchReviews();
+    }, []);
+
+    const renderStars = (rating) => {
+        return [...Array(5)].map((_, index) => (
+            <span key={index} style={index < rating ? styles.starFilled : styles.starEmpty}>
+                &#9733;
+            </span>
+        ));
+    };
+
+    const capitalizeName = (name) => {
+        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    };
+
     const settings = {
         dots: true,
         infinite: true,
@@ -31,40 +70,22 @@ const Reviews = () => {
         ]
     };
 
-    const data = [
-        {
-            name: 'Jane Doe',
-            review: 'Sense has completely transformed how I plan my spaces. The intuitive interface and powerful features make it easy to create and customize any room layout.'
-        },
-        {
-            name: 'John Smith',
-            review: 'Sense is incredibly user-friendly and versatile. It has become an essential part of my workflow for planning and organizing spaces efficiently.'
-        },
-        {
-            name: 'Sarah Johnson',
-            review: 'I love the ready-made templates and the extensive object library. Sense has saved me so much time and effort in visualizing my design ideas.'
-        },
-        {
-            name: 'Michael Brown',
-            review: 'The customization options in Sense are outstanding. Being able to adjust display settings to my preference makes using the tool a delight.'
-        },
-        {
-            name: 'Emily Davis',
-            review: 'The ability to import and export room designs has been a game-changer for my interior design projects. Highly recommended for professionals and hobbyists alike.'
-        }
-    ];
-
     return (
         <div name='reviews' className='w-3/4 m-auto mb-4'>
             <h2 className='text-black text-4xl text-center m-20 font-semibold'>Reviews</h2>
             <div>
                 <Slider {...settings}>
-                    {data.map((d, index) => (
+                    {reviews.map((review, index) => (
                         <div key={index} className='bg-white h-[400px] text-black rounded-xl shadow-lg p-6 flex flex-col items-center overflow-hidden'>
-                            <img src={userImage} alt={d.name} className='w-20 h-20 rounded-full mb-4 object-cover mx-auto' />
+                            <img src={userImage} alt={`${review.first_name} ${review.last_name}`} className='w-20 h-20 rounded-full mb-4 object-cover mx-auto' />
                             <div className='flex flex-col items-center gap-4'>
-                                <p className='text-xl font-semibold text-center'>{d.name}</p>
-                                <p className='text-justify overflow-hidden text-ellipsis'>{d.review}</p>
+                                <p className='text-xl font-semibold text-center'>
+                                    {`${capitalizeName(review.first_name)} ${capitalizeName(review.last_name)}`}
+                                </p>
+                                <div style={styles.stars}>
+                                    {renderStars(review.rating)}
+                                </div>
+                                <p className='text-justify overflow-hidden text-ellipsis'>{review.review}</p>
                             </div>
                         </div>
                     ))}
@@ -72,6 +93,21 @@ const Reviews = () => {
             </div>
         </div>
     );
-}
+};
+
+const styles = {
+    stars: {
+        display: 'flex',
+        marginBottom: '10px',
+    },
+    starFilled: {
+        fontSize: '24px',
+        color: '#FFD700'
+    },
+    starEmpty: {
+        fontSize: '24px',
+        color: '#ccc'
+    }
+};
 
 export default Reviews;
