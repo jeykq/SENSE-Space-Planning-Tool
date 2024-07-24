@@ -19,6 +19,8 @@ const PaidSignUpForm = () => {
   const [errors, setErrors] = useState({});
   const [billingCountry, setBillingCountry] = useState('Singapore'); // Default to Singapore
   const [industryList, setIndustryList] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
   const navigate = useNavigate();
 
   const countryList = [
@@ -89,7 +91,11 @@ const PaidSignUpForm = () => {
     e.preventDefault();
     const isValid = validateForm();
     if (isValid) {
+      setIsLoading(true);
       try {
+        // Simulate payment processing delay
+        await new Promise(resolve => setTimeout(resolve, 3000));
+
         const response = await fetch('https://api.sensespacesplanningtool.com/signup/premium', {
           method: 'POST',
           headers: {
@@ -104,8 +110,9 @@ const PaidSignUpForm = () => {
             jobIndustryId: parseInt(industry, 10), // Ensure only ID is sent
           }),
         });
-        
+
         if (response.ok) {
+          setPaymentSuccess(true);
           setShowAlert(true); // Show the alert
           console.log('Sign up successful!');
         } else {
@@ -116,14 +123,18 @@ const PaidSignUpForm = () => {
       } catch (error) {
         console.error('Error during sign up:', error);
         setErrors({ general: 'Sign up failed. This account already exists.' });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  // Close the alert popup when click OK, and navigate to login
+  // Close the alert popup when click OK, and navigate to login if payment was successful
   const handleOK = () => {
     setShowAlert(false);
-    navigate("/login");
+    if (paymentSuccess) {
+      navigate("/login");
+    }
   };
 
   // Handle click on close button to navigate back to landing page
@@ -222,7 +233,7 @@ const PaidSignUpForm = () => {
             {errors.general && <p style={{ color: 'red' }} className="text-sm">{errors.general}</p>}
             
             <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-5 w-full">
-              Sign Up
+              {isLoading ? 'Processing Payment...' : 'Sign Up'}
             </button>
           </form>
         </div>
