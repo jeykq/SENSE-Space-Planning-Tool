@@ -17,20 +17,26 @@ const Reviews = () => {
                     {},
                     { headers: getHeaders() }
                 );
-
+    
                 const filteredReviews = response.data.body
                     .filter(user => user.review && user.rating)
-                    .sort((a, b) => b.last_review_timestamp - a.last_review_timestamp || b.rating - a.rating)
+                    .sort((a, b) => {
+                        // First sort by rating (descending)
+                        if (b.rating !== a.rating) return b.rating - a.rating;
+                        // Then sort by timestamp (latest first)
+                        return b.last_review_timestamp - a.last_review_timestamp;
+                    })
                     .slice(0, 10); // Get the top 10 reviews
-
+    
                 setReviews(filteredReviews);
             } catch (error) {
                 console.error('Error fetching reviews:', error.message);
             }
         };
-
+    
         fetchReviews();
     }, []);
+    
 
     const renderStars = (rating) => {
         return [...Array(5)].map((_, index) => (
@@ -41,8 +47,12 @@ const Reviews = () => {
     };
 
     const capitalizeName = (name) => {
-        return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+        return name
+            .split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+            .join(' ');
     };
+    
 
     const settings = {
         dots: true,
