@@ -9,42 +9,41 @@ const UserJobIndustryChart = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      const retry = async (fn, retries = 3, delay = 1000) => {
+        try {
+          return await fn();
+        } catch (error) {
+          if (retries === 0) throw error;
+          await new Promise(res => setTimeout(res, delay));
+          return retry(fn, retries - 1, delay);
+        }
+      };
+
       try {
-        // Fetch users data
-        const usersResponse = await axios.post(
-          'https://api.sensespacesplanningtool.com/user/list',
-          {}
-        );
+        const fetchUsers = () => axios.post('https://api.sensespacesplanningtool.com/user/list', {});
+        const fetchIndustries = () => axios.post('https://api.sensespacesplanningtool.com/job_industry/list', {});
+        
+        const usersResponse = await retry(fetchUsers);
+        const industriesResponse = await retry(fetchIndustries);
 
         if (!usersResponse.data || !usersResponse.data.body) {
           throw new Error('No user data returned');
         }
 
         const users = usersResponse.data.body;
-
-        // Count users per job industry
         const industryCounts = {};
         users.forEach(user => {
           const industryId = user.job_industry_id;
           industryCounts[industryId] = (industryCounts[industryId] || 0) + 1;
         });
 
-        // Total number of users
         const totalUsers = users.length;
-
-        // Fetch job industries data
-        const industriesResponse = await axios.post(
-          'https://api.sensespacesplanningtool.com/job_industry/list',
-          {}
-        );
 
         if (!industriesResponse.data || !industriesResponse.data.body) {
           throw new Error('No job industry data returned');
         }
 
         const industries = industriesResponse.data.body;
-
-        // Prepare data for the chart
         const chartLabels = industries.map(industry => industry.name);
         const seriesData = industries.map(industry => ((industryCounts[industry.id] || 0) / totalUsers) * 100);
 
@@ -57,7 +56,7 @@ const UserJobIndustryChart = () => {
               formatter: (val) => `${val.toFixed(2)}%`,
               style: {
                 fontSize: '10px',
-                colors: ['#FFF'] // Change the text color to white
+                colors: ['#FFF']
               }
             },
             legend: {
@@ -66,7 +65,7 @@ const UserJobIndustryChart = () => {
             },
             plotOptions: {
               pie: {
-                customScale: 1.0, // Adjust this value to resize the pie/donut chart
+                customScale: 1.0,
                 donut: {
                   labels: {
                     show: true,
@@ -77,7 +76,7 @@ const UserJobIndustryChart = () => {
                         return totalUsers.toFixed(0);
                       },
                       style: {
-                        color: '#FFF' // Change the total label color to white
+                        color: '#FFF'
                       }
                     }
                   }
