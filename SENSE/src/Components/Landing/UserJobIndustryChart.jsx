@@ -108,7 +108,7 @@ const UserJobIndustryChart = () => {
 
   return (
     <div>
-      <h2 className='text-black text-4xl text-center m-20 font-semibold'>Users by Job Industry</h2>
+      <h2 className='text-black text-4xl text-center m-20 font-semibold'>SENSE Users by Job Industry</h2>
       <div className='w-full flex justify-center'>
         <Chart
           options={chartData.options}

@@ -88,13 +88,13 @@ const LandingSense = () => {
         <h1 className='text-6xl font-semibold'>SENSE SPACES Planning Tool</h1>
         {editMode ? (
           <textarea
-            className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-transparent text-black border-b-2 border-white p-2'
+            className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-white text-black border-b-2 border-white p-2 rounded'
             value={editedParagraph}
             onChange={handleInputChange}
             rows={6}
           />
         ) : (
-          <p className='text-justify text-lg max-w-[800px] my-10 md:my-20 leading-relaxed'>
+          <p className='text-justify text-lg max-w-[800px] my-10 md:my-20 leading-relaxed text-white'>
             {mainParagraph}
           </p>
         )}

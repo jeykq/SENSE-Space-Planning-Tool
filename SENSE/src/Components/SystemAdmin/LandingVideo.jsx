@@ -83,7 +83,7 @@ const LandingVideo = () => {
       <div className="w-3/4 m-5">
         {editMode ? (
           <textarea
-            className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-transparent text-black border-b-2 border-white p-2'
+            className='text-justify text-lg w-full my-10 md:my-20 leading-relaxed bg-gray-100 text-blue-600 border-b-2 p-2 rounded'
             value={editedVideoLink}
             onChange={handleInputChange}
             rows={2}
