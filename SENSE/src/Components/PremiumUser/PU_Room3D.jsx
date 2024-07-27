@@ -18,7 +18,7 @@ const PU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -26,6 +26,7 @@ const PU_Room3D = () => {
   const [isObjectSelected, setIsObjectSelected] = useState(false);
   const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const [showFloorDropdown, setShowFloorDropdown] = useState(false);
+  const [showConfirmChangeDimension, setShowConfirmChangeDimension] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
@@ -190,10 +191,15 @@ const PU_Room3D = () => {
     const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
-    const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
+    const floorTextureUrl = initialFloorTexture || '/textures/hardwood.png'; // Default texture if not provided
+    const floorTexture = new THREE.TextureLoader().load(floorTextureUrl);
     const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+
     const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
     const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+    if (initialWallColor) {
+      wallMaterial.color.set(initialWallColor);
+    }
     setWallMaterial(wallMaterial);
 
     // Floor
@@ -285,7 +291,7 @@ const PU_Room3D = () => {
 
     // Load 3D Model
     const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
-        
+      
       const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
     
       const mtlLoader = new MTLLoader();
@@ -505,7 +511,7 @@ const PU_Room3D = () => {
       mount.removeEventListener('mousemove', onMouseMove);
       mount.removeEventListener('mouseup', onMouseUp);
     };
-  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl, initialWallColor, initialFloorTexture]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -694,7 +700,24 @@ const PU_Room3D = () => {
   ];
 
   const handleChangeRoomDimensions = () => {
-    navigate('/PU_ChangeRoomDimensions')
+    setShowConfirmChangeDimension(true);
+  };
+
+  const handleConfirmChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
+    navigate('/PU_ChangeRoomDimensions', {
+      state: {
+        roomLength,
+        roomWidth,
+        roomHeight,
+        wallColor: wallMaterial.color.getStyle(),
+        floorTexture: floorRef.current.material.map.image.src
+      }
+    });
+  };
+
+  const handleCancelChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
   };
 
   // Publish Template Functions
@@ -989,6 +1012,14 @@ const PU_Room3D = () => {
           onClose={() => setShowConfirmSave(false)}
           onSaveAsDraft={handleSaveAsDraft}
           onPublishTemplate={handlePublishTemplate}
+        />
+      )}
+      {showConfirmChangeDimension && (
+        <ConfirmDialog
+          title="Change Room Dimensions"
+          text="Changing the room dimensions will remove all currently placed objects. Are you sure you want to proceed?"
+          onConfirm={handleConfirmChangeDimension}
+          onClose={handleCancelChangeDimension}
         />
       )}
     </div>

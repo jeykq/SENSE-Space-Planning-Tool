@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
+import { saveAs } from 'file-saver';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
@@ -17,7 +18,7 @@ const FU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -25,6 +26,7 @@ const FU_Room3D = () => {
   const [isObjectSelected, setIsObjectSelected] = useState(false);
   const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const [showFloorDropdown, setShowFloorDropdown] = useState(false);
+  const [showConfirmChangeDimension, setShowConfirmChangeDimension] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
@@ -35,6 +37,7 @@ const FU_Room3D = () => {
   const intersectedRef = useRef(null);
   const transformControlsRef = useRef(null);
   const isTransformingRef = useRef(false); // Reference state to track if TransformControl is active
+  const fileInputRef = useRef(null);
 
   const [categoryData, setCategoryData] = useState(null);
   const [objectListData, setObjectListData] = useState(null);
@@ -188,10 +191,15 @@ const FU_Room3D = () => {
     const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
-    const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
+    const floorTextureUrl = initialFloorTexture || '/textures/hardwood.png'; // Default texture if not provided
+    const floorTexture = new THREE.TextureLoader().load(floorTextureUrl);
     const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+
     const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
     const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+    if (initialWallColor) {
+      wallMaterial.color.set(initialWallColor);
+    }
     setWallMaterial(wallMaterial);
 
     // Floor
@@ -283,7 +291,7 @@ const FU_Room3D = () => {
 
     // Load 3D Model
     const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
-        
+      
       const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
     
       const mtlLoader = new MTLLoader();
@@ -503,7 +511,7 @@ const FU_Room3D = () => {
       mount.removeEventListener('mousemove', onMouseMove);
       mount.removeEventListener('mouseup', onMouseUp);
     };
-  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl, initialWallColor, initialFloorTexture]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -515,13 +523,96 @@ const FU_Room3D = () => {
     setShowConfirmSave(true);
   };
 
+  // Import Room functions
   const handleImportRoom = () => {
-    navigate("/ImportRoom");
+    fileInputRef.current.click();
   };
 
+  const handleFileChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const fileContent = e.target.result;
+      console.log('File content:', fileContent);
+
+      loadGLB(fileContent);
+
+      if (file.name.endsWith('.json') || file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
+        loadGLB(fileContent);
+      } else {
+        alert('Unsupported file format');
+      }
+    };
+
+    if (file.name.endsWith('.json')) {
+      reader.readAsText(file);
+    } else {
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const loadGLB = (data) => {
+    try {
+      const loader = new GLTFLoader();
+      loader.parse(data, '', (gltf) => {
+        sceneRef.current.add(gltf.scene);
+      }, undefined, (error) => {
+        console.error('Error loading GLB:', error);
+      });
+    } catch (error) {
+      console.error('Error parsing GLB:', error);
+    }
+  };
+
+  // Export Room functions
   const [showConfirmExport, setShowConfirmExport] = useState(false);
+
   const handleExportRoom = () => {
-    setShowConfirmExport(true)
+    const scene = sceneRef.current;
+
+    if (!scene) {
+      console.error('No scene found.');
+      return;
+    }
+
+    console.log(scene);
+
+    const exporter = new GLTFExporter();
+
+    exporter.parse(
+      scene,
+      function (result) {
+        if (result instanceof ArrayBuffer) {
+          saveArrayBuffer(result, 'RoomModel.glb');
+        } else if (result instanceof Object) {
+          saveJSON(result, 'RoomModel.json');
+        } else {
+          console.error('Unexpected result format:', result);
+        }
+      },
+      {
+        binary: false
+      }
+    );
+  };
+
+  function saveArrayBuffer(buffer, filename) {
+    save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
+  }
+
+  function saveJSON(data, filename) {
+    save(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), filename);
+  }
+
+  const link = document.createElement('a');
+  document.body.appendChild(link);
+
+  function save(blob, filename) {
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
   };
 
   const toggleDropdown = () => {
@@ -609,14 +700,30 @@ const FU_Room3D = () => {
   ];
 
   const handleChangeRoomDimensions = () => {
-    navigate('/FU_ChangeRoomDimensions')
+    setShowConfirmChangeDimension(true);
+  };
+
+  const handleConfirmChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
+    navigate('/FU_ChangeRoomDimensions', {
+      state: {
+        roomLength,
+        roomWidth,
+        roomHeight,
+        wallColor: wallMaterial.color.getStyle(),
+        floorTexture: floorRef.current.material.map.image.src
+      }
+    });
+  };
+
+  const handleCancelChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
   };
 
   // Publish Template Functions
   async function convertToGLB(scene) {
     const exporter = new GLTFExporter();
 
-    // Export scene to GLB format
     return new Promise((resolve, reject) => {
       exporter.parse(scene, (glb) => {
         resolve(glb);
@@ -626,14 +733,14 @@ const FU_Room3D = () => {
 
   const handlePublishTemplate = async (e) => {
     e.preventDefault();
-
+  
     try {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-
+  
       const glbData = await convertToGLB(sceneRef.current);
-
+  
       const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
         method: 'POST',
         headers: {
@@ -650,12 +757,13 @@ const FU_Room3D = () => {
           "room_type_id": roomType
         }),
       });
-
+  
       if (response.ok) {
         const responseData = await response.json();
         const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-
+  
         if (TemplateURL) {
+          // Upload the GLB file
           await axios.put(
             TemplateURL,
             glbData,
@@ -666,11 +774,15 @@ const FU_Room3D = () => {
               },
             }
           );
-
+  
+          const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
+  
+          await captureScreenshotAndUpload(screenshotURL);
+  
           if (response.status >= 200 && response.status < 300) {
             setAlertType('save');
             setShowAlert(true);
-            console.log('Template successfully published!');
+            console.log('Template and screenshot successfully published!');
           } else {
             console.error('Template uploading failed:', response);
           }
@@ -684,9 +796,42 @@ const FU_Room3D = () => {
     } catch (error) {
       console.error('Error converting to GLB or uploading:', error);
     }
-
+  
     setShowConfirmSave(false);
   };
+
+  const captureScreenshotAndUpload = async (previewUploadUrl) => {
+    try {
+      const canvas = document.querySelector('canvas');
+  
+      await new Promise((resolve) => {
+        let frames = 5;
+        const waitForFrames = () => {
+          if (frames > 0) {
+            frames--;
+            requestAnimationFrame(waitForFrames);
+          } else {
+            resolve();
+          }
+        };
+        requestAnimationFrame(waitForFrames);
+      });
+  
+      canvas.toBlob(async (blob) => {
+        await axios.put(previewUploadUrl, blob, {
+          headers: {
+            'Content-Type': 'image/png',
+            'Content-Disposition': 'attachment',
+          },
+        });
+  
+        console.log("Uploaded screenshot successfully");
+      }, 'image/png');
+    } catch (error) {
+      console.error('Error capturing or uploading screenshot:', error);
+    }
+  };
+  
 
   // Update Template Function
   const handleUpdateTemplate = async (e) => {
@@ -743,7 +888,7 @@ const FU_Room3D = () => {
             onClick={handleSaveAsTemplate}
             className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
-            Save Room
+            Save as Template
           </button>
         )}
         {showAlert && (
@@ -754,6 +899,28 @@ const FU_Room3D = () => {
             onOk={handleOk}
           />
         )}
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          onChange={handleFileChange}
+          accept=".json,.glb,.gltf"
+        />
+        <button
+          onClick={handleImportRoom}
+          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
+        >
+          Import Room
+        </button>
+        <button
+          onClick={handleExportRoom}
+          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
+        >
+          Export Room
+        </button>
+        {showConfirmExport &&
+          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={() => setShowConfirmExport(false)} />
+        }
         <button
           onClick={() => navigate('/FreeUserHomepage')}
           className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
@@ -845,6 +1012,14 @@ const FU_Room3D = () => {
           onClose={() => setShowConfirmSave(false)}
           onSaveAsDraft={handleSaveAsDraft}
           onPublishTemplate={handlePublishTemplate}
+        />
+      )}
+      {showConfirmChangeDimension && (
+        <ConfirmDialog
+          title="Change Room Dimensions"
+          text="Changing the room dimensions will remove all currently placed objects. Are you sure you want to proceed?"
+          onConfirm={handleConfirmChangeDimension}
+          onClose={handleCancelChangeDimension}
         />
       )}
     </div>

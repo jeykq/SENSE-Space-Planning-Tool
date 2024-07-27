@@ -1,14 +1,27 @@
 import axios from 'axios';
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { getHeaders } from '../../../apiUtils';
 import Topbar from '../FreeUser/Topbar';
 
 const FU_ChangeRoomDimensions = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [roomLength, setRoomLength] = useState('');
   const [roomWidth, setRoomWidth] = useState('');
   const [roomHeight, setRoomHeight] = useState('');
+  const [wallColor, setWallColor] = useState(location.state?.wallColor || '');
+  const [floorTexture, setFloorTexture] = useState(location.state?.floorTexture || '');
+
+  useEffect(() => {
+    if (location.state) {
+      setRoomLength(location.state.roomLength);
+      setRoomWidth(location.state.roomWidth);
+      setRoomHeight(location.state.roomHeight);
+      setWallColor(location.state.wallColor);
+      setFloorTexture(location.state.floorTexture);
+    }
+  }, [location.state]);
 
   const handleGenerateRoom = () => {
     if (roomLength && roomWidth && roomHeight) {
@@ -16,7 +29,9 @@ const FU_ChangeRoomDimensions = () => {
         state: {
           roomLength: parseFloat(roomLength),
           roomWidth: parseFloat(roomWidth),
-          roomHeight: parseFloat(roomHeight)
+          roomHeight: parseFloat(roomHeight),
+          wallColor,
+          floorTexture,
         }
       });
     } else {
