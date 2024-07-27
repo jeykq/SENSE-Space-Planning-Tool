@@ -18,7 +18,7 @@ const BU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl } = location.state || {};
+  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -190,10 +190,15 @@ const BU_Room3D = () => {
     const roomD = roomLength || 12; // Default to 12 if roomLength is not provided
 
     // Materials
-    const floorTexture = new THREE.TextureLoader().load('/textures/hardwood.png');
+    const floorTextureUrl = initialFloorTexture || '/textures/hardwood.png'; // Default texture if not provided
+    const floorTexture = new THREE.TextureLoader().load(floorTextureUrl);
     const floorMaterial = new THREE.MeshBasicMaterial({ map: floorTexture });
+
     const wallTexture = new THREE.TextureLoader().load('/textures/abstractwhite.jpg');
     const wallMaterial = new THREE.MeshBasicMaterial({ map: wallTexture });
+    if (initialWallColor) {
+      wallMaterial.color.set(initialWallColor);
+    }
     setWallMaterial(wallMaterial);
 
     // Floor
@@ -285,7 +290,7 @@ const BU_Room3D = () => {
 
     // Load 3D Model
     const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
-        
+      
       const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
     
       const mtlLoader = new MTLLoader();
@@ -505,7 +510,7 @@ const BU_Room3D = () => {
       mount.removeEventListener('mousemove', onMouseMove);
       mount.removeEventListener('mouseup', onMouseUp);
     };
-  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl]);
+  }, [roomLength, roomWidth, roomHeight, roomLayoutUrl, initialWallColor, initialFloorTexture]);
 
   const handleDragStart = (event, modelPath, materialPath) => {
     event.dataTransfer.setData('modelPath', modelPath);
@@ -694,7 +699,15 @@ const BU_Room3D = () => {
   ];
 
   const handleChangeRoomDimensions = () => {
-    navigate('/BU_ChangeRoomDimensions')
+    navigate('/BU_ChangeRoomDimensions', {
+      state: {
+        roomLength,
+        roomWidth,
+        roomHeight,
+        wallColor: wallMaterial.color.getStyle(),
+        floorTexture: floorRef.current.material.map.image.src
+      }
+    });
   };
 
   // Publish Template Functions
