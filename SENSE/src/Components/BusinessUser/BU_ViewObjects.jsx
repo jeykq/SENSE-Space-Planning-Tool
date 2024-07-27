@@ -49,7 +49,7 @@ const BU_ViewObjects = () => {
     const id = object.id;
     const name = object.name;
     const categoryID = object.category_ids;
-    const description = object.product_description;
+    const product_description = object.product_description["description.a"];
     const tags = object.tag_ids;
     const objURL = object.object_media.preview;
 
@@ -58,7 +58,7 @@ const BU_ViewObjects = () => {
         id,
         name,
         categoryID,
-        description,
+        product_description,
         tags,
         objURL
       }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Topbar from '../BusinessUser/Topbar';
+import Footer from "../Landing/Footer";
 import AlertPopup from '../UI/AlertPopup'; 
 import { getHeaders } from '../../../apiUtils'; 
+import { DataArrayTexture } from 'three/src/Three.js';
 
 const BU_UpdateObjectInfo = () => {
     const [objectName, setObjectName] = useState('');
@@ -20,18 +22,12 @@ const BU_UpdateObjectInfo = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const { 
-        id, 
-        name, 
-        categoryID, 
-        productDesc, 
-        tags, 
-        objURL } = location.state || {};
+    const { id, name, categoryID, productDesc, tags, objURL } = location.state || {};
 
     useEffect(() => {
         setObjectName(name);
-        setObjectCat(categoryID[0] || '');  // set initial category ID
-        setSelectedTags(tags || []);  // set initial tags
+        setObjectCat(categoryID[0] || '');
+        setSelectedTags(tags.map(tag => tag.toString()) || []);
         setProductDescription(productDesc);
         fetchCategoriesAndTags();
     }, []);
@@ -66,12 +62,12 @@ const BU_UpdateObjectInfo = () => {
         }
     };
 
-    const handleTagChange = (event) => {
-        const { options } = event.target;
-        const selectedValues = Array.from(options)
-            .filter(option => option.selected)
-            .map(option => option.value);
-        setSelectedTags(selectedValues);
+    const handleCheckboxChange = (event) => {
+        const { value, checked } = event.target;
+        const newSelectedTags = checked
+          ? [...selectedTags, value]
+          : selectedTags.filter(tag => tag !== value);
+        setSelectedTags(newSelectedTags);
     };
 
     const handleSubmit = async (event) => {
@@ -82,7 +78,7 @@ const BU_UpdateObjectInfo = () => {
                 id: id,
                 name: objectName,
                 category_ids: [parseInt(objectCat)],
-                tag_ids: selectedTags,
+                tag_ids: selectedTags.map(tag => parseInt(tag)),
                 product_description: {
                     "description.a": productDescription
                 }
@@ -98,12 +94,23 @@ const BU_UpdateObjectInfo = () => {
 
     const handleCloseAlert = () => {
         setShowAlert(false);
-        navigate(-1);
+        
+        navigate('/BU_ViewObjectsInfo', {
+            state: {
+                id,
+                name: objectName,
+                categoryID: [parseInt(objectCat)],
+                product_description: productDescription,
+                tags: selectedTags.map(tag => parseInt(tag)),
+                objURL
+            }
+        });
     };
 
     return (
         <div>
             <Topbar title="Update Object Information" onClick={() => navigate(-1)} />
+
             <div className="mt-8 flex flex-col items-center">
                 <form className="w-3/4" onSubmit={handleSubmit}>
                     <div className="grid grid-cols-4 gap-4">
@@ -141,20 +148,19 @@ const BU_UpdateObjectInfo = () => {
                             <label htmlFor="tags">Tags:</label>
                         </div>
                         <div className="col-span-3">
-                            <div>
-                                <select
-                                    multiple
-                                    className="border border-gray-400 w-full py-1 px-2 rounded"
-                                    value={selectedTags}
-                                    onChange={handleTagChange}
-                                    required
-                                >
-                                    {tagList.map((tag) => (
-                                        <option key={tag.id} value={tag.id}>
-                                            {tag.name}
-                                        </option>
-                                    ))}
-                                </select>
+                            <div className="border border-gray-400 w-full py-1 px-2 rounded">
+                                {tagList.map((tag) => (
+                                    <label key={tag.id} className="block">
+                                        <input
+                                            type="checkbox"
+                                            value={tag.id}
+                                            checked={selectedTags.includes(tag.id.toString())}
+                                            onChange={handleCheckboxChange}
+                                            className="mr-2"
+                                        />
+                                        {tag.name}
+                                    </label>
+                                ))}
                             </div>
                         </div>
                         <div className="col-span-2 flex justify-center font-semibold">
@@ -195,6 +201,8 @@ const BU_UpdateObjectInfo = () => {
                     />
                 )}
             </div>
+
+            <Footer />
         </div>
     );
 };

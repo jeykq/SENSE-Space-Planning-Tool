@@ -88,7 +88,10 @@ const CreateTemplate = () => {
             required 
           />
           {isTemplateValid !== null && (
-            <p style={{ color: 'red', textAlign: 'center' }}>
+            <p style={{ 
+              color: isTemplateValid ? 'red' : 'green', 
+              textAlign: 'center' 
+            }}>
               {isTemplateValid ? 'Matching template name found' : 'Template name is valid'}
             </p>
           )}

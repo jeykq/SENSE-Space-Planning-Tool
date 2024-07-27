@@ -12,22 +12,15 @@ const BU_ViewObjectsInfo = () => {
   const [categories, setCategories] = useState([]);
   const [tagName, setTagNames] = useState([]);
   const [categoryName, setCategoryName] = useState("");
+  const [productDesc, setProductDesc] = useState("");
 
-  let productDesc;
+  const { id, name, categoryID, product_description, tags, objURL } = location.state || {};
 
-  const { 
-    id, 
-    name, 
-    categoryID, 
-    description, 
-    tags, 
-    objURL } = location.state || {};
-  productDesc = description["description.a"];
-  console.log(id);
-  
+  useEffect(() => {
+    setProductDesc(product_description);
+    fetchCategoriesAndTags();
+  });
 
-  
-  
   const fetchCategoriesAndTags = async () => {
     try {
       const headers = getHeaders();
@@ -42,25 +35,18 @@ const BU_ViewObjectsInfo = () => {
   
       const category = categories.find(cat => cat.id === categoryID[0]);
       const categoryName = category ? category.name : 'Unknown Category';
-      console.log('Category Name:', categoryName);
       setCategoryName(categoryName);
 
       const tagNames = tags.map(tagID => {
         const tag = tagList.find(t => t.id === tagID);
         return tag ? tag.name : 'Unknown Tag';
       });
-  
-      console.log('Tag Names:', tagNames);
       setTagNames(tagNames);
   
     } catch (error) {
       console.error('Error fetching categories and tags:', error);
     }
   };
-
-  useEffect(() => {
-    fetchCategoriesAndTags();
-  }, []);
 
   const updateObjectInfo = () => {
     navigate('/BU_UpdateObjectInfo', {
@@ -78,7 +64,6 @@ const BU_ViewObjectsInfo = () => {
   return (
       <div>
           <Topbar title="View Object Information" onClick={() => navigate(-1)} />
-
           <div className="mt-8 flex flex-col items-center">
               <form className="w-3/4">
                   <div className="grid grid-cols-4 gap-4">
@@ -90,6 +75,7 @@ const BU_ViewObjectsInfo = () => {
                               type="text"
                               className="border border-gray-400 w-full py-1 px-2 rounded"
                               value={name}
+                              readOnly
                           />
                       </div>
                       <div className="col-span-1 text-right self-center font-semibold">
@@ -100,6 +86,7 @@ const BU_ViewObjectsInfo = () => {
                               type="text"
                               className="border border-gray-400 w-full py-1 px-2 rounded"
                               value={categoryName}
+                              readOnly
                           />
                       </div>
                       <div className="col-span-1 text-right self-center font-semibold">
@@ -110,6 +97,7 @@ const BU_ViewObjectsInfo = () => {
                               type="text"
                               className="border border-gray-400 w-full py-1 px-2 rounded"
                               value={tagName.join(", ")}
+                              readOnly
                           />
                       </div>
                       <div className="col-span-2 flex justify-center font-semibold">
@@ -124,7 +112,7 @@ const BU_ViewObjectsInfo = () => {
                           <textarea
                               className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
                               value={productDesc}
-                              placeholder="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
+                              readOnly
                               rows="4"
                           />
                       </div>
@@ -133,7 +121,8 @@ const BU_ViewObjectsInfo = () => {
                       </div>
                       <div className="col-span-4 flex justify-center">
                           <button
-                              onClick = {() => updateObjectInfo()}
+                              type="button"
+                              onClick={updateObjectInfo}
                               className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
                           >
                               Edit
@@ -142,6 +131,7 @@ const BU_ViewObjectsInfo = () => {
                   </div>
               </form>
           </div>
+          <Footer />
       </div>
   );
 };
