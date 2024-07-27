@@ -26,6 +26,7 @@ const BU_Room3D = () => {
   const [isObjectSelected, setIsObjectSelected] = useState(false);
   const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const [showFloorDropdown, setShowFloorDropdown] = useState(false);
+  const [showConfirmChangeDimension, setShowConfirmChangeDimension] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
@@ -699,6 +700,11 @@ const BU_Room3D = () => {
   ];
 
   const handleChangeRoomDimensions = () => {
+    setShowConfirmChangeDimension(true);
+  };
+
+  const handleConfirmChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
     navigate('/BU_ChangeRoomDimensions', {
       state: {
         roomLength,
@@ -708,6 +714,10 @@ const BU_Room3D = () => {
         floorTexture: floorRef.current.material.map.image.src
       }
     });
+  };
+
+  const handleCancelChangeDimension = () => {
+    setShowConfirmChangeDimension(false);
   };
 
   // Publish Template Functions
@@ -1002,6 +1012,14 @@ const BU_Room3D = () => {
           onClose={() => setShowConfirmSave(false)}
           onSaveAsDraft={handleSaveAsDraft}
           onPublishTemplate={handlePublishTemplate}
+        />
+      )}
+      {showConfirmChangeDimension && (
+        <ConfirmDialog
+          title="Change Room Dimensions"
+          text="Changing the room dimensions will remove all currently placed objects. Are you sure you want to proceed?"
+          onConfirm={handleConfirmChangeDimension}
+          onClose={handleCancelChangeDimension}
         />
       )}
     </div>
