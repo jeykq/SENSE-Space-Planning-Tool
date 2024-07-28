@@ -5,6 +5,7 @@ import debit from '../../assets/debit.png';
 import ucb from '../../assets/ucb.jpeg';
 import AlertPopup from '../UI/AlertPopup';
 import { useNavigate } from 'react-router-dom';
+import { TailSpin } from 'react-loader-spinner';
 
 const PaidSignUpForm = () => {
   const [showAlert, setShowAlert] = useState(false);
@@ -94,7 +95,7 @@ const PaidSignUpForm = () => {
       setIsLoading(true);
       try {
         // Simulate payment processing delay
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        await new Promise(resolve => setTimeout(resolve, 3000)); // 3 seconds delay
 
         const response = await fetch('https://api.sensespacesplanningtool.com/signup/premium', {
           method: 'POST',
@@ -233,8 +234,25 @@ const PaidSignUpForm = () => {
             {errors.general && <p style={{ color: 'red' }} className="text-sm">{errors.general}</p>}
             
             <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded mt-5 w-full">
-              {isLoading ? 'Processing Payment...' : 'Sign Up'}
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <TailSpin
+                    visible={true}
+                    height="24"
+                    width="24"
+                    color="#fff"
+                    ariaLabel="tail-spin-loading"
+                    radius="1"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                  />
+                  <span className="ml-2">Payment Loading</span>
+                </div>
+              ) : (
+                'Sign Up'
+              )}
             </button>
+
           </form>
         </div>
       </div>
