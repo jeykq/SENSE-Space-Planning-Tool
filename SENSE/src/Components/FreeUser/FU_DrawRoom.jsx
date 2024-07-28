@@ -27,15 +27,15 @@ const FU_DrawRoom = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/FU_CreateRoom'); 
+    navigate(-1); 
   };
 
   return (
     <>
-      <Topbar title="Free Users: Create A New Template" onClick={handleGoBack} />
+      <Topbar title="Create A New Room" onClick={handleGoBack} />
       <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
-          <label htmlFor="template_name">Template name</label>
+          <label htmlFor="template_name">Room name</label>
         </div>
         <div className="col-span-2 mb-2">
           <input 

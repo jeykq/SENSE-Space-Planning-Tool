@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from './Topbar';
 import Footer from '../Landing/Footer';
-import './FU_SelectTemplate.css';
+import './FU_CreateRoom.css';
+import axios from 'axios';
+import { getHeaders } from '../../../apiUtils';
 
-const FU_SelectTemplate = () => {
+const FU_CreateRoomFromTemplate = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const templates = location.state.templates || [];
+  const initialTemplates = (location.state && location.state.templates) || [];
   const [roomName, setRoomName] = useState('');
   const [selectedTemplate, setSelectedTemplate] = useState(null);
+  const [templates, setTemplates] = useState(initialTemplates);
 
   const handleTemplateClick = (template) => {
     setSelectedTemplate(template);
@@ -25,13 +28,37 @@ const FU_SelectTemplate = () => {
     });
   };
 
+  useEffect(() => {
+    const fetchTemplates = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/template/list',
+          {},
+          { headers }
+        );
+
+        if (!response.data || !response.data.body) {
+          throw new Error('No template names data returned');
+        }
+
+        const sortedTemplates = response.data.body.sort((a, b) => a.id - b.id);
+        setTemplates(sortedTemplates);
+      } catch (error) {
+        console.error('Error fetching template names:', error);
+      }
+    };
+
+    fetchTemplates();
+  }, []);
+
   const handleGoBack = () => {
-    navigate(-1);
+    navigate('/FreeUserHomepage'); 
   };
 
   return (
-    <div className="select-template-page">
-      <Topbar title="Free Users: Create Room" onClick={handleGoBack} />
+    <div className="create-room-page">
+      <Topbar title="Create Room from Templates" onClick={handleGoBack} />
       <div className="select-template-container">
         <div className="select-template-form">
           <label>Room Name</label>
@@ -75,4 +102,4 @@ const FU_SelectTemplate = () => {
   );
 };
 
-export default FU_SelectTemplate;
+export default FU_CreateRoomFromTemplate;

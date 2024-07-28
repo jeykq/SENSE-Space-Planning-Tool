@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from './Topbar';
 
 const PU_DrawRoom = () => {
   const navigate = useNavigate();
@@ -32,10 +32,10 @@ const PU_DrawRoom = () => {
 
   return (
     <>
-      <Topbar title="Premium Users: Create A New Template" onClick={handleGoBack} />
+      <Topbar title="Create A New Room" onClick={handleGoBack} />
       <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
-          <label htmlFor="template_name">Template name</label>
+          <label htmlFor="template_name">Room name</label>
         </div>
         <div className="col-span-2 mb-2">
           <input 

@@ -39,7 +39,7 @@ import PU_ChangeRoomDimensions from './Components/PremiumUser/PU_ChangeRoomDimen
 import PU_CreateRoom from './Components/PremiumUser/PU_CreateRoom';
 import PU_DrawRoom from './Components/PremiumUser/PU_DrawRoom';
 import PU_SelectTemplate from './Components/PremiumUser/PU_SelectTemplate';
-import FU_CreateRoom from './Components/FreeUser/FU_CreateRoom';
+import FU_CreateRoomFromTemplate from './Components/FreeUser/FU_CreateRoomFromTemplate';
 import FU_DrawRoom from './Components/FreeUser/FU_DrawRoom';
 import FU_SelectTemplate from './Components/FreeUser/FU_SelectTemplate';
 
@@ -81,7 +81,7 @@ const App = () => {
         <Route path="/ApplyBusinessUser" element={<ApplyBusinessUser />} />
         <Route path="/FU_Room3D" element={<FU_Room3D />} />
         <Route path="/FU_ChangeRoomDimensions" element={<FU_ChangeRoomDimensions />} />
-        <Route path="/FU_CreateRoom" element={<FU_CreateRoom />} />
+        <Route path="/FU_CreateRoomFromTemplate" element={<FU_CreateRoomFromTemplate />} />
         <Route path="/FU_DrawRoom" element={<FU_DrawRoom />} />
         <Route path="/FU_SelectTemplate" element={<FU_SelectTemplate />} />
         <Route path="/PU_Room3D" element={<PU_Room3D />} />
