@@ -566,37 +566,13 @@ const FU_Room3D = () => {
     }
   };
 
-  // Export Room functions
-  const [showConfirmExport, setShowConfirmExport] = useState(false);
+  // Exit Room functions
+  const [showConfirmExit, setShowConfirmExit] = useState(false);
 
-  const handleExportRoom = () => {
-    const scene = sceneRef.current;
-
-    if (!scene) {
-      console.error('No scene found.');
-      return;
-    }
-
-    console.log(scene);
-
-    const exporter = new GLTFExporter();
-
-    exporter.parse(
-      scene,
-      function (result) {
-        if (result instanceof ArrayBuffer) {
-          saveArrayBuffer(result, 'RoomModel.glb');
-        } else if (result instanceof Object) {
-          saveJSON(result, 'RoomModel.json');
-        } else {
-          console.error('Unexpected result format:', result);
-        }
-      },
-      {
-        binary: false
-      }
-    );
+  const handleConfirmExit = () => {
+    navigate('/FreeUserHomepage');
   };
+   
 
   function saveArrayBuffer(buffer, filename) {
     save(new Blob([buffer], { type: 'application/octet-stream' }), filename);
@@ -888,7 +864,7 @@ const FU_Room3D = () => {
             onClick={handleSaveAsTemplate}
             className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
           >
-            Save as Template
+            Save Room
           </button>
         )}
         {showAlert && (
@@ -906,27 +882,20 @@ const FU_Room3D = () => {
           onChange={handleFileChange}
           accept=".json,.glb,.gltf"
         />
+        
         <button
-          onClick={handleImportRoom}
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
-        >
-          Import Room
-        </button>
-        <button
-          onClick={handleExportRoom}
-          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
-        >
-          Export Room
-        </button>
-        {showConfirmExport &&
-          <ConfirmDialog title={"Export this room?"} onConfirm={() => ''} onClose={() => setShowConfirmExport(false)} />
-        }
-        <button
-          onClick={() => navigate('/FreeUserHomepage')}
+          onClick={() => setShowConfirmExit(true)}
           className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
         >
           Exit
         </button>
+        {showConfirmExit &&
+          <ConfirmDialog 
+          title={"Confirm Exit"} 
+          text={'Are you sure you want to exit the room without saving?'}
+          onConfirm={handleConfirmExit}
+          onClose={() => setShowConfirmExit(false)} />
+        }
       </div>
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
         <button
