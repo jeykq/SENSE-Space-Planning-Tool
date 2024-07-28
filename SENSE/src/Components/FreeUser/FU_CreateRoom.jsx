@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from '../FreeUser/Topbar';
 import Footer from '../Landing/Footer';
 import './FU_CreateRoom.css';
 import axios from 'axios';
@@ -55,14 +55,14 @@ const FU_CreateRoom = () => {
 
   return (
     <div className="create-room-page">
-      <Topbar title="Free Users：Create Room" onClick={handleGoBack} />
+      <Topbar title="Create Room" onClick={handleGoBack} />
       <div className="create-room-container">
         <label className="create-room-label">Who are you creating the room for?</label>
         <div className="col-span-2 mb-2 relative"></div>
         <select 
           value={selectedOption} 
           onChange={handleOptionChange} 
-          className="border border-gray-400 py-2 px-2 w-72 text-center"
+          className="border border-gray-400 py-2 px-2 w-72 text-center rounded"
         >
           <option value="">-</option>
           <option value="autistic_person">Autistic person</option>
@@ -72,12 +72,39 @@ const FU_CreateRoom = () => {
           <option value="employees">Employees</option>
         </select>
         <div className="create-room-buttons">
-          <button onClick={handleTemplateClick} className="rounded w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase">
+          <button 
+            onClick={handleTemplateClick} 
+            title='Create room with SENSE templates'
+            className="rounded w-max-min text-nowrap py-3 px-8 mt-5 mr-2 uppercase"
+            style={{ backgroundColor: '#cfd2e3' }}
+                  onMouseEnter={(e) => { 
+                    e.target.style.backgroundColor = '#c5cbeb';
+                    e.target.style.color = '#6c6d70';
+                  }}
+                  onMouseLeave={(e) => { 
+                    e.target.style.backgroundColor = '#cfd2e3';
+                    e.target.style.color = '#333';
+                  }}
+            >
             Templates
           </button>
-          <button onClick={handleDrawClick} className="rounded w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase">
+          <button 
+            onClick={handleDrawClick}
+            title="Create room with your own dimensions" 
+            className="rounded w-max-min text-nowrap py-3 px-8 mt-5 ml-2 uppercase"
+            style={{ backgroundColor: '#cfd2e3' }}
+            onMouseEnter={(e) => { 
+              e.target.style.backgroundColor = '#c5cbeb';
+              e.target.style.color = '#6c6d70';
+            }}
+            onMouseLeave={(e) => { 
+              e.target.style.backgroundColor = '#cfd2e3';
+              e.target.style.color = '#333';
+            }}
+          >
             Draw
           </button>
+
         </div>
       </div>
       <Footer />
