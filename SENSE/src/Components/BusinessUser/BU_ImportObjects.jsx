@@ -379,7 +379,7 @@ const BU_ImportObjects = ({ submit }) => {
             </form>
             {showAlert && (
                 <AlertPopup
-                    title="New Object imported successfully!"
+                    title="Success"
                     text="New Object has been imported successfully."
                     onClose={() => setShowAlert(false)}
                     onOk={handleOK}

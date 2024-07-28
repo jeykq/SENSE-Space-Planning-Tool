@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from "react-scroll";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -10,7 +9,6 @@ import ProfileDropdown from './ProfileDropdown';
 const Navbar = () => {
   const navigate = useNavigate();
   const [sticky, setSticky] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
 
   useEffect(() => {
@@ -18,7 +16,7 @@ const Navbar = () => {
     if (!token) {
       navigate('/');
     }
-    
+
     const handleScroll = () => {
       window.scrollY > 40 ? setSticky(true) : setSticky(false);
     };
@@ -35,17 +33,17 @@ const Navbar = () => {
 
   const confirmLogout = async () => {
     const token = localStorage.getItem('authToken');
-    
+
     if (!token) {
       navigate('/login');
       return;
     }
 
-    const headers = { 
+    const headers = {
       'Content-Type': 'application/json',
       'sense-token': token
     };
-    
+
     try {
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/logout',
@@ -57,7 +55,7 @@ const Navbar = () => {
         localStorage.removeItem('authToken');
         navigate('/');
       }
-      
+
     } catch (error) {
       console.error('Logout failed:', error);
     }
@@ -67,41 +65,27 @@ const Navbar = () => {
     navigate('/FU_CreateRoom');
   };
 
-
-
   return (
-    <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
+    <nav className={`navbar bg-black text-white w-full py-1 px-4 fixed top-0 left-0 flex items-center justify-between h-20 z-10 ${sticky ? 'bg-black duration-75' : ''}`}>
       <img src={logo} alt="Logo" className='logo w-20 mx-2' />
-      <button onClick={() => setSidebarOpen(!sidebarOpen)} className="fixed lg:hidden">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-        </svg>
-      </button>
-      <div className={`h-screen w-52 lg:w-auto lg:max-h-20 bg-black bg-opacity-100 lg:bg-opacity-100 translate-y-[375px] lg:translate-y-0 ${sidebarOpen ? 'translate-x-4 sticky right-0 top-0' : 'translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100'} duration-100 lg:translate-x-0 px-4`}>
-        <ul className="flex flex-col lg:flex-row mb-4 mt-20 lg:mt-1">
-          
-      
-          <li className="flex items-center px-2 ml-1 my-1.5 mx-1 lg:mx-1 text base text-nowrap">
-            <button className="bg-white hover:bg-purple-700 text-white font-bold py-2 px-4 rounded"
-              style={{ borderRadius: "6px", backgroundColor: 'rgb(124 58 237)' }}
-              onClick={handleCreateRoomClick}
-            >
-              Create a room
-            </button>
-          </li>
-          <li className="flex items-center ml-auto">
-            <ProfileDropdown onLogout={handleLogOut} />
-          </li>
-        </ul>
+      <div className="flex items-center justify-end w-full">
+        <button
+          className="bg-white hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mx-2"
+          style={{ borderRadius: "6px", backgroundColor: 'rgb(124 58 237)' }}
+          onClick={handleCreateRoomClick}
+        >
+          Create a room
+        </button>
+        <ProfileDropdown onLogout={handleLogOut} />
       </div>
-      {showPopup && <ConfirmDialogPopup 
-        title={"Confirm Logout"} 
-        text={"Are you sure you want to log out?"} 
+      {showPopup && <ConfirmDialogPopup
+        title={"Confirm Logout"}
+        text={"Are you sure you want to log out?"}
         onConfirm={() => {
           setShowPopup(false);
           confirmLogout();
-        }} 
-        onClose={() => setShowPopup(false)} 
+        }}
+        onClose={() => setShowPopup(false)}
       />}
     </nav>
   );
