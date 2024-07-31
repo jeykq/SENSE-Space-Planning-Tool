@@ -10,10 +10,6 @@
   margin-top: 5px;
 }
   
-.swiper-slide:hover .overlay {
-  display: flex;
-}
-
 .custom-hover:hover {
   background-color: #f7fafc;
   border-radius: 10px;

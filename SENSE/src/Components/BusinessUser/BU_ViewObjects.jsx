@@ -6,13 +6,13 @@ import Footer from "../Landing/Footer";
 
 const BU_ViewObjects = () => {
   const location = useLocation();
-  const { roomType } = location.state || {};
+  const { objCat, catId } = location.state || {};
   const [objects, setObjects] = useState([]);
 
   const navigate = useNavigate();
-    const handleGoBack = () => {
-        navigate(-1);
-    };
+  const handleGoBack = () => {
+    navigate(-1);
+  };
 
   const fetchObjData = async () => {
     const token = localStorage.getItem('authToken');
@@ -33,7 +33,8 @@ const BU_ViewObjects = () => {
         {},
         { headers: headers }
       );
-      setObjects(response.data.body || []);
+      const filteredObjects = response.data.body.filter(object => object.category_ids.includes(catId));
+      setObjects(filteredObjects || []);
     } catch (err) {
       console.error('API Error', err);
     }
@@ -41,7 +42,7 @@ const BU_ViewObjects = () => {
 
   useEffect(() => {
     fetchObjData();
-  }, []);
+  }, [objCat]);
 
   const viewObjectInfo = (object) => {
     console.log(object);
@@ -68,9 +69,10 @@ const BU_ViewObjects = () => {
   return (
     <div>
       <Topbar title="View Objects" onClick={handleGoBack} />
+      
       <div style={{ paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
         <div className={"mt-10 ml-5"}>
-          {roomType && <p>{roomType}</p>}
+          {objCat && <p>{objCat}</p>}
         </div>
       </div>
 

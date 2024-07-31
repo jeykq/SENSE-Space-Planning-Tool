@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from './Topbar';
 import Footer from '../Landing/Footer';
-import './PU_CreateRoom.css';
+import './FU_CreateRoom.css';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
 
@@ -39,20 +39,12 @@ const PU_CreateRoom = () => {
     setSelectedOption(event.target.value);
   };
 
-  const handleSubmit = () => {
-    if (selectedOption === "") {
-      alert("Please select an option before proceeding.");
-      return;
-    }
-  };
-
-
   const handleTemplateClick = () => {
     if (selectedOption === "") {
       alert("Please select an option before proceeding.");
       return;
     } else {
-      navigate('/PU_SelectTemplate', { state: { templates } });
+      navigate('/FU_SelectTemplate', { state: { templates } });
     }
   };
 
@@ -61,21 +53,12 @@ const PU_CreateRoom = () => {
       alert("Please select an option before proceeding.");
       return;
     } else {
-      navigate('/PU_DrawRoom');
-    }
-  };
-
-  const handleImportClick = () => {
-    if (selectedOption === "") {
-      alert("Please select an option before proceeding.");
-      return;
-    } else {
-      navigate('/PU_FillRoomInfo');
+      navigate('/FU_DrawRoom');
     }
   };
 
   const handleGoBack = () => {
-    navigate('/PremiumUserHomepage'); 
+    navigate('/FreeUserHomepage'); 
   };
 
   return (
@@ -128,21 +111,6 @@ const PU_CreateRoom = () => {
             }}
             >
             Draw
-          </button>
-          <button onClick={handleImportClick} 
-          title="Create a new room by importing your room.json" 
-          className="rounded w-max-min text-nowrap py-3  px-8 mt-5 uppercase"
-          style={{ backgroundColor: '#cfd2e3' }}
-          onMouseEnter={(e) => { 
-            e.target.style.backgroundColor = '#c5cbeb';
-            e.target.style.color = '#6c6d70';
-          }}
-          onMouseLeave={(e) => { 
-            e.target.style.backgroundColor = '#cfd2e3';
-            e.target.style.color = '#333';
-          }}
-          >
-            Import
           </button>
         </div>
       </div>

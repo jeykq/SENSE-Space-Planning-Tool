@@ -19,6 +19,7 @@ const BusinessUserHomepage = () => {
   const [deleteTemplateId, setDeleteTemplateId] = useState(null);
   const [deleteTemplateURL, setDeleteTemplateURL] = useState(null);
   const [roomTypes, setRoomTypes] = useState([]);
+  const [objectCategories, setObjCategories] = useState([]);
   const [templateNames, setTemplateNames] = useState([]);
   const [error, setError] = useState(null);
   const [confirmDeletePopup, setConfirmDeletePopup] = useState(false);
@@ -27,22 +28,21 @@ const BusinessUserHomepage = () => {
   const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const [searchType, setSearchType] = useState("name"); // State for search type
 
+  if (swiperContainer1.current) {
+    new Swiper(swiperContainer1.current, {
+      slidesPerView: 3,
+      spaceBetween: 30,
+    });
+  }
+
+  if (swiperContainer2.current) {
+    new Swiper(swiperContainer2.current, {
+      slidesPerView: 4,
+      spaceBetween: 30,
+    });
+  }
+
   useEffect(() => {
-
-    if (swiperContainer1.current) {
-      new Swiper(swiperContainer2.current, {
-        slidesPerView: 4,
-        spaceBetween: 30,
-      });
-    }
-
-    if (swiperContainer2.current) {
-      new Swiper(swiperContainer2.current, {
-        slidesPerView: 4,
-        spaceBetween: 30,
-      });
-    }
-
     const fetchRoomTypes = async () => {
       try {
         const headers = getHeaders();
@@ -85,8 +85,31 @@ const BusinessUserHomepage = () => {
       }
     };
 
+    const fetchObjectCategories = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/category/list',
+          {},
+          { headers }
+        );
+  
+        if (!response.data || !response.data.body) {
+          throw new Error('No object categories data returned');
+        }
+  
+        const sortedObjCategories = response.data.body.sort((a, b) => a.id - b.id);
+        console.log("Object Categories: ", sortedObjCategories);
+        setObjCategories(sortedObjCategories);
+      } catch (error) {
+        console.error('Error fetching object categories:', error);
+        setError(error.message);
+      }
+    };
+
     fetchRoomTypes();
     fetchTemplateNames();
+    fetchObjectCategories();
   }, [refreshTemplates]);
 
   const handleSearch = (query, type) => {
@@ -115,8 +138,6 @@ const BusinessUserHomepage = () => {
     setShowDeleteConfirmation(false);
 
     try {
-      const headers = getHeaders();
-
       await axios.post('https://api.sensespacesplanningtool.com/template/delete',
         { id: deleteTemplateId },
         { headers }
@@ -136,16 +157,19 @@ const BusinessUserHomepage = () => {
     setShowDeleteConfirmation(false);
   };
 
-  const handleCategoryClick = (category, roomType) => {
+  const handleCategoryClick = (category, objCat, catId) => {
+    console.log(objCat, catId);
+
     if (category === 'view') {
-      navigate('/BU_ViewObjects', { state: { roomType } });
+      navigate('/BU_ViewObjects', { state: { objCat, catId } });
     } else if (category === 'import') {
       navigate('/BU_ImportObjects');
     }
   };
 
   const viewTemplate = (template) => {
-    const { 
+    const {
+      id: templateId,
       name: templateName, 
       room_type_id: roomType, 
       dimension: { 
@@ -159,6 +183,7 @@ const BusinessUserHomepage = () => {
   
     navigate('/BU_Room3D', {
       state: {
+        templateId,
         templateName,
         roomType,
         roomLength: parseFloat(roomLength),
@@ -171,7 +196,6 @@ const BusinessUserHomepage = () => {
 
   const renderDropdown = () => (
     <div ref={dropdownRef} style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
-      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left">Update</button>
       <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteTemplateId, deleteTemplateURL)}>Delete</button>
     </div>
   );
@@ -202,7 +226,7 @@ const BusinessUserHomepage = () => {
   const capitalizeFirstLetter = (string) => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
-
+  
   const getRoomTypeName = (roomTypeId) => {
     const roomType = roomTypes.find(room => room.id === roomTypeId);
     return roomType ? capitalizeFirstLetter(roomType.name) : 'Unknown Category';
@@ -238,7 +262,6 @@ const BusinessUserHomepage = () => {
             <div className="swiper-wrapper">
               {filteredTemplates.map((template) => {
                 const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
-                console.log('Screenshot URL:', screenshotURL); 
                 return (
                   <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
                     <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
@@ -272,7 +295,7 @@ const BusinessUserHomepage = () => {
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500" }}>
         <div className={"ml-5"}>
-          <p>Room Objects</p>
+          <p>Object Categories</p>
         </div>
       </div>
 
@@ -280,16 +303,16 @@ const BusinessUserHomepage = () => {
         <div className="flex items-center" style={{ width: "100%" }}>
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {roomTypes.map((roomType, index) => (
+              {objectCategories.map((objectCategory, index) => (
                 <div key={index} className="swiper-slide" style={{ position: 'relative' }}>
                   <div className="overlay">
-                    <div className="option" onClick={() => handleCategoryClick('view', roomType.name)}>View Objects</div>
+                    <div className="option" onClick={() => handleCategoryClick('view', objectCategory.name, objectCategory.id)}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
                     <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                     <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p> {roomType.name} </p>
+                      <p> {objectCategory.name.toUpperCase()} </p>
                     </div>
                   </div>
                 </div>

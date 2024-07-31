@@ -4,7 +4,7 @@ import Swiper from "swiper";
 import Navbar from "./Navbar";
 import Footer from "../Landing/Footer";
 import axios from "axios";
-import { FaSearch } from "react-icons/fa";
+import PU_SearchBar from "./PU_SearchBar";
 import { getHeaders } from '../../../apiUtils';
 import "./PremiumUserHomepage.css";
 
@@ -14,17 +14,49 @@ const PremiumUserHomepage = () => {
   const swiperContainer2 = useRef(null);
   const dropdownRef = useRef(null);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [confirmDeletePopup, setConfirmDeletePopup] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
   const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
-  const [deleteTemplateId, setDeleteTemplateId] = useState(null);
-  const [deleteTemplateURL, setDeleteTemplateURL] = useState(null);
+
+  const [deleteRoomId, setDeleteRoomId] = useState(null);
+  const [deleteRoomURL, setDeleteRoomURL] = useState(null);
+
+  const [rooms, setRooms] = useState([]);
   const [roomTypes, setRoomTypes] = useState([]);
   const [templateNames, setTemplateNames] = useState([]);
+
   const [error, setError] = useState(null);
-  const [activeSearchField, setActiveSearchField] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [refreshTemplates, setRefreshTemplates] = useState(false);
+  const [searchType, setSearchType] = useState('name');
+  const [refreshRooms, setRefreshRooms] = useState(false);
+
+  const [hoveredItem, setHoveredItem] = useState(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  
 
   useEffect(() => {
+    const fetchRooms = async () => {
+      try {
+        const headers = getHeaders();
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/room/list',
+          {},
+          { headers }
+        );
+
+        if (!response.data || !response.data.body) {
+          throw new Error('No room data returned');
+        }
+
+        const sortedRooms = response.data.body.sort((a, b) => a.id - b.id);
+        setRooms(sortedRooms);
+      } catch (error) {
+        console.error('Error fetching room types:', error);
+        setError(error.message);
+      }
+    };
+
+
     const fetchRoomTypes = async () => {
       try {
         const headers = getHeaders();
@@ -67,9 +99,10 @@ const PremiumUserHomepage = () => {
       }
     };
 
+    fetchRooms();
     fetchRoomTypes();
     fetchTemplateNames();
-  }, [refreshTemplates]);
+  }, [refreshRooms]);
 
   useEffect(() => {
     if (swiperContainer1.current) {
@@ -124,16 +157,53 @@ const PremiumUserHomepage = () => {
     };
   }, []);
 
-  const toggleDropdown = (event, templateId, url) => {
+  const toggleDropdown = (event, roomId, url) => {
     event.stopPropagation();
     setShowDropdown(!showDropdown);
+    setDeleteRoomId(roomId);
+    setDeleteRoomURL(url);
     const rect = event.target.getBoundingClientRect();
     setDropdownPosition({ x: rect.left + window.scrollX, y: rect.bottom + window.scrollY });
   };
 
-  const viewTemplate = (template) => {
-    const { 
-      name: templateName, 
+  // Delete Template functions
+  const handleDelete = (roomId, deleteURL) => {
+    setDeleteRoomId(roomId);
+    setDeleteRoomURL(deleteURL);
+    setShowDeleteConfirmation(true);
+    setShowDropdown(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    setShowDeleteConfirmation(false);
+
+    try {
+      const headers = getHeaders();
+
+      await axios.post('https://api.sensespacesplanningtool.com/room/delete',
+        { id: deleteRoomId },
+        { headers }
+      );
+
+      setConfirmDeletePopup(true);
+      setRefreshRooms(prev => !prev);
+      console.log("Room Layout URL: ", deleteRoomURL);
+      console.log("Room ID: ", deleteRoomId);
+    } catch (error) {
+      setError('Failed to delete Room ID', deleteRoomId);
+      console.error("Error:", error);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+
+  const viewRoom = (room) => {
+    const {
+      id: roomId, 
+      name: roomName, 
       room_type_id: roomType, 
       dimension: { 
         length: roomLength, 
@@ -142,11 +212,12 @@ const PremiumUserHomepage = () => {
       }, 
       room_layout: { 
         room_layout: roomLayoutUrl 
-      } } = template;
+      } } = room;
 
     navigate('/PU_Room3D', {
       state: {
-        templateName,
+        roomId,
+        roomName,
         roomType,
         roomLength: parseFloat(roomLength),
         roomWidth: parseFloat(roomWidth),
@@ -156,12 +227,50 @@ const PremiumUserHomepage = () => {
     });
   };
 
-  const toggleSearchField = (field) => {
-    setActiveSearchField(activeSearchField === field ? null : field);
+  const handleMouseEnter = (item) => {
+    setHoveredItem(item);
   };
 
-  const handleSearchChange = (event) => {
-    setSearchQuery(event.target.value);
+  const handleMouseLeave = () => {
+    setHoveredItem(null);
+  };
+
+  const handleMouseMove = (event) => {
+    setMousePosition({ x: event.clientX, y: event.clientY });
+  };
+
+  const renderDropdown = () => (
+    <div ref={dropdownRef} style={{ position: 'absolute', top: `${dropdownPosition.y}px`, left: `${dropdownPosition.x}px`, backgroundColor: 'white', borderRadius: '10px', boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)', zIndex: 1 }}>
+      <button className="block px-4 py-2 text-sm text-gray-700 custom-hover w-full text-left" onClick={() => handleDelete(deleteRoomId, deleteRoomURL)}>Delete</button>
+    </div>
+  );
+
+  const renderDeleteConfirmation = () => (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
+      <div className="bg-white rounded-lg p-8">
+        <p className="mb-4">Are you sure you want to delete this room?</p>
+        <div className="flex justify-center">
+          <button className="bg-red-500 text-white px-4 py-2 rounded mr-2" onClick={handleConfirmDelete}>Delete</button>
+          <button className="bg-gray-300 px-4 py-2 rounded" onClick={handleCancelDelete}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderConfirmDeletePopup = () => (
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
+      <div className="bg-white rounded-lg p-8">
+        <p className="mb-4">{`Room deleted successfully!`}</p>
+        <div className="flex justify-center">
+          <button className="bg-gray-300 px-4 py-2 rounded" onClick={() => setConfirmDeletePopup(false)}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  const handleSearch = (query, type) => {
+    setSearchQuery(query);
+    setSearchType(type);
   };
 
   const getRoomTypeName = (roomTypeId) => {
@@ -173,49 +282,62 @@ const PremiumUserHomepage = () => {
     return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
   };
 
+  const filteredTemplates = templateNames.filter(template => {
+    if (searchType === 'name') {
+      return template.name.toLowerCase().includes(searchQuery.toLowerCase());
+    } else if (searchType === 'category') {
+      const roomTypeName = getRoomTypeName(template.room_type_id).toLowerCase();
+      return roomTypeName.includes(searchQuery.toLowerCase());
+    }
+    return false;
+  });
+
+  const filteredRooms = rooms.filter(room => {
+    if (searchType === 'name') {
+      return room.name.toLowerCase().includes(searchQuery.toLowerCase());
+    } else if (searchType === 'category') {
+      const roomTypeName = getRoomTypeName(room.room_type_id).toLowerCase();
+      return roomTypeName.includes(searchQuery.toLowerCase());
+    }
+    return false;
+  });
+
   return (
     <div>
       <div>
         <Navbar />
       </div>
 
-      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontSize: "25px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
+      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontWeight: "500" }}>
         <div className={"mt-20 ml-5"}>
-          <p style={{ marginRight: '10px' }}>Room Templates</p>
+          <p style={{ marginRight: '10px', fontSize: "25px" }}>Room Designs</p>
         </div>
-        <div className={"mt-20 ml-10"} style={{ border: '1px solid black', borderRadius: '20px', padding: '10px 40px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => toggleSearchField('roomTemplates')}>
-          <FaSearch />
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
+          <PU_SearchBar handleSearch={handleSearch} />
         </div>
-        {activeSearchField === 'roomTemplates' && (
-          <div style={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search..."
-              style={{ padding: '10px', borderRadius: '20px', border: '1px solid black', width: '300px' }}
-            />
-          </div>
-        )}
       </div>
 
-      <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "30px" }} className="justify-center">
+      <div style={{ paddingTop: "20px", paddingLeft: "30px" }} className="justify-center">
         <div className="flex items-center" style={{ width: "96%" }}>
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {templateNames.map((template) => (
-                <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
-                    <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                    <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p>{template.name}</p>
+              {filteredRooms.map((room) => {
+                const screenshotURL = room.room_layout.room_layout.replace(/\.glb$/, '.png');
+                return (
+                  <div key={room.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewRoom(room)}>
+                    <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                        <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                        <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                          <p>{room.name}</p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <p>{getRoomTypeName(room.room_type_id)}</p>
+                        </div>
                     </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <p>{getRoomTypeName(template.room_type_id)}</p>
-                    </div>
-                  </div>
                 </div>
-              ))}
+                )
+              })}
             </div>
             <div className="swiper-pagination swiper-pagination1"></div>
           </div>
@@ -224,48 +346,77 @@ const PremiumUserHomepage = () => {
 
       <hr style={{ border: "1px solid black" }} />
 
-      <div style={{ paddingLeft: "20px", fontSize: "25px", fontWeight: "500", display: 'flex', alignItems: 'center' }}>
+      <div style={{ paddingTop: "30px", paddingLeft: "20px", fontWeight: "500" }}>
         <div className={"mt-5 ml-5"}>
-          <p style={{ marginRight: '10px' }}>Recent Designs</p>
+          <p style={{ marginRight: '10px', fontSize: "25px" }}>Room Templates</p>
         </div>
-        <div className={"mt-5 ml-10"} style={{ border: '1px solid black', borderRadius: '20px', padding: '10px 40px', cursor: 'pointer', display: 'flex', alignItems: 'center' }} onClick={() => toggleSearchField('recentDesigns')}>
-          <FaSearch />
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
+          <PU_SearchBar handleSearch={handleSearch} />
         </div>
-        {activeSearchField === 'recentDesigns' && (
-          <div style={{ marginLeft: '10px', display: 'flex', alignItems: 'center' }}>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              placeholder="Search..."
-              style={{ padding: '10px', borderRadius: '20px', border: '1px solid black', width: '300px' }}
-            />
-          </div>
-        )}
       </div>
 
       <div style={{ paddingTop: "20px", paddingBottom: "0px", paddingLeft: "30px" }} className="justify-center">
-        <div className="flex items-center" style={{ width: "96%" }}>
+        <div className="flex items-center">
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {templateNames.map((template) => (
-                <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '20px', padding: '20px' }}>
-                    <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                    <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                      <p>{template.name}</p>
-                    </div>
-                    <div style={{ textAlign: 'center' }}>
-                      <p>{getRoomTypeName(template.room_type_id)}</p>
+            {filteredTemplates.map((template) => {
+                const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
+                return (
+                  <div 
+                  key={template.id} 
+                  className="swiper-slide" 
+                  style={{ position: 'relative', cursor: 'pointer' }} 
+                  onMouseEnter={() => handleMouseEnter(template)}
+                  onMouseLeave={handleMouseLeave}
+                  onMouseMove={handleMouseMove}
+                  >
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                      <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                      <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                        <p>{template.name}</p>
+                      </div>
+                      <div style={{ textAlign: 'center' }}>
+                        <p>{getRoomTypeName(template.room_type_id)}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             <div className="swiper-pagination swiper-pagination2"></div>
           </div>
         </div>
       </div>
+
+      {hoveredItem && (
+          <div
+            className="hover-popup"
+            style={{
+              position: 'fixed',
+              top: mousePosition.y + 10,
+              left: mousePosition.x + 10,
+              background: 'white',
+              border: '1px solid #ccc',
+              borderRadius: '5px',
+              padding: '10px',
+              zIndex: 1000,
+              boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            }}
+          >
+            <h3 className="mb-2 text-lg font-bold text-center">{hoveredItem.name}</h3>
+            <hr></hr>
+            <p className="mt-2 text-lg font-medium text-center"> Room Dimensions </p>
+            <p className="text-center">Width: {hoveredItem.dimension.width}m</p>
+            <p className="text-center">Length: {hoveredItem.dimension.length}m</p>
+            <p className="text-center">Height: {hoveredItem.dimension.height}m</p>
+          </div>
+        )}
+
+      {showDropdown && renderDropdown()}
+
+      {showDeleteConfirmation && renderDeleteConfirmation()}
+
+      {confirmDeletePopup && renderConfirmDeletePopup()}
 
       <div>
         <Footer />

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Topbar from './Topbar';
 
-const FU_DrawRoom = () => {
+const PU_FillRoomInfo = () => {
   const navigate = useNavigate();
   const [roomType, setRoomType] = useState('');
   const [roomLength, setRoomLength] = useState('');
@@ -11,7 +11,7 @@ const FU_DrawRoom = () => {
 
   const handleCreateRoom = () => {
     if (roomType && roomLength && roomWidth && roomHeight) {
-      navigate('/FU_Room3D', { 
+      navigate('/PU_Room3D', { 
         state: { 
           roomType,
           roomLength: parseFloat(roomLength), 
@@ -25,12 +25,13 @@ const FU_DrawRoom = () => {
   };
 
   const handleGoBack = () => {
-    navigate('/FU_CreateRoom'); 
+    navigate('/PU_CreateRoom'); 
   };
 
   return (
     <>
-      <Topbar title="Create A New Room" onClick={handleGoBack} />
+      <Topbar title="Fill in room information" onClick={handleGoBack} />
+
       <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="room_type">Room type</label>
@@ -102,4 +103,4 @@ const FU_DrawRoom = () => {
   );
 }
 
-export default FU_DrawRoom;
+export default PU_FillRoomInfo;

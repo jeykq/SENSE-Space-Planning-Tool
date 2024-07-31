@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as THREE from 'three';
-import { saveAs } from 'file-saver';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
@@ -12,13 +11,14 @@ import AddObjDropdown from './AddObjDropdown';
 import ConfirmDialog from '../UI/ConfirmDialog';
 import SaveDialogPopup from '../UI/SaveDialogPopup';
 import AlertPopup from '../UI/AlertPopup';
+import ConfirmNamePopup from '../UI/ConfirmNamePopup';
 import axios from 'axios';
 
 const BU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
+  const { templateId, templateName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -27,6 +27,7 @@ const BU_Room3D = () => {
   const [currentMode, setCurrentMode] = useState(null); // State to keep track of current mode of the object (rotate/scale)
   const [showFloorDropdown, setShowFloorDropdown] = useState(false);
   const [showConfirmChangeDimension, setShowConfirmChangeDimension] = useState(false);
+  const [showConfirmInputName, setShowConfirmInputName] = useState(false);
   const selectedObjectRef = useRef(null);
   const controlsRef = useRef(null);
   const sceneRef = useRef(null);
@@ -47,6 +48,10 @@ const BU_Room3D = () => {
   const [objListLoading, setObjListLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertType, setAlertType] = useState('');
+  const [showConfirmName, setShowConfirmName] = useState(false);
+  const [isDraft, setIsDraft] = useState(false);
+  const [isTemplateValid, setIsTemplateValid] = useState(null);
+  const [tempName, setTemplateName] = useState('');
 
   const token = localStorage.getItem('authToken');
 
@@ -125,6 +130,10 @@ const BU_Room3D = () => {
 
   useEffect(() => {
     const mount = mountRef.current;
+
+    if (templateName !== null) {
+      setTemplateName(templateName);
+    }
 
     if (!mount) {
       console.error("Mount ref not found");
@@ -280,6 +289,9 @@ const BU_Room3D = () => {
         .then(data => {
           const loader = new GLTFLoader();
           loader.parse(data, '', (glb) => {
+            glb.scene.traverse((child) => {
+              child.userData.fromGLB = true;
+            });
             scene.add(glb.scene);
             console.log("Model loaded:", glb.scene);
           });
@@ -627,13 +639,37 @@ const BU_Room3D = () => {
 
   const handleRemove = () => {
     if (selectedObjectRef.current) {
-      sceneRef.current.remove(selectedObjectRef.current);
-      setObjects(objects.filter(obj => obj !== selectedObjectRef.current));
-      selectedObjectRef.current = null;
-      setIsObjectSelected(false);
-      transformControlsRef.current.detach();
-      arrowHelperRef.current.visible = false; // Hide the arrow when the object is removed
-      setCurrentMode(null); // Reset current mode
+      const objectToRemove = selectedObjectRef.current;
+
+      console.log("Object to remove:", objectToRemove);
+  
+      if (objectToRemove.parent) {
+        objectToRemove.parent.remove(objectToRemove);
+        console.log("Object removed:", objectToRemove);
+  
+        objectToRemove.traverse((child) => {
+          if (child.geometry) {
+            child.geometry.dispose();
+          }
+          if (child.material) {
+            if (Array.isArray(child.material)) {
+              child.material.forEach((material) => material.dispose());
+            } else {
+              child.material.dispose();
+            }
+          }
+        });
+
+        setObjects(objects.filter(obj => obj !== objectToRemove));
+        selectedObjectRef.current = null;
+        setIsObjectSelected(false);
+  
+        transformControlsRef.current.detach();
+        arrowHelperRef.current.visible = false;
+        setCurrentMode(null);
+      } else {
+        console.warn("Object does not have a parent:", objectToRemove);
+      }
     }
   };
 
@@ -673,8 +709,15 @@ const BU_Room3D = () => {
   };
 
   const handleSaveAsDraft = () => {
-    // Logic to save as draft
-    setShowConfirmSave(false);
+    if (roomLayoutUrl) {
+      handleChangeUpdateName();
+      setIsDraft(true);
+
+    } else {
+      setIsDraft(true);
+      setShowConfirmSave(false);
+      setShowConfirmName(true);
+    }
   };
 
   const handleWallColorChange = (event) => {
@@ -729,10 +772,22 @@ const BU_Room3D = () => {
         resolve(glb);
       }, { binary: true }, reject);
     });
-  }
+  };
 
-  const handlePublishTemplate = async (e) => {
-    e.preventDefault();
+  const handlePublishTemplate = () => {
+    if (roomLayoutUrl) {
+      handleChangeUpdateName();
+      setIsDraft(false);
+    } else {
+      setIsDraft(false);
+      setShowConfirmSave(false);
+      setShowConfirmName(true);
+    }
+  };
+
+  const handleConfirmName = async (name) => {
+    console.log("Template Name: ", name);
+    console.log("Draft: ", isDraft);
   
     try {
       if (!sceneRef.current) {
@@ -741,31 +796,24 @@ const BU_Room3D = () => {
   
       const glbData = await convertToGLB(sceneRef.current);
   
-      const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'sense-token': token
-        },
-        body: JSON.stringify({
-          "name": templateName,
-          "dimension": {
-            "width": roomWidth,
-            "height": roomHeight,
-            "length": roomLength
+      if (roomLayoutUrl) {
+        const response = await fetch('https://api.sensespacesplanningtool.com/template/update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'sense-token': token
           },
-          "room_type_id": roomType
-        }),
-      });
-  
-      if (response.ok) {
-        const responseData = await response.json();
-        const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-  
-        if (TemplateURL) {
-          // Upload the GLB file
+          body: JSON.stringify({
+            "id": templateId,
+            "name": name,
+            "room_type_id": roomType,
+            "is_draft": isDraft
+          }),
+        });
+    
+        if (response.ok) {
           await axios.put(
-            TemplateURL,
+            roomLayoutUrl,
             glbData,
             {
               headers: {
@@ -773,31 +821,84 @@ const BU_Room3D = () => {
                 'Content-Disposition': 'attachment',
               },
             }
-          );
-  
-          const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
-  
+          )
+
+          setShowConfirmName(false);
+          setIsTemplateValid(true);
+          setTemplateName(name);
+
+          const screenshotURL = roomLayoutUrl.replace(/\.glb$/, '.png');
           await captureScreenshotAndUpload(screenshotURL);
-  
-          if (response.status >= 200 && response.status < 300) {
-            setAlertType('save');
-            setShowAlert(true);
-            console.log('Template and screenshot successfully published!');
-          } else {
-            console.error('Template uploading failed:', response);
-          }
+
+          setAlertType('update');
+          setShowAlert(true);
         } else {
-          console.error('Template URL is not available in the response:', responseData);
+          throw new Error('Update failed');
         }
       } else {
-        const errorData = await response.json();
-        console.error('Template publishing failed:', errorData);
+        const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'sense-token': token
+          },
+          body: JSON.stringify({
+            "name": name,
+            "dimension": {
+              "width": roomWidth,
+              "height": roomHeight,
+              "length": roomLength
+            },
+            "room_type_id": roomType,
+            "is_draft": isDraft
+          }),
+        });
+    
+        if (response.ok) {
+          const responseData = await response.json();
+          const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
+    
+          if (TemplateURL) {
+            await axios.put(
+              TemplateURL,
+              glbData,
+              {
+                headers: {
+                  'Content-Type': 'model/gltf-binary',
+                  'Content-Disposition': 'attachment',
+                },
+              }
+            );
+    
+            const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
+    
+            await captureScreenshotAndUpload(screenshotURL);
+    
+            if (isDraft) {
+              setShowAlert(true);
+              setAlertType('draft');
+            } else {
+              setShowAlert(true);
+              setAlertType('save');
+            }
+    
+            setShowConfirmName(false);
+            setIsTemplateValid(true);
+            setTemplateName(name);
+    
+            console.log('Template and screenshot successfully published!');
+          } else {
+            throw new Error('Template URL is not available in the response');
+          }
+        } else {
+          throw new Error('Template creation failed');
+        }
       }
     } catch (error) {
-      console.error('Error converting to GLB or uploading:', error);
+      console.error('Error:', error.message);
+      setIsTemplateValid(false);
     }
-  
-    setShowConfirmSave(false);
+    
   };
 
   const captureScreenshotAndUpload = async (previewUploadUrl) => {
@@ -833,9 +934,21 @@ const BU_Room3D = () => {
   };
   
 
-  // Update Template Function
-  const handleUpdateTemplate = async (e) => {
-    e.preventDefault();
+  // Update Template Functions
+  const handleChangeUpdateName = () => {
+    setShowConfirmInputName(true);
+  }
+
+  const handleConfirmInputName = () => {
+    setShowConfirmSave(false);
+    setShowConfirmInputName(false);
+    setShowConfirmName(true);
+  }
+
+  const handleCancelInputName = async () => {
+    setShowConfirmSave(false);
+    setShowConfirmInputName(false);
+    console.log("Draft: ", isDraft);
 
     try {
       if (!sceneRef.current) {
@@ -844,19 +957,40 @@ const BU_Room3D = () => {
 
       const glbData = await convertToGLB(sceneRef.current);
 
-      await axios.put(
-        roomLayoutUrl,
-        glbData,
-        {
-          headers: {
-            'Content-Type': 'model/gltf-binary',
-            'Content-Disposition': 'attachment',
-          },
-        }
-      );
+      const response = await fetch('https://api.sensespacesplanningtool.com/template/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'sense-token': token
+        },
+        body: JSON.stringify({
+          "id": templateId,
+          "name": templateName,
+          "room_type_id": roomType,
+          "is_draft": isDraft
+        }),
+      });
+  
+      if (response.ok) {
+        await axios.put(
+          roomLayoutUrl,
+          glbData,
+          {
+            headers: {
+              'Content-Type': 'model/gltf-binary',
+              'Content-Disposition': 'attachment',
+            },
+          }
+        )
 
-      setAlertType('update');
-      setShowAlert(true);
+        setTemplateName(templateName);
+
+        const screenshotURL = roomLayoutUrl.replace(/\.glb$/, '.png');
+        await captureScreenshotAndUpload(screenshotURL);
+
+        setAlertType('update');
+        setShowAlert(true);
+      }
     } catch (error) {
       console.error('Error converting to GLB or updating:', error);
     }
@@ -864,12 +998,26 @@ const BU_Room3D = () => {
     setShowConfirmSave(false);
   }
 
+  const handleUpdateTemplate = async () => {
+    setShowConfirmSave(true);
+  };
+
   const handleClose = () => {
+    setShowConfirmName(false);
     setShowAlert(false);
   };
 
-  const handleOk = () => {
-    setShowAlert(false);
+  const handleOk = (inputValue) => {
+    setShowConfirmName(false);
+
+    if (inputValue) {
+      setTemplateName(inputValue);
+      if (isDraft) {
+        handleSaveAsDraft(inputValue);
+      } else {
+        handlePublishTemplate(inputValue);
+      }
+    }
   };
 
   return (
@@ -893,10 +1041,16 @@ const BU_Room3D = () => {
         )}
         {showAlert && (
           <AlertPopup
-            title={templateName}
-            text={alertType === 'update' ? 'Template updated successfully!' : 'Template published successfully!'}
+            title={tempName}
+            text={
+              alertType === 'update'
+                ? 'Template updated successfully!'
+                : alertType === 'draft'
+                ? 'Draft saved successfully!'
+                : 'Template published successfully!'
+            }
             onClose={handleClose}
-            onOk={handleOk}
+            onOk={handleClose}
           />
         )}
         <input
@@ -1014,12 +1168,31 @@ const BU_Room3D = () => {
           onPublishTemplate={handlePublishTemplate}
         />
       )}
+      {showConfirmName && (
+        <ConfirmNamePopup
+          title="Input Template Name"
+          onClose={() => {
+            setShowConfirmName(false);
+            setIsTemplateValid(null);
+          }}
+          onOk={handleConfirmName}
+          isTemplateValid={isTemplateValid}
+        />
+      )}
       {showConfirmChangeDimension && (
         <ConfirmDialog
           title="Change Room Dimensions"
           text="Changing the room dimensions will remove all currently placed objects. Are you sure you want to proceed?"
           onConfirm={handleConfirmChangeDimension}
           onClose={handleCancelChangeDimension}
+        />
+      )}
+      {showConfirmInputName && (
+        <ConfirmDialog
+          title="Change Template Name"
+          text="Do you want to update your template name?"
+          onConfirm={handleConfirmInputName}
+          onClose={handleCancelInputName}
         />
       )}
     </div>

@@ -73,9 +73,6 @@ const Navbar = ({ handleSearch }) => {
           <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap">
             <Link onClick={() => setSidebarOpen(false)} to='/ViewTemplates'>Templates</Link>
           </li>
-          <li className="py-4 px-2 my-1.5 mx-2 lg:mx-5 text-base text-nowrap">
-            <Link onClick={() => setSidebarOpen(false)} to='/categories'>Categories</Link>
-          </li>
           <li className="flex items-center px-2 ml-1 my-1.5 mx-auto lg:mx-2 text-base text-nowrap text-black">
             <SearchBar handleSearch={handleSearch} />
           </li>
