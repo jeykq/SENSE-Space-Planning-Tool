@@ -24,7 +24,7 @@ const BU_ImportObjects = ({ submit }) => {
     const [mtlUrl, setMtlUrl] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [screenshotDataUrl, setScreenshotDataUrl] = useState('');
-    
+
     let previewUploadUrl;
     let headers;
 
@@ -35,6 +35,7 @@ const BU_ImportObjects = ({ submit }) => {
 
     useEffect(() => {
         fetchCategoriesAndTags();
+        window.scrollTo(0, 0);
     }, []);
 
     const fetchCategoriesAndTags = async () => {
@@ -47,7 +48,6 @@ const BU_ImportObjects = ({ submit }) => {
             setTags(tagsResponse.data.body);
             console.log('Categories:', categoriesResponse.data.body);
             console.log('Tags:', tagsResponse.data.body);
-
         } catch (error) {
             console.error('Error fetching categories and tags:', error);
         }
@@ -66,8 +66,8 @@ const BU_ImportObjects = ({ submit }) => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-    
-        if (objFile && mtlFile && isObjectNameFilled ) {
+
+        if (objFile && mtlFile && isObjectNameFilled) {
             try {
                 const headers = getHeaders();
 
@@ -78,20 +78,20 @@ const BU_ImportObjects = ({ submit }) => {
                     tag_ids: selectedTags,
                     filenames: [objFileName, mtlFileName]
                 };
-    
+
                 // Step 1: Import object metadata and get object_id
                 const importResponse = await axios.post(
                     'https://api.sensespacesplanningtool.com/object/import',
                     data,
                     { headers }
                 );
-    
+
                 const objectId = importResponse.data.body.id;
                 console.log('Object ID:', objectId);
-    
+
                 // Step 2: Upload .obj file to S3 with dynamic folder path
                 const objUpdateUrl = importResponse.data.body.object_files[objFileName];
-                
+
                 await axios.put(
                     objUpdateUrl,
                     objFile,
@@ -103,13 +103,13 @@ const BU_ImportObjects = ({ submit }) => {
                         },
                     }
                 );
-    
+
                 console.log("Uploaded .obj file successfully");
-    
+
                 // Step 3: Upload .mtl file to S3 with dynamic folder path
                 const mtlUpdateUrl = importResponse.data.body.object_files[mtlFileName];
                 previewUploadUrl = importResponse.data.body.object_media.preview;
-    
+
                 await axios.put(
                     mtlUpdateUrl,
                     mtlFile,
@@ -121,18 +121,18 @@ const BU_ImportObjects = ({ submit }) => {
                         },
                     }
                 );
-    
+
                 console.log("Uploaded .mtl file successfully");
-    
+
                 setObjUrl(objUpdateUrl);
                 setMtlUrl(mtlUpdateUrl);
 
                 // Step 4: Capture screenshot and upload to S3
                 await captureScreenshotAndUpload(previewUploadUrl);
-    
+
                 console.log("Upload complete", importResponse.data);
                 setShowAlert(true);
-    
+
             } catch (error) {
                 console.error('Error uploading files:', error);
             }
@@ -140,7 +140,7 @@ const BU_ImportObjects = ({ submit }) => {
             alert('Please select both .obj and .mtl files to upload.');
         }
     };
-    
+
     const handleOK = () => {
         setShowAlert(false);
         navigate("/BusinessUserHomepage");
@@ -165,7 +165,7 @@ const BU_ImportObjects = ({ submit }) => {
             const file = files[i];
             const fileExtension = file.name.split('.').pop().toLowerCase();
             const reader = new FileReader();
-            
+
             reader.onload = (e) => {
                 const content = e.target.result;
                 if (fileExtension === 'obj') {
@@ -212,7 +212,7 @@ const BU_ImportObjects = ({ submit }) => {
     const captureScreenshotAndUpload = async (previewUploadUrl) => {
         try {
             const canvas = document.querySelector('canvas');
-    
+
             await new Promise((resolve) => {
                 let frames = 5;
                 const waitForFrames = () => {
@@ -225,7 +225,7 @@ const BU_ImportObjects = ({ submit }) => {
                 };
                 requestAnimationFrame(waitForFrames);
             });
-    
+
             canvas.toBlob(async (blob) => {
                 const formData = new FormData();
                 formData.append('file', blob, 'Preview.png');
@@ -236,155 +236,157 @@ const BU_ImportObjects = ({ submit }) => {
                         ...headers
                     },
                 });
-    
+
                 console.log("Uploaded screenshot successfully");
             }, 'image/png');
         } catch (error) {
             console.error('Error capturing or uploading screenshot:', error);
         }
     };
-    
+
     const handleRenderComplete = async () => {
         console.log("Render complete, capturing screenshot...");
         await captureScreenshotAndUpload(previewUploadUrl);
     };
-    
+
     return (
         <div>
-            <Topbar title="Import Objects" onClick={handleGoBack} />
-            <div className='mt-10'></div>
-            <form onSubmit={handleSubmit}>
-                <div className="grid grid-cols-4 gap-4">
-                    <div className="col-span-1 text-center self-center">
-                        <label htmlFor="obj_name">Object Name:</label>
-                    </div>
-                    <div className="col-span-3">
-                        <input
-                            type="text"
-                            placeholder="Enter Object name..."
-                            className="border border-gray-400 w-3/4 py-1 px-2 rounded"
-                            value={objectName}
-                            onChange={(e) => setObjectName(e.target.value)}
-                            required
-                        />
-                    </div>
-                    <div className="col-span-1 text-center self-center">
-                        <label htmlFor="obj_cat">Category:</label>
-                    </div>
-                    <div className="col-span-3">
-                        <select
-                            className="border border-gray-400 w-3/4 py-1 px-2 rounded"
-                            value={objectCat}
-                            onChange={(e) => setObjectCat(e.target.value)}
-                            disabled={!isObjectNameFilled}
-                            required
-                        >
-                            <option value="">Select a category</option>
-                            {categories.map((category) => (
-                                <option key={category.id} value={category.id}>
-                                    {category.name}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="col-span-1 text-center self-center">
-                        <label htmlFor="tags">Tags:</label>
-                    </div>
-                    <div className="col-span-3">
-                        <button
-                            type="button"
-                            onClick={() => setShowTags(!showTags)}
-                            className="flex items-center"
-                            disabled={!isObjectNameFilled}
-                        >
-                            <span className="mr-2">Select Tags</span>
-                            <span className={`transform ${showTags ? 'rotate-90' : ''}`}>▶</span>
-                        </button>
-                        {selectedTags && <span className="ml-2">({selectedTags.join(', ')})</span>}
-                        {showTags && (
-                            <ul className="list-none mt-2 border border-gray-400 p-2 rounded w-3/4">
-                                {tags.map((tag) => (
-                                    <li key={tag.id} className="flex items-center mb-2">
-                                        <input
-                                            type="checkbox"
-                                            value={tag.id}
-                                            checked={selectedTags.includes(tag.id.toString())}
-                                            onChange={handleTagChange}
-                                            className="mr-2"
-                                            disabled={!isObjectNameFilled}
-                                        />
-                                        {tag.name}
-                                    </li>
+            <div style={{ position: 'fixed', top: 0, width: '100%', zIndex: 1000 }}>
+                <Topbar title="Import Objects" onClick={handleGoBack} />
+            </div>
+            <div className="min-h-screen flex flex-col items-center justify-center p-6 mt-10">
+                <form onSubmit={handleSubmit} className="w-full max-w-4xl p-8">
+                    <div className="grid grid-cols-4 gap-6">
+                        <div className="col-span-1 flex flex-col justify-center items-end">
+                            <label htmlFor="obj_name" className="font-bold">Object Name:</label>
+                        </div>
+                        <div className="col-span-3">
+                            <input
+                                type="text"
+                                placeholder="Enter Object name..."
+                                className="border border-gray-400 w-full py-2 px-3 rounded"
+                                value={objectName}
+                                onChange={(e) => setObjectName(e.target.value)}
+                                required
+                            />
+                        </div>
+                        <div className="col-span-1 flex flex-col justify-center items-end">
+                            <label htmlFor="obj_cat" className="font-bold">Category:</label>
+                        </div>
+                        <div className="col-span-3">
+                            <select
+                                className="border border-gray-400 w-full py-2 px-3 rounded"
+                                value={objectCat}
+                                onChange={(e) => setObjectCat(e.target.value)}
+                                disabled={!isObjectNameFilled}
+                                required
+                            >
+                                <option value="">Select a category</option>
+                                {categories.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                        {category.name}
+                                    </option>
                                 ))}
-                            </ul>
-                        )}
-                    </div>
-                    <div className="col-span-4 flex flex-col items-center justify-center">
-                        <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: 'none' }}
-                            onChange={handleFileChange}
-                            accept=".obj,.mtl"
-                            multiple
-                            disabled={!isObjectNameFilled}
-                        />
-                        <button
-                            type="button"
-                            className="max-w-min text-nowrap bg-orange-500 px-8 py-1 text-white mt-5 uppercase rounded"
-                            onClick={handleImportClick}
-                        >
-                            Import Object
-                        </button>
-                        <p>Please select both *.obj and *.mtl files to import object.</p>
-                        <span className="text-xs">*Only file format *.obj and *.mtl is accepted</span>
-                        {objFileName && <p className="mt-2 text-sm">Selected OBJ file: {objFileName}</p>}
-                        {mtlFileName && <p className="mt-2 text-sm">Selected MTL file: {mtlFileName}</p>}
-                    </div>
-                    <div className="flex col-span-2 mx-8">
-                        <span className="self-end">Product Description</span>
-                    </div>
-                    <div className="col-span-2 mx-8">
-                        <div className="flex">
-                            <span className="self-end">Object Preview</span>
+                            </select>
+                        </div>
+                        <div className="col-span-1 flex flex-col justify-center items-end">
+                            <label htmlFor="tags" className="font-bold">Tags:</label>
+                        </div>
+                        <div className="col-span-3">
+                            <button
+                                type="button"
+                                onClick={() => setShowTags(!showTags)}
+                                className="text-blue-500"
+                                disabled={!isObjectNameFilled}
+                            >
+                                <span className="mr-2">Select Tags</span>
+                                <span className={`transform ${showTags ? 'rotate-90' : ''}`}>▶</span>
+                            </button>
+                            {selectedTags.length > 0 && (
+                                <span className="ml-2">
+                                    ({selectedTags.map(tagId => tags.find(tag => tag.id.toString() === tagId)?.name).join(', ')})
+                                </span>
+                            )}
+                            {showTags && (
+                                <ul className="list-none mt-2 border border-gray-400 p-2 rounded w-full">
+                                    {tags.map((tag) => (
+                                        <li key={tag.id} className="flex items-center mb-2">
+                                            <input
+                                                type="checkbox"
+                                                value={tag.id}
+                                                checked={selectedTags.includes(tag.id.toString())}
+                                                onChange={handleTagChange}
+                                                className="mr-2"
+                                                disabled={!isObjectNameFilled}
+                                            />
+                                            {tag.name}
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
+                        </div>
+                        <div className="col-span-4 flex flex-col items-center mt-6">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                                onChange={handleFileChange}
+                                accept=".obj,.mtl"
+                                multiple
+                                disabled={!isObjectNameFilled}
+                            />
+                            <button
+                                type="button"
+                                className="bg-orange-500 text-white py-2 px-6 mt-5 uppercase rounded hover:bg-orange-600 transition-all"
+                                onClick={handleImportClick}
+                            >
+                                Import Object
+                            </button>
+                            <p className="text-gray-500 mt-2">Please select both *.obj and *.mtl files to import object.</p>
+                            <p className="text-xs text-gray-500">*Only file format *.obj and *.mtl is accepted</p>
+                            {objFileName && <p className="mt-2 text-sm">Selected OBJ file: {objFileName}</p>}
+                            {mtlFileName && <p className="mt-2 text-sm">Selected MTL file: {mtlFileName}</p>}
+                        </div>
+                        <div className="col-span-2">
+                            <label className="block text-gray-700 font-bold mb-2">Product Description</label>
+                            <textarea
+                                className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
+                                value={productDescription}
+                                onChange={(e) => setProductDescription(e.target.value)}
+                                placeholder="Enter product description..."
+                                disabled={!isObjectNameFilled}
+                            />
+                        </div>
+                        <div className="col-span-2">
+                            <label className="block text-gray-700 font-bold mb-2">Object Preview</label>
+                            <div className="rounded-md border border-gray-400" style={{ height: '300px', width: '100%' }}>
+                                {objUrl && mtlUrl ? (
+                                    <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} onRenderComplete={handleRenderComplete} />
+                                ) : (
+                                    <p className="text-center p-4 text-gray-500">Select .obj and .mtl files to see the preview.</p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <div className="col-span-2 mx-8 -translate-y-2">
-                        <textarea
-                            className="bg-white h-40 rounded-md p-4 border border-gray-400 w-full"
-                            value={productDescription}
-                            onChange={(e) => setProductDescription(e.target.value)}
-                            placeholder="Enter product description..."
-                            disabled={!isObjectNameFilled}
-                        />
+                    <div className="col-span-4 flex justify-center mt-6">
+                        <button
+                            type="submit"
+                            className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition-all cursor-pointer"
+                            disabled={!isObjectNameFilled || !objFile || !mtlFile}
+                        >
+                            Save
+                        </button>
                     </div>
-                    <div className="col-span-2 mx-8 -translate-y-2 rounded-md border border-gray-400" style={{ height: '300px', width: '400px' }}>
-                        {objUrl && mtlUrl ? (
-                            <ThreeDPreview objUrl={objUrl} mtlUrl={mtlUrl} onRenderComplete={handleRenderComplete} />
-                        ) : (
-                            <p>Select .obj and .mtl files to see the preview.</p>
-                        )}
-                    </div>
-                </div>
-
-                <div className="col-span-4 flex justify-center">
-                    <button
-                        type="submit"
-                        className="max-w-min text-nowrap bg-blue-500 px-8 py-2 text-white mt-5 uppercase rounded"
-                        disabled={!isObjectNameFilled || !objFile || !mtlFile}
-                    >
-                        Submit
-                    </button>
-                </div>
-            </form>
-            {showAlert && (
-                <AlertPopup
-                    title="Success"
-                    text="New Object has been imported successfully."
-                    onClose={() => setShowAlert(false)}
-                    onOk={handleOK}
-                />
-            )}
+                </form>
+                {showAlert && (
+                    <AlertPopup
+                        title="Success"
+                        text="New Object has been imported successfully."
+                        onClose={() => setShowAlert(false)}
+                        onOk={handleOK}
+                    />
+                )}
+            </div>
         </div>
     );
 };
