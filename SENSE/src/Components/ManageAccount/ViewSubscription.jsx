@@ -160,10 +160,10 @@ const ViewSubscription = () => {
     if ( loading ) {
         return (
             <>
-                {accountDetails && accountDetails.role === "BUSINESS_USER" && <BusinessUserTopbar title="My Profile" onClick={handleGoBack} />}
-                {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="My Profile" onClick={handleGoBack} />}
-                {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}
-                {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="My Profile" onClick={handleGoBack} />}
+                {accountDetails && accountDetails.role === "BUSINESS_USER" && <BusinessUserTopbar title="Subscription Details" onClick={handleGoBack} />}
+                {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
+                {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="Subscription Details" onClick={handleGoBack} />}
+                {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
 
 
                 <div className="flex h-[90vh] justify-center items-center">
@@ -188,10 +188,10 @@ const ViewSubscription = () => {
         <>
             {accountDetails && 
                 <>
-                    {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="My Profile" onClick={handleGoBack} />}
-                    {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="My Profile" onClick={handleGoBack} />}
-                    {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}
-                    {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="My Profile" onClick={handleGoBack} />}
+                    {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="Subscription Details" onClick={handleGoBack} />}
+                    {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
+                    {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="Subscription Details" onClick={handleGoBack} />}
+                    {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
 
                     <div className="flex flex-col h-[400px] justify-center items-center mt-10">
                         <div>
