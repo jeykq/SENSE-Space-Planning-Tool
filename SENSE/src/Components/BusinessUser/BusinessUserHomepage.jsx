@@ -6,7 +6,6 @@ import Footer from "../Landing/Footer";
 import axios from 'axios'; 
 import AlertPopup from '../UI/AlertPopup';
 import { getHeaders } from '../../../apiUtils';
-import "./BusinessUserHomepage.css";
 
 const BusinessUserHomepage = () => {
   const navigate = useNavigate();
@@ -301,20 +300,19 @@ const BusinessUserHomepage = () => {
         </div>
       </div>
 
-      <div style={{ paddingTop: "20px"}} className="justify-center">
-        <div className="flex items-center" style={{ width: "100%" }}>
-          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", width: "100%" }}>
+      <div style={{ paddingTop: "20px"}}>
+        <div className="items-center" style={{ width: "100%" }}>
+          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", width: "100%", height: "150px" }}>
             <div className="swiper-wrapper">
               {objectCategories.map((objectCategory, index) => (
                 <div key={index} className="swiper-slide">
-                  <div className="overlay">
+                  <div className="overlay" style={{ backgroundColor: '#e3e3e3', height: '100px', borderRadius: '15px' }}>
                     <div className="option" onClick={() => handleCategoryClick('view', objectCategory.name, objectCategory.id)}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#D1D5DB', borderRadius: '15px', padding: '15px' }}>
-                    <div className="bg-gray-300" style={{ borderRadius: '15px', height: '40px', width: '150px', marginBottom: '10px' }}></div>
-                    <div style={{ textAlign: 'center', fontWeight: 'bold', fontSize: '14px' }}>
-                      <p> {objectCategory.name.toUpperCase()} </p>
+                  <div style={{ backgroundColor: '#D1D5DB', borderRadius: '15px', padding: '15px' }}>
+                    <div className="bg-gray-300" style={{ fontWeight: 'bold', textAlign: 'center', borderRadius: '15px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                      <p style={{ margin: 0 }}>{objectCategory.name.toUpperCase()}</p>
                     </div>
                   </div>
                 </div>

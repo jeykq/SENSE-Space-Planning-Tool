@@ -33,6 +33,29 @@ const FreeUserHomepage = () => {
   const [hoveredItem, setHoveredItem] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
+  if (swiperContainer1.current) {
+    new Swiper(swiperContainer1.current, {
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      navigation: true,
+      pagination: {
+        el: '.swiper-pagination1',
+        clickable: true,
+      },
+    });
+  }
+
+  if (swiperContainer2.current) {
+    new Swiper(swiperContainer2.current, {
+      slidesPerView: 'auto',
+      spaceBetween: 20,
+      navigation: true,
+      pagination: {
+        el: '.swiper-pagination2',
+        clickable: true,
+      },
+    });
+  }
 
   useEffect(() => {
     const fetchRooms = async () => {
@@ -105,30 +128,6 @@ const FreeUserHomepage = () => {
   }, [refreshRooms]);
 
   useEffect(() => {
-    if (swiperContainer1.current) {
-      new Swiper(swiperContainer1.current, {
-        slidesPerView: 'auto',
-        spaceBetween: 20,
-        navigation: true,
-        pagination: {
-          el: '.swiper-pagination1',
-          clickable: true,
-        },
-      });
-    }
-
-    if (swiperContainer2.current) {
-      new Swiper(swiperContainer2.current, {
-        slidesPerView: 'auto',
-        spaceBetween: 20,
-        navigation: true,
-        pagination: {
-          el: '.swiper-pagination2',
-          clickable: true,
-        },
-      });
-    }
-
     const handleScroll = () => {
       if (showDropdown) {
         const rect = swiperContainer1.current.getBoundingClientRect();
