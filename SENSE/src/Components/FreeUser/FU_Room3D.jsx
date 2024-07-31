@@ -670,8 +670,8 @@ const FU_Room3D = () => {
   const floorTextures = [
     { name: 'Hardwood', url: '/textures/hardwood.png', thumbnailUrl: '/thumbnails/hardwood_thumbnail.png' },
     { name: 'Light-wood', url: '/textures/light_fine_wood.jpg', thumbnailUrl: '/thumbnails/light_fine_wood_thumbnail.png' },
-    { name: 'Marble', url: '/textures/marble-texture.jpg', thumbnailUrl: '/thumbnails/marble_thumbnail.png' },
     { name: 'White-marble', url: '/textures/white-marble.jpg', thumbnailUrl: '/thumbnails/white-marble_thumbnail.png' },
+    { name: 'Grass', url: '/textures/grass.jpg', thumbnailUrl: '/thumbnails/grass.png' },
     { name: 'Foam-tiles', url: '/textures/foam-tiles.jpg', thumbnailUrl: '/thumbnails/foam-tiles_thumbnail.png' },
   ];
 
