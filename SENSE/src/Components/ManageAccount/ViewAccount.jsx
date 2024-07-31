@@ -50,7 +50,7 @@ const ViewAccount = () => {
   };
 
   const handleEditPreferences = () => {
-    navigate('/editpreferences');
+    navigate('/EditPreferences');
   };
 
   const handleChangeUserType = () => {

@@ -32,6 +32,7 @@ import GiveReview from './Components/ManageAccount/GiveReview';
 import ApplyBusinessUser from './Components/ManageAccount/ApplyBusinessUser';
 import BuySubscription from './Components/ManageAccount/BuySubscription';
 import ViewSubscription from './Components/ManageAccount/ViewSubscription';
+import EditPreferences from './Components/ManageAccount/EditPreferences';
 import FU_Room3D from './Components/FreeUser/FU_Room3D';
 import FU_CreateRoom from './Components/FreeUser/FU_CreateRoom';
 import FU_ChangeRoomDimensions from './Components/FreeUser/FU_ChangeRoomDimensions';
@@ -69,6 +70,7 @@ const App = () => {
         <Route path="/BU_ChangeUserType" element={<BU_ChangeUserType />} />
         <Route path="/viewaccount" element={<ViewAccount />} />
         <Route path="/ViewSubscription" element={<ViewSubscription />} />
+        <Route path="/EditPreferences" element={<EditPreferences />} />
         <Route path="/updateaccount" element={<UpdateAccount />} />
         <Route path="/ChangePassword" element={<ChangePassword />} />
         <Route path="/ThreeDPreview" element={<ThreeDPreview />} />
