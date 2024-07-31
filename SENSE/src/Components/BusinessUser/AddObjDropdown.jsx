@@ -5,9 +5,8 @@ import axios from 'axios';
 const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [tags, setTags] = useState([]);
-    const [categories, setCategories] = useState([]); // Define setCategories
+    const [categories, setCategories] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
-    const [tagsDropdownVisible, setTagsDropdownVisible] = useState(false);
     const [authError, setAuthError] = useState(null);
     const dropdownRef = useRef(null);
 
@@ -102,14 +101,17 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         )
     };
 
-    const handleBlur = (e) => {
-        if (dropdownRef.current && !dropdownRef.current.contains(e.relatedTarget)) {
-            setTagsDropdownVisible(false);
-        }
+    const getTagNames = () => {
+        return selectedTags
+            .map(tagId => {
+                const tag = tags.find(tag => tag.id === parseInt(tagId));
+                return tag ? tag.name : '';
+            })
+            .filter(tagName => tagName !== '');
     };
 
     return (
-        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll" onBlur={handleBlur}>
+        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
             <div className="flex pb-1 mb-2 border-b border-black justify-between items-center">
                 <h3 className="text-lg font-semibold uppercase">Object catalogue</h3>
                 <button onClick={closeDropdown} className="text-black text-lg">
@@ -117,43 +119,57 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                 </button>
             </div>
             {authError && <div className="text-red-500 mb-2">{authError}</div>}
-            <div className="mb-4 relative" ref={dropdownRef} onMouseDown={() => setTagsDropdownVisible(true)}>
+            <div className="relative mb-4" ref={dropdownRef}>
                 <input
                     type="text"
-                    placeholder="Search objects..."
+                    placeholder="Search objects by name..."
                     value={searchQuery}
                     onChange={handleSearch}
                     className="w-full p-2 border border-gray-300 rounded-md"
                 />
-                {tagsDropdownVisible && (
-                    <div className="absolute left-0 right-0 top-full mt-2 bg-white border border-gray-300 rounded-md shadow-lg z-10">
-                        <div className="p-2">
-                            <h4 className="text-sm font-semibold">Filter by tags</h4>
-                            <div className="flex flex-col">
-                                {tags.map(tag => (
-                                    <label key={tag.id} className="mb-2 flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            value={tag.id}
-                                            onChange={handleTagChange}
-                                            className="mr-1"
-                                        />
-                                        {tag.name}
-                                    </label>
-                                ))}
-                            </div>
-                        </div>
+                <div className="mt-2 p-2 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                    <div className="flex justify-between items-center">
+                        <h4 className="text-sm font-semibold">Filter by tags</h4>
                     </div>
-                )}
+                    <div className="flex flex-wrap mt-2 overflow-y-auto max-h-24">
+                        {getTagNames().map(tagName => (
+                            <span key={tagName} className="bg-gray-200 text-gray-700 text-xs font-semibold mr-2 mb-2 px-2.5 py-0.5 rounded">
+                                {tagName}
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex flex-col mt-2">
+                        {tags.map(tag => (
+                            <label key={tag.id} className="mb-2 flex items-center">
+                                <input
+                                    type="checkbox"
+                                    value={tag.id}
+                                    onChange={handleTagChange}
+                                    className="mr-1"
+                                    checked={selectedTags.includes(tag.id.toString())}
+                                />
+                                {tag.name}
+                            </label>
+                        ))}
+                    </div>
+                </div>
             </div>
-            {categoryData?.body?.map((cat) => (
-                <ObjCategory 
-                    name={cat.name} 
-                    catId={cat.id} 
-                    key={cat.id} 
-                    objectListData={filteredObjectListData} 
-                />
-            ))}
+            {filteredObjectListData.body && filteredObjectListData.body.length > 0 ? (
+                <div className="mt-4">
+                    {categoryData?.body?.map((cat) => (
+                        <ObjCategory 
+                            name={cat.name} 
+                            catId={cat.id} 
+                            key={cat.id} 
+                            objectListData={filteredObjectListData} 
+                        />
+                    ))}
+                </div>
+            ) : (
+                <div className="mt-4 text-center text-gray-500">
+                    No objects found, try searching another object.
+                </div>
+            )}
         </div>
     );
 };
