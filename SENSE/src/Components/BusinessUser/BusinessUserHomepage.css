@@ -1,16 +1,11 @@
-.overlay .option {
-  color: black;
-  cursor: pointer;
-  margin: 5px 0;
-}
-  
-.overlay .option + .option {
-  border-top: 1px solid black;
-  padding-top: 5px;
-  margin-top: 5px;
-}
-  
-.custom-hover:hover {
-  background-color: #f7fafc;
+.overlay {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 10px;
   border-radius: 10px;
+  width: 100%;
+}
+
+.overlay .option {
+  font-size: 15px;
 }
