@@ -13,7 +13,7 @@ const ConfirmDialogPopup = ({ title, text, onClose, onConfirm }: ConfirmDialogPo
         <div className="fixed inset-0 z-50 overflow-auto bg-black/30 flex">
             <div className="relative p-8 bg-white w-[90%] max-w-md m-auto flex-col flex rounded-lg items-center">
                 <div className="text-black text-xl p-2 font-bold">{title}</div>
-                <p className="text-black p-2 my-2">{text}</p>
+                <p className="text-black p-2 my-2 text-center">{text}</p>
                 <span className="absolute top-0 right-0 p-4">
                     <button
                         onClick={() => onClose()}

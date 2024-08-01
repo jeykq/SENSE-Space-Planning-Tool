@@ -893,6 +893,13 @@ const FU_Room3D = () => {
     }
   };
 
+  // Exit Room functions
+  const [showConfirmExit, setShowConfirmExit] = useState(false);
+
+  const handleConfirmExit = () => {
+    navigate('/FreeUserHomepage');
+  };
+
   return (
     <div className="relative w-full h-full">
       <div ref={mountRef} className="w-full h-screen cursor-default" />
@@ -925,11 +932,18 @@ const FU_Room3D = () => {
           />
         )}
         <button
-          onClick={() => navigate('/FreeUserHomepage')}
+          onClick={() => setShowConfirmExit(true)}
           className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
         >
           Exit
         </button>
+        {showConfirmExit &&
+          <ConfirmDialog 
+          title={"Confirm Exit"} 
+          text={'Are you sure you want to exit the room without saving?'}
+          onConfirm={handleConfirmExit}
+          onClose={() => setShowConfirmExit(false)} />
+        }
       </div>
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
         <button
