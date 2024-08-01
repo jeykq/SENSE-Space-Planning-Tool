@@ -29,7 +29,7 @@ const BusinessUserHomepage = () => {
 
   if (swiperContainer1.current) {
     new Swiper(swiperContainer1.current, {
-      slidesPerView: 3,
+      slidesPerView: 'auto',
       spaceBetween: 30,
     });
   }
@@ -116,6 +116,20 @@ const BusinessUserHomepage = () => {
     setSearchType(type);
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+  
   const toggleDropdown = (event, templateId, url) => {
     event.stopPropagation();
     setShowDropdown(!showDropdown);
