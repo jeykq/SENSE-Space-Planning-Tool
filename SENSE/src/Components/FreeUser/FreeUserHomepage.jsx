@@ -267,6 +267,18 @@ const FreeUserHomepage = () => {
     </div>
   );
 
+  const renderNoRoomsMessage = () => (
+    <div className="swiper-slide" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px', width: '100%' }}>
+      <p style={{ textAlign: 'center', justifyItems: 'center', fontSize: '20px', fontWeight: 'bold', color: 'grey' }}>NO ROOM DESIGNS CREATED</p>
+    </div>
+  );
+
+  const renderNoTemplatesMessage = () => (
+    <div className="swiper-slide" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px', width: '100%' }}>
+      <p style={{ textAlign: 'center', justifyItems: 'center', fontSize: '20px', fontWeight: 'bold', color: 'grey' }}>NO TEMPLATES AVAILABLE</p>
+    </div>
+  );
+
   const handleSearch = (query, type) => {
     setSearchQuery(query);
     setSearchType(type);
@@ -320,11 +332,12 @@ const FreeUserHomepage = () => {
         <div className="flex items-center" style={{ width: "96%" }}>
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {filteredRooms.map((room) => {
-                const screenshotURL = room.room_layout.room_layout.replace(/\.glb$/, '.png');
-                return (
-                  <div key={room.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewRoom(room)}>
-                    <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
+              {filteredRooms.length > 0 ? (
+                filteredRooms.map((room) => {
+                  const screenshotURL = room.room_layout.room_layout.replace(/\.glb$/, '.png');
+                  return (
+                    <div key={room.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewRoom(room)}>
+                      <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
                         <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                         <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
@@ -333,10 +346,13 @@ const FreeUserHomepage = () => {
                         <div style={{ textAlign: 'center' }}>
                           <p>{getRoomTypeName(room.room_type_id)}</p>
                         </div>
+                      </div>
                     </div>
-                </div>
-                )
-              })}
+                  )
+                })
+              ) : (
+                renderNoRoomsMessage()
+              )}
             </div>
             <div className="swiper-pagination swiper-pagination1"></div>
           </div>
@@ -358,29 +374,33 @@ const FreeUserHomepage = () => {
         <div className="flex items-center">
           <div ref={swiperContainer2} className="swiper-container" style={{ paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-            {filteredTemplates.map((template) => {
-                const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
-                return (
-                  <div 
-                  key={template.id} 
-                  className="swiper-slide" 
-                  style={{ position: 'relative', cursor: 'pointer' }} 
-                  onMouseEnter={() => handleMouseEnter(template)}
-                  onMouseLeave={handleMouseLeave}
-                  onMouseMove={handleMouseMove}
-                  >
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
-                      <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                      <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                        <p>{template.name}</p>
+              {filteredTemplates.length > 0 ? (
+                filteredTemplates.map((template) => {
+                    const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
+                    return (
+                      <div 
+                      key={template.id} 
+                      className="swiper-slide" 
+                      style={{ position: 'relative', cursor: 'pointer' }} 
+                      onMouseEnter={() => handleMouseEnter(template)}
+                      onMouseLeave={handleMouseLeave}
+                      onMouseMove={handleMouseMove}
+                      >
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                          <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                          <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                            <p>{template.name}</p>
+                          </div>
+                          <div style={{ textAlign: 'center' }}>
+                            <p>{getRoomTypeName(template.room_type_id)}</p>
+                          </div>
+                        </div>
                       </div>
-                      <div style={{ textAlign: 'center' }}>
-                        <p>{getRoomTypeName(template.room_type_id)}</p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })
+                ) : (
+                  renderNoTemplatesMessage()
+                )}
             </div>
             <div className="swiper-pagination swiper-pagination2"></div>
           </div>

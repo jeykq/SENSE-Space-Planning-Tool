@@ -257,6 +257,12 @@ const BusinessUserHomepage = () => {
     return false;
   });
 
+  const renderNoTemplatesMessage = () => (
+    <div className="swiper-slide" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '250px', width: '100%' }}>
+      <p style={{ textAlign: 'center', justifyItems: 'center', fontSize: '20px', fontWeight: 'bold', color: 'grey' }}>NO TEMPLATES CREATED</p>
+    </div>
+  );
+
   return (
     <div>
       <Navbar handleSearch={handleSearch} />
@@ -275,23 +281,27 @@ const BusinessUserHomepage = () => {
 
           <div ref={swiperContainer1} className="swiper-container" style={{ paddingLeft: "40px", paddingRight: "40px", paddingBottom: "50px", width: "100%", height: "350px", overflow: "hidden" }}>
             <div className="swiper-wrapper">
-              {filteredTemplates.map((template) => {
-                const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
-                return (
-                  <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
-                    <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
-                      <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                      <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
-                        <p>{template.name}</p>
-                      </div>
-                      <div style={{ textAlign: 'center' }}>
-                        <p>{getRoomTypeName(template.room_type_id)}</p>
+              {filteredTemplates.length > 0 ? (
+                filteredTemplates.map((template) => {
+                  const screenshotURL = template.room_layout.room_layout.replace(/\.glb$/, '.png');
+                  return (
+                    <div key={template.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewTemplate(template)}>
+                      <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, template.id, template.room_layout.room_layout)}>...</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                        <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                        <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                          <p>{template.name}</p>
+                        </div>
+                        <div style={{ textAlign: 'center' }}>
+                          <p>{getRoomTypeName(template.room_type_id)}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              ) : (
+                renderNoTemplatesMessage()
+              )}
             </div>
           </div>
         </div>
@@ -316,11 +326,11 @@ const BusinessUserHomepage = () => {
 
       <div style={{ paddingTop: "20px"}}>
         <div className="items-center" style={{ width: "100%" }}>
-          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", width: "100%", height: "150px" }}>
+          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", width: "100%", overflow: 'hidden'}}>
             <div className="swiper-wrapper">
               {objectCategories.map((objectCategory, index) => (
                 <div key={index} className="swiper-slide">
-                  <div className="overlay" style={{ backgroundColor: '#cadaeb', height: '100px', borderRadius: '15px' }}>
+                  <div className="overlay" style={{ backgroundColor: '#cadaeb', height: '90px', borderRadius: '10px' }}>
                     <div className="option" onClick={() => handleCategoryClick('view', objectCategory.name, objectCategory.id)}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
