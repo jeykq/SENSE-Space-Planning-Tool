@@ -940,7 +940,7 @@ const FU_Room3D = () => {
         {showConfirmExit &&
           <ConfirmDialog 
           title={"Confirm Exit"} 
-          text={'Are you sure you want to exit the room without saving?'}
+          text={'Are you sure you want to exit the room?'}
           onConfirm={handleConfirmExit}
           onClose={() => setShowConfirmExit(false)} />
         }
