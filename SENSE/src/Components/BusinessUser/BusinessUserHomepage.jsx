@@ -306,12 +306,12 @@ const BusinessUserHomepage = () => {
             <div className="swiper-wrapper">
               {objectCategories.map((objectCategory, index) => (
                 <div key={index} className="swiper-slide">
-                  <div className="overlay" style={{ backgroundColor: '#e3e3e3', height: '100px', borderRadius: '15px' }}>
+                  <div className="overlay" style={{ backgroundColor: '#cadaeb', height: '100px', borderRadius: '15px' }}>
                     <div className="option" onClick={() => handleCategoryClick('view', objectCategory.name, objectCategory.id)}>View Objects</div>
                     <div className="option" onClick={() => handleCategoryClick('import')}>Import Objects</div>
                   </div>
-                  <div style={{ backgroundColor: '#D1D5DB', borderRadius: '15px', padding: '15px' }}>
-                    <div className="bg-gray-300" style={{ fontWeight: 'bold', textAlign: 'center', borderRadius: '15px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
+                  <div style={{ backgroundColor: '#DFEFFF', borderRadius: '15px', padding: '15px' }}>
+                    <div style={{ backgroundColor: '#DFEFFF', fontWeight: 'bold', textAlign: 'center', borderRadius: '15px', height: '60px', display: 'flex', justifyContent: 'center', alignItems: 'center', width: '100%' }}>
                       <p style={{ margin: 0 }}>{objectCategory.name.toUpperCase()}</p>
                     </div>
                   </div>
