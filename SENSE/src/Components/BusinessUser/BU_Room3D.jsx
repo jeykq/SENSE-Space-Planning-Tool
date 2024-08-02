@@ -414,7 +414,8 @@ const BU_Room3D = () => {
 
         // Clamp the new position within the room bounds and fix the y position
         newPosition.x = Math.max(-roomW / 2, Math.min(roomW / 2, newPosition.x));
-        newPosition.y = intersectedRef.current.position.y; // Keep y position fixed
+        // newPosition.y = intersectedRef.current.position.y; // Keep y position fixed
+        newPosition.y = Math.max(0, Math.min(roomH, newPosition.y)); // Allow y position to vary within bounds
         newPosition.z = Math.max(-roomD / 2, Math.min(roomD / 2, newPosition.z));
 
         intersectedRef.current.position.copy(newPosition);
