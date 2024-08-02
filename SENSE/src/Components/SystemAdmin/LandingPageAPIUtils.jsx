@@ -68,8 +68,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
         const fetchedContactPhone = response.data.body.string.contact.phone;
         const fetchedContactAddress = response.data.body.string.contact.address;
         const fileData = response.data.body.file;
-        console.log("1111111111111111111111111111111111111111")
-        console.log(fileData)
+        // console.log(fileData)
 
         setMainParagraph(fetchedParagraph);
         setFreePlanFeatures(fetchedFreePlanFeatures);
@@ -192,7 +191,7 @@ const LandingPageAPIUtils = ({ onUpdateSuccess, onError }) => {
 
       setLoading(false);
       onUpdateSuccess();
-      console.log('API Response:', updateResponse.data);
+      // console.log('API Response:', updateResponse.data);
 
       // Update local storage with the new data
       localStorage.setItem('landingPageData', JSON.stringify({
