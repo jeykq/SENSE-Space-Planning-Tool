@@ -17,66 +17,57 @@ const EditPreferences = () => {
     const [error, setError] = useState(null);
     const [showPopup, setShowPopup] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
-    const [darkLightMode, setDarkLightMode] = useState(1);
+    const [darkLightMode, setDarkLightMode] = useState('light');
     const [textSize, setTextSize] = useState(2);
 
     const handleGoBack = () => {
         navigate('/viewaccount');
     };
 
-    // const handleCancelSubscription = () => {
-    //     setShowPopup(true);
-    // };
 
-    // const handleSubmit = async () => {
-    //     setShowPopup(false);
-    //     setIsCancelling(true);
-    //     const token = localStorage.getItem('authToken');
+    const handleSubmit = async (e) => {
+        // setShowPopup(false);
+        // setIsCancelling(true);
+        e.preventDefault();
+        const token = localStorage.getItem('authToken');
 
-    //     if (!token) {
-    //         navigate('/login');
-    //         return;
-    //     }
+        if (!token) {
+            navigate('/login');
+            return;
+        }
 
-    //     try {
-    //         const response = await fetch('https://api.sensespacesplanningtool.com/user/cancel_subscription', {
-    //             method: 'POST',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //                 'sense-token': token
-    //             },
-    //             body: JSON.stringify({
+        const darkLightMode = e.target[0].value;
+        const textSize = e.target[1].value;
 
-    //             }),
-    //         });
-    //         console.log(response);
-    //         if (response.ok) {
-    //             setIsCancelling(false);
-    //             setShowAlert(true); // Show the alert
-    //             console.log('Cancelled premium subscription successfully.');
-    //             const timer = setTimeout(() => {
-    //                 navigate('/viewaccount'); 
-    //             }, 3000);
+        localStorage.setItem('theme', darkLightMode);
 
-    //             return () => clearTimeout(timer);
-    //         } else {
-    //             const errorData = await response.json();
-    //             console.error('Cancel subscription failed:', errorData);
-    //             setError({ general: 'Cancel subscription failed.' });
-    //         }
-    //     } catch (error) {
-    //         console.error('Error during cancelling of subscription:', error);
-    //         setError({ general: 'Cancel subscription failed.' });
-    //     }
-    // };
+        if (darkLightMode == 'dark') {
+            document.documentElement.classList.add("dark");
+        } else {
+            document.documentElement.classList.remove("dark");
+        }
+    };
+
+    useEffect(() => {
+        const existingTheme = localStorage.getItem('theme');
+        if (existingTheme) {
+            if (existingTheme == 'dark') {
+                setDarkLightMode('dark');
+                document.documentElement.classList.add("dark");
+            }
+        }
+    }, [])
+
+    console.log(localStorage);
+
 
     useEffect(() => {
         const headers = getHeaders(); 
 
         if (!headers) {
-        setError('Token not found');
-        setLoading(false);
-        return;
+            setError('Token not found');
+            setLoading(false);
+            return;
         }
         
         const fetchAccountDetails = async () => {
@@ -160,8 +151,8 @@ const EditPreferences = () => {
       };
 
       const DarkLightModeOptions = [
-        { value: '1', label: 'Light' },
-        { value: '2', label: 'Dark' },
+        { value: 'light', label: 'Light' },
+        { value: 'dark', label: 'Dark' },
       ];
 
       const TextSizeOptions = [
@@ -179,17 +170,19 @@ const EditPreferences = () => {
                 {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Preferences" onClick={handleGoBack} />}
 
 
-                <div className="flex h-[90vh] justify-center items-center">
-                    <TailSpin
-                        visible={true}
-                        height="25"
-                        width="25"
-                        color="#595959"
-                        ariaLabel="tail-spin-loading"
-                        radius="1"
-                        wrapperStyle={{}}
-                        wrapperClass=""
-                    />
+                <div className="bg-white dark:bg-zinc-800 h-screen">
+                    <div className="flex h-[90vh] justify-center items-center">
+                        <TailSpin
+                            visible={true}
+                            height="25"
+                            width="25"
+                            color="#595959"
+                            ariaLabel="tail-spin-loading"
+                            radius="1"
+                            wrapperStyle={{}}
+                            wrapperClass=""
+                        />
+                    </div>
                 </div>
             </>
             
@@ -200,45 +193,48 @@ const EditPreferences = () => {
     return (
         <>
             {accountDetails && 
-                <>
+                <div className="h-screen bg-white dark:bg-zinc-800 dark:text-white">
                     {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="Preferences" onClick={handleGoBack} />}
                     {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="Preferences" onClick={handleGoBack} />}
                     {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="Preferences" onClick={handleGoBack} />}
                     {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Preferences" onClick={handleGoBack} />}
 
                     <div className="flex flex-col h-[400px] justify-center items-center mt-10">
-                        <div>
-                            <div style={fieldContainerStyle}>
-                                <span style={labelStyle}>Dark/Light mode</span>
-                                <div style={valueStyle}>
-                                    <select value={darkLightMode} onChange={(e) => setDarkLightMode(e.target.value)} className="bg-[#EDEFF7]">
-                                    {DarkLightModeOptions.map(option => (
-                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                    ))}
-                                    </select>
+                        <form onSubmit={handleSubmit}>
+                            <div>
+                                <div style={fieldContainerStyle}>
+                                    <span style={labelStyle}>Dark/Light mode</span>
+                                    <div style={valueStyle}>
+                                        <select value={darkLightMode} name="darkLightMode" onChange={(e) => setDarkLightMode(e.target.value)} className="text-black bg-[#EDEFF7]">
+                                        {DarkLightModeOptions.map(option => (
+                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                        ))}
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div style={fieldContainerStyle}>
-                                <span style={labelStyle}>Text size</span>
-                                <div style={valueStyle}>
-                                    <select value={textSize} onChange={(e) => setTextSize(e.target.value)} className="bg-[#EDEFF7]">
-                                    {TextSizeOptions.map(option => (
-                                        <option key={option.value} value={option.value}>{option.label}</option>
-                                    ))}
-                                    </select>
+                                <div style={fieldContainerStyle}>
+                                    <span style={labelStyle}>Text size</span>
+                                    <div style={valueStyle}>
+                                        <select value={textSize} onChange={(e) => setTextSize(e.target.value)} className="text-black bg-[#EDEFF7]">
+                                        {TextSizeOptions.map(option => (
+                                            <option key={option.value} value={option.value}>{option.label}</option>
+                                        ))}
+                                        </select>
+                                    </div>
                                 </div>
+                                <hr style={hrStyle} />
                             </div>
-                            <hr style={hrStyle} />
-                        </div>
-                        <div style={buttonContainerStyle}>
-                            <button 
-                                onClick={() => console.log('save button clicked')}
-                                style={buttonStyle}
-                                onMouseEnter={handleMouseEnter}
-                                onMouseLeave={handleMouseLeave}>
-                                Save
-                            </button>
-                        </div>
+                            <div style={buttonContainerStyle}>
+                                <button 
+                                    type="submit"
+                                    onClick={() => console.log('save button clicked')}
+                                    style={buttonStyle}
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}>
+                                    Save
+                                </button>
+                            </div>
+                        </form>
                         {showAlert && 
                             <div className="fixed top-[40%] left-[39%] px-[20px] py-[40px] bg-black/60 text-white z-90 max-w-[280px] text-center rounded-lg">
                                 <div className="flex flex-col">
@@ -262,7 +258,7 @@ const EditPreferences = () => {
                             </div> */}
                         {/* } */}
                     </div>
-                </>
+                </div>
             }
         </>
     );

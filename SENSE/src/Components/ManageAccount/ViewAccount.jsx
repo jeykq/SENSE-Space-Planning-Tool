@@ -5,6 +5,7 @@ import Topbar from '../FreeUser/Topbar';
 import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
+import { faBlackboard } from '@fortawesome/free-solid-svg-icons';
 
 const ViewAccount = () => {
   const navigate = useNavigate();
@@ -56,6 +57,13 @@ const ViewAccount = () => {
   const handleChangeUserType = () => {
     navigate('/BU_ChangeUserType');
   };
+
+  useEffect(() => {
+    const theme = localStorage.getItem('theme');
+      if (theme && theme == 'dark') {
+        document.documentElement.classList.add("dark");
+      }
+  }, [])
 
   useEffect(() => {
     const headers = getHeaders(); 
@@ -147,6 +155,7 @@ const ViewAccount = () => {
 
   const valueStyle = {
     backgroundColor: "#EDEFF7",
+    color: '#000',
     padding: "10px",
     borderRadius: "5px",
     display: "inline-block",
@@ -199,7 +208,7 @@ const ViewAccount = () => {
         {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}
         {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="My Profile" onClick={handleGoBack} />}
 
-        <div>Loading...</div>
+        <div className="bg-white dark:bg-zinc-800 h-screen">Loading...</div>
       </>
     );
   }
@@ -209,7 +218,7 @@ const ViewAccount = () => {
   }
 
   return (
-    <div>
+    <div className="bg-white dark:text-white dark:bg-zinc-800 h-screen">
       {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="My Profile" onClick={handleGoBack} />}
       {accountDetails && accountDetails.role === "FREE_USER" && <Topbar title="My Profile" onClick={handleGoBack} />}
       {accountDetails && accountDetails.role === "PREMIUM_USER" && <PremiumUserTopbar title="My Profile" onClick={handleGoBack} />}

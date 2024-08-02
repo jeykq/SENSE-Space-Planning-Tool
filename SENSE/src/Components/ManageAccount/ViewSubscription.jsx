@@ -67,7 +67,7 @@ const ViewSubscription = () => {
             setError({ general: 'Cancel subscription failed.' });
         }
     };
-
+    
     useEffect(() => {
         const headers = getHeaders(); 
 
@@ -113,6 +113,7 @@ const ViewSubscription = () => {
     
       const valueStyle = {
         backgroundColor: "#EDEFF7",
+        color: "#000",
         padding: "10px",
         borderRadius: "5px",
         display: "inline-block",
@@ -166,7 +167,7 @@ const ViewSubscription = () => {
                 {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
 
 
-                <div className="flex h-[90vh] justify-center items-center">
+                <div className="flex h-[90vh] justify-center items-center bg-white dark:bg-zinc-800 h-screen">
                     <TailSpin
                         visible={true}
                         height="25"
@@ -185,7 +186,7 @@ const ViewSubscription = () => {
     }
         
     return (
-        <>
+        <div className="bg-white dark:bg-zinc-800 h-screen dark:text-white">
             {accountDetails && 
                 <>
                     {accountDetails && accountDetails.role.includes("BUSINESS_USER") && <BusinessUserTopbar title="Subscription Details" onClick={handleGoBack} />}
@@ -244,7 +245,7 @@ const ViewSubscription = () => {
                     </div>
                 </>
             }
-        </>
+        </div>
     );
 }
 

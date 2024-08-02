@@ -95,11 +95,11 @@ const GiveReview = () => {
     };
 
     return (
-      <>
+      <div className="bg-white dark:bg-zinc-800 h-screen">
         {renderTopbar()}
-        <div style={styles.container}>
+        <div style={styles.container} className="bg-[#EDEFF7] dark:bg-zinc-800 dark:text-white">
             <div style={styles.reviewSection}>
-                <p style={styles.subtitle}>Leave us a review</p>
+                <p style={styles.title}>Leave us a review</p>
                 <div style={styles.stars}>
                     {[...Array(5)].map((star, index) => (
                         <span
@@ -113,6 +113,7 @@ const GiveReview = () => {
                 </div>
                 <textarea
                     style={styles.textarea}
+                    className="dark:bg-zinc-700"
                     value={review}
                     onChange={handleReviewChange}
                     placeholder="Write your review here..."
@@ -128,7 +129,7 @@ const GiveReview = () => {
                 </div>
             )}
         </div>
-      </>
+      </div>
     );
 };
 
@@ -139,8 +140,8 @@ const styles = {
         flexDirection: 'column',
         alignItems: 'center',
         padding: '20px',
-        backgroundColor: '#fff',
-        border: '1px solid #ccc',
+        // backgroundColor: '#fff',
+        // border: '1px solid #ccc',
         borderRadius: '10px',
         width: '600px',
         margin: '50px auto'

@@ -79,7 +79,7 @@ const PU_CreateRoom = () => {
   };
 
   return (
-    <div className="create-room-page">
+    <div className="create-room-page bg-white dark:bg-zinc-800 text-black dark:text-white">
       <Topbar title="Create Room" onClick={handleGoBack} />
       <div className="create-room-container">
         <label className="create-room-label">Who are you creating the room for?</label>
@@ -87,7 +87,7 @@ const PU_CreateRoom = () => {
         <select 
           value={selectedOption} 
           onChange={handleOptionChange} 
-          className="border border-gray-400 py-2 px-2 w-72 text-center rounded"
+          className="border border-gray-400 py-2 px-2 w-72 text-center text-black rounded"
         >
           <option value="">-</option>
           <option value="autistic_person">Autistic person</option>
@@ -101,7 +101,7 @@ const PU_CreateRoom = () => {
             onClick={handleTemplateClick} 
             title='Create room with SENSE templates'
             className="rounded w-max-min text-nowrap py-3  px-8 mt-5 uppercase"
-            style={{ backgroundColor: '#cfd2e3' }}
+            style={{ backgroundColor: '#cfd2e3', color: '#333' }}
             onMouseEnter={(e) => { 
               e.target.style.backgroundColor = '#c5cbeb';
               e.target.style.color = '#6c6d70';
@@ -117,7 +117,7 @@ const PU_CreateRoom = () => {
             onClick={handleDrawClick} 
             title="Create room with your own dimensions" 
             className="rounded w-max-min text-nowrap py-3  px-8 mt-5 uppercase"
-            style={{ backgroundColor: '#cfd2e3' }}
+            style={{ backgroundColor: '#cfd2e3', color: '#333' }}
             onMouseEnter={(e) => { 
               e.target.style.backgroundColor = '#c5cbeb';
               e.target.style.color = '#6c6d70';
@@ -132,7 +132,7 @@ const PU_CreateRoom = () => {
           <button onClick={handleImportClick} 
           title="Create a new room by importing your room.json" 
           className="rounded w-max-min text-nowrap py-3  px-8 mt-5 uppercase"
-          style={{ backgroundColor: '#cfd2e3' }}
+          style={{ backgroundColor: '#cfd2e3', color: '#333' }}
           onMouseEnter={(e) => { 
             e.target.style.backgroundColor = '#c5cbeb';
             e.target.style.color = '#6c6d70';

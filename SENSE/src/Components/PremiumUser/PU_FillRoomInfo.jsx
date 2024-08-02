@@ -29,16 +29,15 @@ const PU_FillRoomInfo = () => {
   };
 
   return (
-    <>
+    <div className="bg-white dark:bg-zinc-800 text-black dark:text-white">
       <Topbar title="Fill in room information" onClick={handleGoBack} />
-
       <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="room_type">Room type</label>
         </div>
         <div className="col-span-2 mb-2 relative">
           <select
-            className="border border-gray-400 py-2 px-2 w-72 text-center"
+            className="border border-gray-400 py-2 px-2 w-72 text-center text-black"
             value={roomType}
             onChange={(e) => setRoomType(e.target.value)}
             required
@@ -60,7 +59,7 @@ const PU_FillRoomInfo = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72 text-center" 
+            className="border border-gray-400 py-1 w-72 text-center text-black" 
             value={roomLength}
             onChange={(e) => setRoomLength(e.target.value)} 
             required 
@@ -72,7 +71,7 @@ const PU_FillRoomInfo = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72 text-center" 
+            className="border border-gray-400 py-1 w-72 text-center text-black" 
             value={roomWidth}
             onChange={(e) => setRoomWidth(e.target.value)} 
             required 
@@ -84,7 +83,7 @@ const PU_FillRoomInfo = () => {
         <div className="col-span-2">
           <input 
             type="text" 
-            className="border border-gray-400 py-1 w-72 text-center" 
+            className="border border-gray-400 py-1 w-72 text-center text-black" 
             value={roomHeight}
             onChange={(e) => setRoomHeight(e.target.value)} 
             required 
@@ -99,7 +98,7 @@ const PU_FillRoomInfo = () => {
           </button>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

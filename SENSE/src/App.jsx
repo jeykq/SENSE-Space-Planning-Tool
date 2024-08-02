@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUpForm from './Components/SignUp/SignUpForm';
 import PaidSignUpForm from './Components/SignUp/PaidSignUpForm';
@@ -47,6 +48,15 @@ import FU_DrawRoom from './Components/FreeUser/FU_DrawRoom';
 import FU_SelectTemplate from './Components/FreeUser/FU_SelectTemplate';
 
 const App = () => {
+  useEffect(() => {
+    const theme = localStorage.getItem('theme');
+      if (theme && theme == 'dark') {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+  }, [])
+
   return (
     <Router>
       <Routes>

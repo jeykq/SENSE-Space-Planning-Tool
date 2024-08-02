@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from '../PremiumUser/Topbar';
 import Footer from '../Landing/Footer';
 import PU_SearchBar from "./PU_SearchBar";
 import axios from "axios";
@@ -131,7 +131,7 @@ const PU_SelectTemplate = () => {
   };
 
   return (
-    <div className="select-template-page">
+    <div className="select-template-page bg-white dark:bg-zinc-800 dark:text-white">
       <Topbar title="Create Room" onClick={handleGoBack} />
 
       <div className="select-template-container">
@@ -195,6 +195,7 @@ const PU_SelectTemplate = () => {
               top: mousePosition.y + 10,
               left: mousePosition.x + 10,
               background: 'white',
+              color: '#000',
               border: '1px solid #ccc',
               borderRadius: '5px',
               padding: '10px',

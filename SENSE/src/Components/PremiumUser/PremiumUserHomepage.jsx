@@ -314,7 +314,7 @@ const PremiumUserHomepage = () => {
   });
 
   return (
-    <div>
+    <div className="bg-white dark:bg-zinc-800 h-full text-black dark:text-white">
       <div>
         <Navbar />
       </div>
@@ -339,7 +339,7 @@ const PremiumUserHomepage = () => {
                     <div key={room.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewRoom(room)}>
                       <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
-                        <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
+                        <div className="bg-gray-300 text-black" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                         <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
                           <p>{room.name}</p>
                         </div>
@@ -386,7 +386,7 @@ const PremiumUserHomepage = () => {
                       onMouseLeave={handleMouseLeave}
                       onMouseMove={handleMouseMove}
                       >
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
+                        <div className="text-black" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
                           <div className="bg-gray-300" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
                           <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
                             <p>{template.name}</p>
@@ -415,6 +415,7 @@ const PremiumUserHomepage = () => {
               top: mousePosition.y + 10,
               left: mousePosition.x + 10,
               background: 'white',
+              color: '#000',
               border: '1px solid #ccc',
               borderRadius: '5px',
               padding: '10px',

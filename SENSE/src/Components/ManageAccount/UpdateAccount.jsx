@@ -117,7 +117,7 @@ const UpdateAccount = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="bg-white dark:bg-zinc-800 h-screen text-black dark:text-white">Loading...</div>;
   }
 
   if (error) {
@@ -125,34 +125,34 @@ const UpdateAccount = () => {
   }
 
   return (
-    <div>
+    <div className="bg-white dark:bg-zinc-800 h-screen">
       {renderTopbar()}
       <div className="flex flex-col items-center justify-center mt-5">
-        <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#EDEFF7' }}>
+        <div className="rounded-lg p-8 max-w-md w-full bg-[#EDEFF7] dark:bg-zinc-700 dark:text-white">
           <h2 className="text-3xl text-center mb-4">Account Information</h2>
           <div className="flex-grow flex items-center justify-center p-4">
             <form onSubmit={handleSubmit} className="w-full max-w-md">
               <div className="mb-4 flex">
                 <div className="w-1/2 mr-2">
-                  <label htmlFor="firstName" className="block text-gray-700 text-sm font-bold mb-2">First Name</label>
+                  <label htmlFor="firstName" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">First Name</label>
                   <input type="text" id="firstName" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="First Name" value={firstName} onChange={(e) => setFirstName(e.target.value)} required />
                 </div>
                 <div className="w-1/2 ml-2">
-                  <label htmlFor="lastName" className="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
+                  <label htmlFor="lastName" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Last Name</label>
                   <input type="text" id="lastName" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" placeholder="Last Name" value={lastName} onChange={(e) => setLastName(e.target.value)} required />
                 </div>
               </div>
               <div className="mb-4">
-                <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                <label htmlFor="email" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Email</label>
                 <input type="text" id="email" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200" placeholder="Email" value={email} readOnly />
               </div>
               <div className="mb-4 flex">
                 <div className="w-1/2 mr-2">
-                  <label htmlFor="dateOfBirth" className="block text-gray-700 text-sm font-bold mb-2">Date of Birth</label>
+                  <label htmlFor="dateOfBirth" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Date of Birth</label>
                   <input type="date" id="dateOfBirth" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
                 </div>
                 <div className="w-1/2 ml-2">
-                  <label htmlFor="industry" className="block text-gray-700 text-sm font-bold mb-2">Job Industry</label>
+                  <label htmlFor="industry" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Job Industry</label>
                   <select id="industry" name="industry" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={industry} onChange={(e) => setIndustry(e.target.value)} required>
                     <option value="" disabled hidden>-</option>
                     {jobIndustryOptions.map(option => (

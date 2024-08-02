@@ -121,10 +121,10 @@ const ChangePassword = () => {
   };
 
   return (
-    <div>
+    <div className="bg-white dark:bg-zinc-800 h-screen">
       {renderTopbar()}
       <div className="flex flex-col items-center justify-center mt-5">
-        <div className="rounded-lg p-8 max-w-md w-full" style={{ backgroundColor: '#EDEFF7' }}>
+        <div className="rounded-lg p-8 max-w-md w-full bg-[#EDEFF7] dark:bg-zinc-700 dark:text-white">
           <h2 className="text-3xl text-center mb-4">Change Password</h2>
           {isAlertVisible && (
             <AlertPopup
@@ -136,21 +136,21 @@ const ChangePassword = () => {
           )}
           <form onSubmit={handleSubmit} className="w-full">
             <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 text-sm font-bold mb-2">Email</label>
+              <label htmlFor="email" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Email</label>
               <input type="text" id="email" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline bg-gray-200" placeholder="Email" value={email} readOnly />
             </div>
             <div className="mb-4">
-              <label htmlFor="oldPassword" className="block text-gray-700 text-sm font-bold mb-2">Old Password</label>
+              <label htmlFor="oldPassword" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Old Password</label>
               <input type="password" id="oldPassword" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.oldPassword ? 'border-red-500' : ''}`} value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} required />
               {errors.oldPassword && <p className="text-red-500 text-xs italic">{errors.oldPassword}</p>}
             </div>
             <div className="mb-4">
-              <label htmlFor="newPassword" className="block text-gray-700 text-sm font-bold mb-2">New Password</label>
+              <label htmlFor="newPassword" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">New Password</label>
               <input type="password" id="newPassword" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.newPassword ? 'border-red-500' : ''}`} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required />
               {errors.newPassword && <p className="text-red-500 text-xs italic">{errors.newPassword}</p>}
             </div>
             <div className="mb-4">
-              <label htmlFor="confirmPassword" className="block text-gray-700 text-sm font-bold mb-2">Confirm New Password</label>
+              <label htmlFor="confirmPassword" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Confirm New Password</label>
               <input type="password" id="confirmPassword" className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${errors.confirmPassword ? 'border-red-500' : ''}`} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required />
               {errors.confirmPassword && <p className="text-red-500 text-xs italic">{errors.confirmPassword}</p>}
             </div>
