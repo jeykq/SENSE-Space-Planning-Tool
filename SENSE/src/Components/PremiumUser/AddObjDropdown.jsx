@@ -111,8 +111,8 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
     };
 
     return (
-        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
-            <div className="flex pb-1 mb-2 border-b border-black justify-between items-center">
+        <div className="w-full mt-2 bg-white dark:bg-zinc-700 p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
+            <div className="flex pb-1 mb-2 border-b border-black dark:border-white text-black dark:text-white justify-between items-center">
                 <h3 className="text-lg font-semibold uppercase">Object catalogue</h3>
             </div>
             {authError && <div className="text-red-500 mb-2">{authError}</div>}
@@ -122,9 +122,9 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                     placeholder="Search objects by name..."
                     value={searchQuery}
                     onChange={handleSearch}
-                    className="w-full p-2 border border-gray-300 rounded-md"
+                    className="w-full p-2 bg-white dark:bg-zinc-200 text-black border border-gray-300 rounded-md"
                 />
-                <div className="mt-2 p-2 bg-white border border-gray-300 rounded-md shadow-lg z-10">
+                <div className="mt-2 p-2 bg-white dark:bg-zinc-400 border border-gray-300 rounded-md shadow-lg z-10">
                     <div className="flex justify-between items-center">
                         <h4 className="text-sm font-semibold">Filter by tags</h4>
                     </div>

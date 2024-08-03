@@ -142,6 +142,12 @@ const PU_Room3D = () => {
       return;
     }
 
+    // let bgColorHex = 0xdfefff;
+    // const DarkLightMode = localStorage.getItem('theme');
+    // if (DarkLightMode == "dark") {
+    //   bgColorHex = 0x1b2433
+    // }
+
     // Scene
     let scene = new THREE.Scene();
     scene.background = new THREE.Color(0xdfefff);
@@ -991,14 +997,14 @@ const PU_Room3D = () => {
         {roomLayoutUrl && isTemplate == null ? (
           <button
             onClick={handleUpdateRoom}
-            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            className="bg-purple-500 dark:bg-purple-700 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 dark:hover:bg-purple-800 transition duration-100"
           >
             Update Room
           </button>
         ) : (
           <button
             onClick={handleSaveRoom}
-            className="bg-purple-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 transition duration-100"
+            className="bg-purple-500 dark:bg-purple-700 text-white py-2 px-4 rounded-full shadow-lg hover:bg-purple-600 dark:hover:bg-purple-800 transition duration-100"
           >
             Save Room
           </button>
@@ -1024,13 +1030,13 @@ const PU_Room3D = () => {
         />
         <button
           onClick={handleImportRoom}
-          className="bg-blue-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 transition duration-100"
+          className="bg-blue-500 dark:bg-blue-700 text-white py-2 px-4 rounded-full shadow-lg hover:bg-blue-600 dark:hover:bg-blue-800 transition duration-100"
         >
           Import Room
         </button>
         <button
           onClick={handleExportRoom}
-          className="bg-red-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 transition duration-100"
+          className="bg-red-500 dark:bg-red-700 text-white py-2 px-4 rounded-full shadow-lg hover:bg-red-600 dark:hover:bg-red-800 transition duration-100"
         >
           Export Room
         </button>
@@ -1039,7 +1045,7 @@ const PU_Room3D = () => {
         }
         <button
           onClick={() => setShowConfirmExit(true)}
-          className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
+          className="bg-white dark:bg-zinc-500 text-black dark:text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
         >
           Exit
         </button>
@@ -1054,7 +1060,7 @@ const PU_Room3D = () => {
       <div className="absolute top-4 right-4 flex flex-col space-y-4">
         <button
           onClick={toggleDropdown}
-          className="bg-yellow-500 text-white py-2 px-4 rounded-full shadow-lg hover:bg-yellow-600 transition duration-100"
+          className="bg-yellow-500 dark:bg-yellow-700 text-white py-2 px-4 rounded-full shadow-lg hover:bg-yellow-600 dark:hover:bg-yellow-900 transition duration-100"
         >
           Add Objects
         </button>
@@ -1067,7 +1073,7 @@ const PU_Room3D = () => {
           <>
             <button
               onClick={() => document.getElementById('wallColorPicker').click()}
-              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100"
+              className="bg-white dark:bg-zinc-500 text-black dark:text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-zinc-600 transition duration-100"
             >
               Change Wall Color
             </button>
@@ -1080,16 +1086,16 @@ const PU_Room3D = () => {
             <div className="relative">
               <button
                 onClick={toggleFloorDropdown}
-                className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+                className="bg-white dark:bg-zinc-500 text-black dark:text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-zinc-600 transition duration-100 w-full"
               >
                 Change Floor
               </button>
               {showFloorDropdown && (
-                <div className="absolute mt-2 bg-white border border-gray-200 rounded-md shadow-lg w-full">
+                <div className="absolute mt-2 bg-white dark:bg-zinc-700 text-black dark:text-white border border-gray-200 rounded-md shadow-lg w-full">
                   {floorTextures.map((texture) => (
                     <div
                       key={texture.url}
-                      className="flex flex-col items-center px-2 py-1 cursor-pointer hover:bg-gray-100"
+                      className="flex flex-col items-center px-2 py-1 cursor-pointer hover:bg-gray-100 dark:hover:bg-zinc-800"
                       onClick={() => handleFloorChange(texture.url)}
                     >
                       <img src={texture.thumbnailUrl} alt={texture.name} className="h-20 w-20 object-cover mb-2" />
@@ -1101,7 +1107,7 @@ const PU_Room3D = () => {
             </div>
             <button
               onClick={handleChangeRoomDimensions}
-              className="bg-white text-black py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 transition duration-100 w-full"
+              className="bg-white dark:bg-zinc-500 text-black dark:text-white py-2 px-4 rounded-full shadow-lg hover:bg-gray-100 dark:hover:bg-zinc-600 transition duration-100 w-full"
             >
               Change Dimension
             </button>

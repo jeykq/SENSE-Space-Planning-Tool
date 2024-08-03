@@ -17,11 +17,11 @@ const ObjCategory = ({ name, catId, objectListData }) => {
     const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
     const matchingObj = objectListData?.body?.filter(obj => obj.category_ids?.includes(catId));
-    console.log(matchingObj);
+    // console.log(matchingObj);
 
     const handleHover = (id) => {
         setShowInfo(id);
-        console.log(id);
+        // console.log(id);
     };
 
     const handleMouseMove = (event) => {
@@ -42,9 +42,9 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                 throw new Error('No tags data returned');
             }
 
-            console.log("Tags: ", response.data);
+            // console.log("Tags: ", response.data);
             setTags(response.data.body);
-            console.log(tags);
+            // console.log(tags);
 
             } catch (error) {
             console.error('Error fetching tags:', error);
@@ -65,22 +65,22 @@ const ObjCategory = ({ name, catId, objectListData }) => {
     };
 
     return (
-        <>
+        <div>
             {matchingObj?.length > 0 &&
-                <div onClick={() => setIsExpand(!expand)} className="flex bg-gray-200 px-3 py-2 rounded-lg mb-2 cursor-pointer">
+                <div onClick={() => setIsExpand(!expand)} className="flex bg-gray-200 dark:bg-zinc-500 text-black dark:text-white px-3 py-2 rounded-lg mb-2 cursor-pointer">
                     <div>{name}</div>
                 </div>
             }
             {expand &&
                 <>
-                    <div className="bg-gray-100 mb-2 rounded-lg max-h-[320px] overflow-y-scroll">
+                    <div className="bg-gray-100 dark:bg-zinc-500 mb-2 rounded-lg max-h-[320px] overflow-y-scroll">
                         <div className="grid grid-cols-3 gap-2 p-2">
                             {matchingObj &&
                                 <>
                                     {matchingObj.map((obj) => (
                                         <div 
                                             key={obj.id} 
-                                            className="bg-gray-200 rounded-md aspect-square flex flex-col text-center hover:bg-gray-300" 
+                                            className="bg-gray-200 dark:bg-zinc-400 rounded-md aspect-square flex flex-col text-center hover:bg-gray-300" 
                                             onMouseEnter={() => handleHover(obj.id)}
                                             onMouseMove={handleMouseMove} 
                                             onMouseLeave={() => setShowInfo(0)} 
@@ -128,7 +128,7 @@ const ObjCategory = ({ name, catId, objectListData }) => {
                     </div>
                 </>
             }
-        </>
+        </div>
     );
 };
 

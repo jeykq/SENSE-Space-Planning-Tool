@@ -337,13 +337,13 @@ const PremiumUserHomepage = () => {
                   const screenshotURL = room.room_layout.room_layout.replace(/\.glb$/, '.png');
                   return (
                     <div key={room.id} className="swiper-slide" style={{ position: 'relative', cursor: 'pointer' }} onClick={() => viewRoom(room)}>
-                      <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
+                      <div style={{ position: 'absolute', display: 'flex', justifyContent: 'center', top: '10px', right: '10px', width: '30px', height: '30px', borderRadius: '30%', backgroundColor: 'white', color: 'black', cursor: 'pointer' }} onClick={(e) => toggleDropdown(e, room.id, room.room_layout.room_layout)}>...</div>
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundImage: `url(${screenshotURL})`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '20px', padding: '20px' }}>
                         <div className="bg-gray-300 text-black" style={{ borderRadius: '20px', height: '200px', marginBottom: '10px' }}></div>
-                        <div style={{ textAlign: 'center', fontWeight: 'bold' }}>
+                        <div style={{ textAlign: 'center', fontWeight: 'bold', color: '#000' }}>
                           <p>{room.name}</p>
                         </div>
-                        <div style={{ textAlign: 'center' }}>
+                        <div style={{ textAlign: 'center', color: '#000' }}>
                           <p>{getRoomTypeName(room.room_type_id)}</p>
                         </div>
                       </div>
