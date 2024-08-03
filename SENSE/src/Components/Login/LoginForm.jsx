@@ -24,10 +24,17 @@ const LoginForm = () => {
             });
 
             if (response.status === 200) {
-                const { role, token } = response.data;
+                const { role, token, dark_mode, text_size } = response.data;
                 localStorage.setItem('authToken', token);
                 setIsAuthenticated(true);
                 setUserRole(role);
+
+                // Save preferences in local storage
+                localStorage.setItem('theme', dark_mode ? 'dark' : 'light');
+                localStorage.setItem('textSize', text_size);
+
+                // Apply theme based on the updated preferences
+                document.documentElement.classList.toggle("dark", dark_mode);
 
                 if (role === 'FREE_USER') {
                     navigate('/FreeUserHomepage');
