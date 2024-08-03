@@ -57,12 +57,21 @@ const EditPreferences = () => {
             localStorage.setItem('theme', response.data.body.dark_mode ? 'dark' : 'light');
             localStorage.setItem('textSize', response.data.body.text_size);
 
-            // Set state with new data
-            setAccountDetails(response.data.body);
-            setShowAlert(true);
 
             // Apply theme based on the updated preferences
             document.documentElement.classList.toggle("dark", response.data.body.dark_mode);
+            // document.documentElement.classList.toggle("dark", response.data.body.text_size);
+            const sizeInPx = (newTextSize == "large" ? '20px' : (newTextSize == "small" ? '12px' : '16px'))
+            document.documentElement.style.setProperty("--html-font-size", sizeInPx)
+
+            // Set state with new data
+            setAccountDetails(response.data.body);
+            setShowAlert(true);
+            const timer = setTimeout(() => {
+                navigate('/viewaccount'); 
+            }, 3000);
+
+            return () => clearTimeout(timer);
         } catch (error) {
             console.error('Error updating preferences:', error);
             setError(error.message);
@@ -80,6 +89,8 @@ const EditPreferences = () => {
 
         if (existingTextSize) {
             setTextSize(existingTextSize);
+            const sizeInPx = (existingTextSize == "large" ? '20px' : (existingTextSize == "small" ? '12px' : '16px'))
+            document.documentElement.style.setProperty("--html-font-size", sizeInPx)
         }
     }, []);
 
@@ -245,7 +256,7 @@ const EditPreferences = () => {
                             </div>
                         </form>
                         {showAlert && 
-                            <div className="fixed top-[40%] left-[39%] px-[20px] py-[40px] bg-black/60 text-white z-90 max-w-[280px] text-center rounded-lg">
+                            <div className="fixed top-[40%] left-[44%] px-[20px] py-[40px] bg-black/60 text-white z-90 max-w-[280px] text-center rounded-lg">
                                 <div className="flex flex-col">
                                     <span className="absolute top-0 right-0 px-2 py-1 cursor-pointer" onClick={() => setShowAlert(false)}>&times;</span>
                                     <p>Preferences Saved!</p>

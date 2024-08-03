@@ -58,6 +58,43 @@ const PremiumUserHomepage = () => {
   }
 
   useEffect(() => {
+    const headers = getHeaders();
+
+    const fetchAccountDetails = async () => {
+      try {
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/user/get', 
+          {}, 
+          { headers }
+        );
+
+        if (!response.data) {
+          throw new Error('No data returned');
+        }
+
+        localStorage.setItem('theme', response.data.body.dark_mode ? 'dark' : 'light');
+        localStorage.setItem('textSize', response.data.body.text_size);
+
+        const theme = localStorage.getItem('theme')
+        if (theme && theme == 'dark') {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+
+        const fontSize = localStorage.getItem('textSize');
+        const sizeInPx = (fontSize == "large" ? '20px' : (fontSize == "small" ? '12px' : '16px'))
+        console.log('here?');
+        document.documentElement.style.setProperty("--html-font-size", sizeInPx)
+      } catch (error) {
+        console.error('Error fetching account details:', error);
+        setError(error.message);
+      }
+    };
+    fetchAccountDetails();
+  }, []);
+
+  useEffect(() => {
     const fetchRooms = async () => {
       try {
         const headers = getHeaders();

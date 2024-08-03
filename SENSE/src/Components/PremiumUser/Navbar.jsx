@@ -47,6 +47,8 @@ const Navbar = () => {
 
       if (response.status === 200) {
         localStorage.removeItem('authToken');
+        localStorage.removeItem('theme');
+        localStorage.removeItem('textSize');
         navigate('/');
       }
 

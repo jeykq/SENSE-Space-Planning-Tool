@@ -12,6 +12,8 @@ import Footer from './Footer'
 
 
 const Landing = () => {
+  document.documentElement.style.setProperty("--html-font-size", '16px')
+
   return (
     <div>
       <Navbar/>

@@ -49,12 +49,19 @@ import FU_SelectTemplate from './Components/FreeUser/FU_SelectTemplate';
 
 const App = () => {
   useEffect(() => {
-    const theme = localStorage.getItem('theme');
-      if (theme && theme == 'dark') {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+    const theme = localStorage.getItem('theme')
+    if (theme && theme == 'dark') {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [])
+
+  useEffect(() => {
+    const fontSize = localStorage.getItem('textSize');
+    const sizeInPx = (fontSize == "large" ? '20px' : (fontSize == "small" ? '12px' : '16px'))
+    console.log('here?');
+    document.documentElement.style.setProperty("--html-font-size", sizeInPx)
   }, [])
 
   return (
