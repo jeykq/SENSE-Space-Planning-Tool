@@ -64,8 +64,8 @@ const Navbar = () => {
       <img src={logo} alt="" className='logo mx-2' style={{ width: '100px' }} />
       <div className="flex items-center justify-end w-full">
         <button
-          className="bg-white hover:bg-purple-700 text-white font-bold py-2 px-4 rounded mx-2"
-          style={{ borderRadius: "6px", backgroundColor: 'rgb(124 58 237)' }}
+          className="bg-purple-700 hover:bg-purple-800 text-white font-bold py-2 px-4 rounded mx-2"
+          style={{ borderRadius: "6px" }}
           onClick={handleCreateRoomClick}
         >
           Create a room

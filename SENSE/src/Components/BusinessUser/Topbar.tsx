@@ -27,7 +27,7 @@ const Topbar = ({ title, onClick }: TopbarProps) => {
       <div className="flex-grow text-center text-xl font-medium">
         {title}
       </div>
-      <div onClick={() => onClick()} className="flex items-center cursor-pointer mr-4">
+      <div onClick={() => onClick()} className="flex items-center cursor-pointer text-xl px-6 py-4 mr-4 hover:scale-125 duration-100">
         x  
       </div>
     </div>
