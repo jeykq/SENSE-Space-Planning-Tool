@@ -171,14 +171,14 @@ const styles = {
         alignItems: 'center',
         padding: '20px',
         // backgroundColor: '#f3f3f3',
-        border: '1px solid #ccc',
+        // border: '1px solid #ccc',
         borderRadius: '10px',
         width: '400px',
         margin: '50px auto',
         position: 'relative'
     },
     title: {
-        fontSize: '20px',
+        fontSize: '24px',
         marginBottom: '20px'
     },
     form: {
