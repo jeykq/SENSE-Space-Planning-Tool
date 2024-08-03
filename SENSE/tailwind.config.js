@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const plugin = require('tailwindcss/plugin')
+
 export default {
   content: [
     "./src/**/*.{js,jsx,ts,tsx}"
@@ -18,5 +20,11 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    plugin(function({ addBase }) {
+      addBase({
+        'html': {fontSize:"var(--html-font-size)"}
+      })
+    })
+  ],
 }
