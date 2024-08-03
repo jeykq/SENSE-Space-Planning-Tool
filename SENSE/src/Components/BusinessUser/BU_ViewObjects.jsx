@@ -11,7 +11,7 @@ const BU_ViewObjects = () => {
 
   const navigate = useNavigate();
   const handleGoBack = () => {
-    navigate(-1);
+    navigate('/BusinessUserHomepage');
   };
 
   const fetchObjData = async () => {
