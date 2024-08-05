@@ -63,7 +63,7 @@ const BU_ViewObjectsInfo = () => {
 
   return (
       <div>
-          <Topbar title="View Object Information" onClick={() => navigate(-3)} />
+          <Topbar title="View Object Information" onClick={() => navigate('/BusinessUserHomepage')} />
           <div className="mt-8 flex flex-col items-center">
               <form className="w-3/4">
                   <div className="grid grid-cols-4 gap-4">
