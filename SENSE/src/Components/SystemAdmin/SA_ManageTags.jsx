@@ -131,8 +131,8 @@ const SA_ManageTagsPage = () => {
       <Topbar title="Manage Tags" onClick={handleGoBack} />
       <div className="flex flex-col items-center justify-center mt-5">
         <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-3xl text-center">Tag List</h2>
+          <div className="flex justify-center mb-4">
+            <h2 className="text-3xl mr-4">Tag List</h2>
             {!showAddInput && (
               <button
                 onClick={handleAdd}
@@ -142,6 +142,7 @@ const SA_ManageTagsPage = () => {
               </button>
             )}
           </div>
+
           {isAlertVisible && (
             <AlertPopup
               title="Success"
