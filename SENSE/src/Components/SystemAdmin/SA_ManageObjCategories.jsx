@@ -133,7 +133,7 @@ const SA_ManageObjCategoriesPage = () => {
       <div className="flex flex-col items-center justify-center mt-5">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-3xl text-center">Obj Category List</h2>
+            <h2 className="text-3xl text-center">Object Category List</h2>
             {!showAddInput && (
               <button
                 onClick={handleAdd}
