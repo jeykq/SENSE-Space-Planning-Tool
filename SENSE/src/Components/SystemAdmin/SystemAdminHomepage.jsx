@@ -55,16 +55,18 @@ const SystemAdminHomepage = () => {
 
   // Handle search input change
   const handleSearch = (searchTerm) => {
-    setSearchTerm(searchTerm.toLowerCase());
+    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+    setSearchTerm(lowerCaseSearchTerm);
     
     const results = accountDetails.filter(user =>
-      user.first_name.toLowerCase().includes(searchTerm) ||
-      user.last_name.toLowerCase().includes(searchTerm) ||
-      user.email.toLowerCase().includes(searchTerm)
+      user.first_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.last_name.toLowerCase().includes(lowerCaseSearchTerm) ||
+      user.email.toLowerCase().includes(lowerCaseSearchTerm)
     );
     setSearchResults(results);
     setCurrentPage(1); // Reset to first page after searching
   };
+  
 
   // Get current accounts based on search term and pagination
   const indexOfLastAccount = currentPage * accountsPerPage;
