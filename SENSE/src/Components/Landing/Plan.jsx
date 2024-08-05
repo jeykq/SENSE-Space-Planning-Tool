@@ -46,7 +46,7 @@ const Plan = () => {
   return (
     <div className="flex justify-center mt-10">
       {/* Free Account */}
-      <div className="w-80 bg-white rounded-lg p-6 m-4 shadow-lg">
+      <div className="w-80 bg-white rounded-lg p-6 m-4" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
         <div className="text-center mb-6">
           <div className="bg-blue-500 text-white rounded-md py-2 px-4 inline-block">Free Account</div>
         </div>
@@ -59,7 +59,7 @@ const Plan = () => {
       </div>
 
       {/* Premium */}
-      <div className="w-80 bg-white rounded-lg p-6 m-4 shadow-lg">
+      <div className="w-80 bg-white rounded-lg p-6 m-4" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
         <div className="text-center mb-6">
           <div className="bg-yellow-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
         </div>
