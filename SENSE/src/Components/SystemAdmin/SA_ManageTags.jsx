@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from '../FreeUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils'; 
 import AlertPopup from '../UI/AlertPopup'; 
