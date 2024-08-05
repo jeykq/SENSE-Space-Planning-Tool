@@ -121,7 +121,7 @@ const LandingPlan = () => {
     <div name='plan' className="flex flex-col items-center mt-10">
       <div className={`flex flex-row space-x-4 ${editMode ? 'h-auto w-auto' : ''}`}>
         {/* Free Account */}
-        <div className={`w-80 bg-white rounded-lg p-6 ${editMode ? 'h-auto' : 'h-80'}`} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
+        <div className={`w-96 bg-white rounded-lg p-6 ${editMode ? 'h-auto' : 'h-80'}`} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
 
           <div className="text-center mb-6">
             <div className="bg-blue-500 text-white rounded-md py-2 px-4 inline-block">Free Account</div>
@@ -135,7 +135,7 @@ const LandingPlan = () => {
         </div>
 
         {/* Premium */}
-        <div className={`w-80 bg-white rounded-lg p-6 ${editMode ? 'h-auto' : 'h-80'}`} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
+        <div className={`w-96 bg-white rounded-lg p-6 ${editMode ? 'h-auto' : 'h-80'}`} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
           <div className="text-center mb-6">
             <div className="bg-yellow-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
           </div>
