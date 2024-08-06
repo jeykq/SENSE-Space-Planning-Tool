@@ -12,6 +12,7 @@ import ConfirmDialog from '../UI/ConfirmDialog';
 import AlertPopup from '../UI/AlertPopup';
 import ConfirmNamePopup from '../UI/ConfirmNamePopup';
 import axios from 'axios';
+import { Oval } from 'react-loader-spinner';
 
 const FU_Room3D = () => {
   const mountRef = useRef(null);
@@ -49,6 +50,9 @@ const FU_Room3D = () => {
   const [showConfirmName, setShowConfirmName] = useState(false);
   const [isRoomValid, setIsRoomValid] = useState(null);
   const [rName, setRoomName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false); // State for submit button loading
+  const [pageLoading, setPageLoading] = useState(false); // State for page loading
 
   const token = localStorage.getItem('authToken');
 
@@ -296,11 +300,15 @@ const FU_Room3D = () => {
             });
             scene.add(glb.scene);
             console.log("Model loaded:", glb.scene);
+            setIsLoading(false); // Stop the loader when the model is loaded
           });
         })
         .catch(error => {
           console.error('Error loading GLB:', error);
+          setIsLoading(false); // Stop the loader in case of error
         });
+    } else {
+      setIsLoading(false); // Stop the loader if no room layout URL
     }
 
     // Load 3D Model
@@ -686,6 +694,7 @@ const FU_Room3D = () => {
     console.log("Room ID: ", roomId);
     console.log("Room Name: ", name);
     console.log("Room Layout URL: ", roomLayoutUrl);
+    setSubmitLoading(true); // Set loading state to true
   
     try {
       if (!sceneRef.current) {
@@ -787,8 +796,9 @@ const FU_Room3D = () => {
     } catch (error) {
       console.error('Error:', error.message);
       setIsRoomValid(false);
+    } finally {
+      setSubmitLoading(false); // Set loading state to false
     }
-    
   };
 
   const captureScreenshotAndUpload = async (previewUploadUrl) => {
@@ -832,6 +842,7 @@ const FU_Room3D = () => {
 
   const handleCancelInputName = async () => {
     setShowConfirmInputName(false);
+    setPageLoading(true); // Set page loading state to true
 
     try {
       if (!sceneRef.current) {
@@ -874,6 +885,8 @@ const FU_Room3D = () => {
       }
     } catch (error) {
       console.error('Error converting to GLB or updating:', error);
+    } finally {
+      setPageLoading(false); // Set page loading state to false
     }
   }
 
@@ -903,6 +916,38 @@ const FU_Room3D = () => {
 
   return (
     <div className="relative w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Oval
+            height={80}
+            width={80}
+            color="#808080"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#808080"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+      {pageLoading && ( 
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Oval
+            height={80}
+            width={80}
+            color="#808080"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#808080"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
       <div ref={mountRef} className="w-full h-screen cursor-default" />
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
         {roomLayoutUrl && isTemplate == null ? (
@@ -1034,6 +1079,7 @@ const FU_Room3D = () => {
           }}
           onOk={handleConfirmName}
           isTemplateValid={isRoomValid}
+          isLoading={submitLoading} // Pass loading state to ConfirmNamePopup
         />
       )}
       {showConfirmChangeDimension && (

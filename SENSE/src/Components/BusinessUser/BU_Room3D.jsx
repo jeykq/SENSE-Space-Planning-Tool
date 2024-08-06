@@ -13,6 +13,7 @@ import SaveDialogPopup from '../UI/SaveDialogPopup';
 import AlertPopup from '../UI/AlertPopup';
 import ConfirmNamePopup from '../UI/ConfirmNamePopup';
 import axios from 'axios';
+import { Oval } from 'react-loader-spinner';
 
 const BU_Room3D = () => {
   const mountRef = useRef(null);
@@ -52,6 +53,9 @@ const BU_Room3D = () => {
   const [isDraft, setIsDraft] = useState(false);
   const [isTemplateValid, setIsTemplateValid] = useState(null);
   const [tempName, setTemplateName] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false); // State for submit button loading
+  const [pageLoading, setPageLoading] = useState(false); // State for page loading
 
   const token = localStorage.getItem('authToken');
 
@@ -294,30 +298,33 @@ const BU_Room3D = () => {
             });
             scene.add(glb.scene);
             console.log("Model loaded:", glb.scene);
+            setIsLoading(false); // Stop the loader when the model is loaded
           });
         })
         .catch(error => {
           console.error('Error loading GLB:', error);
+          setIsLoading(false); // Stop the loader in case of error
         });
+    } else {
+      setIsLoading(false); // Stop the loader if no room layout URL
     }
 
     // Load 3D Model
     const loadModel = (id, modelPath, materialPath, position = { x: 0, y: 0, z: 0 }) => {
-      
       const s3URL = `https://sense-wholly-locally-top-blowfish.s3.ap-southeast-1.amazonaws.com/object/${id}/`;
-    
+
       const mtlLoader = new MTLLoader();
       mtlLoader.setPath(s3URL);
       mtlLoader.load(materialPath, (materials) => {
         materials.preload();
-    
+
         // Ensure that materials are not transparent and have full opacity
         for (let materialName in materials.materials) {
           const material = materials.materials[materialName];
           material.transparent = false;
           material.opacity = 1.0;
         }
-    
+
         const objLoader = new OBJLoader();
         objLoader.setMaterials(materials);
         objLoader.setPath(s3URL);
@@ -325,16 +332,16 @@ const BU_Room3D = () => {
           // Calculate the bounding box of the loaded object
           const boundingBox = new THREE.Box3().setFromObject(object);
           const size = boundingBox.getSize(new THREE.Vector3());
-    
+
           // Calculate the scaling factor to fit the object within the room
           const maxDimension = Math.max(size.x, size.y, size.z);
           const scale = Math.min(roomW / maxDimension, roomH / maxDimension, roomD / maxDimension) * 0.5;
           object.scale.set(scale, scale, scale);
-    
+
           // Recalculate the bounding box after scaling
           const scaledBoundingBox = new THREE.Box3().setFromObject(object);
           const scaledSize = scaledBoundingBox.getSize(new THREE.Vector3());
-    
+
           // Adjust the position of the object to fit within the room bounds
           const adjustedPosition = {
             x: Math.max(-roomW / 2 + scaledSize.x / 2, Math.min(roomW / 2 - scaledSize.x / 2, position.x)),
@@ -344,10 +351,10 @@ const BU_Room3D = () => {
           object.position.set(adjustedPosition.x, adjustedPosition.y, adjustedPosition.z);
           object.userData.selectable = true; // Set selectable on the parent group
           scene.add(object);
-    
+
           // Add object to the list
           setObjects((prevObjects) => [...prevObjects, object]);
-    
+
           console.log('Model loaded and added to scene:', object);
         }, undefined, (error) => {
           console.error('Error loading model:', error);
@@ -355,7 +362,7 @@ const BU_Room3D = () => {
       }, undefined, (error) => {
         console.error('Error loading materials:', error);
       });
-    };    
+    };
 
     const onMouseDown = (event) => {
       if (isTransformingRef.current) return; // Ignore if interacting with transform controls
@@ -483,7 +490,7 @@ const BU_Room3D = () => {
     // Drag and Drop Logic
     const handleDrop = (event) => {
       event.preventDefault();
-      
+
       const id = event.dataTransfer.getData('id');
       const modelPath = event.dataTransfer.getData('modelPath');
       const materialPath = event.dataTransfer.getData('materialPath');
@@ -643,11 +650,11 @@ const BU_Room3D = () => {
       const objectToRemove = selectedObjectRef.current;
 
       console.log("Object to remove:", objectToRemove);
-  
+
       if (objectToRemove.parent) {
         objectToRemove.parent.remove(objectToRemove);
         console.log("Object removed:", objectToRemove);
-  
+
         objectToRemove.traverse((child) => {
           if (child.geometry) {
             child.geometry.dispose();
@@ -664,7 +671,7 @@ const BU_Room3D = () => {
         setObjects(objects.filter(obj => obj !== objectToRemove));
         selectedObjectRef.current = null;
         setIsObjectSelected(false);
-  
+
         transformControlsRef.current.detach();
         arrowHelperRef.current.visible = false;
         setCurrentMode(null);
@@ -789,15 +796,17 @@ const BU_Room3D = () => {
   const handleConfirmName = async (name) => {
     console.log("Template Name: ", name);
     console.log("Draft: ", isDraft);
-  
+
     try {
       if (!sceneRef.current) {
         throw new Error("Scene not available");
       }
-  
+
       const glbData = await convertToGLB(sceneRef.current);
-  
+
       if (roomLayoutUrl) {
+        setSubmitLoading(true); // Set submit loading to true
+
         const response = await fetch('https://api.sensespacesplanningtool.com/template/update', {
           method: 'POST',
           headers: {
@@ -811,7 +820,7 @@ const BU_Room3D = () => {
             "is_draft": isDraft
           }),
         });
-    
+
         if (response.ok) {
           await axios.put(
             roomLayoutUrl,
@@ -837,6 +846,8 @@ const BU_Room3D = () => {
           throw new Error('Update failed');
         }
       } else {
+        setSubmitLoading(true); // Set submit loading to true
+
         const response = await fetch('https://api.sensespacesplanningtool.com/template/create', {
           method: 'POST',
           headers: {
@@ -854,11 +865,11 @@ const BU_Room3D = () => {
             "is_draft": isDraft
           }),
         });
-    
+
         if (response.ok) {
           const responseData = await response.json();
           const TemplateURL = responseData && responseData.body ? responseData.body.room_layout.room_layout : null;
-    
+
           if (TemplateURL) {
             await axios.put(
               TemplateURL,
@@ -870,11 +881,11 @@ const BU_Room3D = () => {
                 },
               }
             );
-    
+
             const screenshotURL = TemplateURL.replace(/\.glb$/, '.png');
-    
+
             await captureScreenshotAndUpload(screenshotURL);
-    
+
             if (isDraft) {
               setShowAlert(true);
               setAlertType('draft');
@@ -882,11 +893,11 @@ const BU_Room3D = () => {
               setShowAlert(true);
               setAlertType('save');
             }
-    
+
             setShowConfirmName(false);
             setIsTemplateValid(true);
             setTemplateName(name);
-    
+
             console.log('Template and screenshot successfully published!');
           } else {
             throw new Error('Template URL is not available in the response');
@@ -898,14 +909,15 @@ const BU_Room3D = () => {
     } catch (error) {
       console.error('Error:', error.message);
       setIsTemplateValid(false);
+    } finally {
+      setSubmitLoading(false); // Reset submit loading to false
     }
-    
   };
 
   const captureScreenshotAndUpload = async (previewUploadUrl) => {
     try {
       const canvas = document.querySelector('canvas');
-  
+
       await new Promise((resolve) => {
         let frames = 5;
         const waitForFrames = () => {
@@ -918,7 +930,7 @@ const BU_Room3D = () => {
         };
         requestAnimationFrame(waitForFrames);
       });
-  
+
       canvas.toBlob(async (blob) => {
         await axios.put(previewUploadUrl, blob, {
           headers: {
@@ -926,14 +938,13 @@ const BU_Room3D = () => {
             'Content-Disposition': 'attachment',
           },
         });
-  
+
         console.log("Uploaded screenshot successfully");
       }, 'image/png');
     } catch (error) {
       console.error('Error capturing or uploading screenshot:', error);
     }
   };
-  
 
   // Update Template Functions
   const handleChangeUpdateName = () => {
@@ -958,6 +969,8 @@ const BU_Room3D = () => {
 
       const glbData = await convertToGLB(sceneRef.current);
 
+      setPageLoading(true); // Set page loading to true
+
       const response = await fetch('https://api.sensespacesplanningtool.com/template/update', {
         method: 'POST',
         headers: {
@@ -971,7 +984,7 @@ const BU_Room3D = () => {
           "is_draft": isDraft
         }),
       });
-  
+
       if (response.ok) {
         await axios.put(
           roomLayoutUrl,
@@ -994,6 +1007,8 @@ const BU_Room3D = () => {
       }
     } catch (error) {
       console.error('Error converting to GLB or updating:', error);
+    } finally {
+      setPageLoading(false); // Reset page loading to false
     }
 
     setShowConfirmSave(false);
@@ -1030,6 +1045,54 @@ const BU_Room3D = () => {
 
   return (
     <div className="relative w-full h-full">
+      {isLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Oval
+            height={80}
+            width={80}
+            color="#808080"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#808080"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+      {submitLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Oval
+            height={80}
+            width={80}
+            color="#808080"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#808080"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
+      {pageLoading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+          <Oval
+            height={80}
+            width={80}
+            color="#808080"
+            wrapperStyle={{}}
+            wrapperClass=""
+            visible={true}
+            ariaLabel='oval-loading'
+            secondaryColor="#808080"
+            strokeWidth={2}
+            strokeWidthSecondary={2}
+          />
+        </div>
+      )}
       <div ref={mountRef} className="w-full h-screen cursor-default" />
       <div className="absolute top-4 left-4 flex flex-col space-y-4">
         {roomLayoutUrl ? (
@@ -1192,6 +1255,7 @@ const BU_Room3D = () => {
           }}
           onOk={handleConfirmName}
           isTemplateValid={isTemplateValid}
+          isLoading={submitLoading} // Pass loading state to ConfirmNamePopup
         />
       )}
       {showConfirmChangeDimension && (

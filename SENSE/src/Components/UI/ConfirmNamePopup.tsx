@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Oval } from 'react-loader-spinner';
 
-const ConfirmNamePopup = ({ title, onClose, onOk, isTemplateValid }) => {
+const ConfirmNamePopup = ({ title, onClose, onOk, isTemplateValid, isLoading }) => {
     const [inputValue, setInputValue] = useState('');
 
     const handleSubmit = () => {
@@ -36,9 +37,25 @@ const ConfirmNamePopup = ({ title, onClose, onOk, isTemplateValid }) => {
                     <div className="mx-auto">
                         <button 
                             onClick={handleSubmit}
-                            className="bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded"
+                            className={`bg-blue-500 hover:bg-blue-600 text-white px-5 py-2 rounded flex items-center ${isLoading ? 'bg-gray-500' : ''}`}
+                            disabled={isLoading}
                         >
-                            Submit
+                            {isLoading ? (
+                                <div className="flex items-center">
+                                    <Oval
+                                        height={20}
+                                        width={20}
+                                        color="#ffffff"
+                                        ariaLabel='oval-loading'
+                                        secondaryColor="#ffffff"
+                                        strokeWidth={2}
+                                        strokeWidthSecondary={2}
+                                    />
+                                    <span className="ml-2">Loading...</span>
+                                </div>
+                            ) : (
+                                'Submit'
+                            )}
                         </button>
                     </div>
                 </div>
