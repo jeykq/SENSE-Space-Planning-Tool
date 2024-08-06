@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
-import Topbar from '../BusinessUser/Topbar';
+import Topbar from '../FreeUser/Topbar';
 import AlertPopup from '../UI/AlertPopup'; // Import AlertPopup component
 
 const SA_ViewUserAccount = () => {
@@ -170,39 +170,39 @@ const SA_ViewUserAccount = () => {
   return (
     <div>
       <Topbar title="User Details" onClick={handleGoBack} />
-      <div className="flex flex-col items-center justify-center mt-5">
-        <div className="rounded-lg p-8 max-w-md w-full bg-gray-300 shadow">
+      <div className="flex flex-col items-center justify-center mt-10">
+        <div className="rounded-lg p-8 max-w-md w-full shadow-lg" style={{backgroundColor: "#fcfcfc"}}>
           <h2 className="text-3xl text-center mb-4">User Information</h2>
           <div className="flex-grow flex items-center justify-center p-4">
             <div className="w-full max-w-md">
               <div className="mb-4 flex">
                 <div className="w-1/2 mr-2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">First Name</label>
-                  <span className="input-value bg-gray-100 rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.first_name}</span>
+                  <span className="input-value rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.first_name}</span>
                 </div>
                 <div className="w-1/2 ml-2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">Last Name</label>
-                  <span className="input-value bg-gray-100 rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.last_name}</span>
+                  <span className="input-value rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.last_name}</span>
                 </div>
               </div>
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <span className="input-value bg-gray-100 rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.email}</span>
+                <span className="input-value rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.email}</span>
               </div>
               <div className="mb-4 flex">
                 <div className="w-1/2 mr-2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">Date of Birth</label>
-                  <span className="input-value bg-gray-100 rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.dob.split('T')[0]}</span>
+                  <span className="input-value  rounded w-full py-2 px-3 border shadow text-gray-700 block">{userDetails.dob.split('T')[0]}</span>
                 </div>
                 <div className="w-1/2 ml-2">
                   <label className="block text-gray-700 text-sm font-bold mb-2">Job Industry</label>
-                  <span className="input-value bg-gray-100 rounded w-full py-2 px-3 border shadow text-gray-700 block">{jobIndustryMapping[userDetails.job_industry_id]}</span>
+                  <span className="input-value rounded w-full py-2 px-3 border shadow text-gray-700 block">{jobIndustryMapping[userDetails.job_industry_id]}</span>
                 </div>
               </div>
               <div className="mb-4 flex items-center justify-center">
-                <label className="block text-gray-700 text-base font-bold mb-2 mr-1.5">User Type</label>
+                <label className="block text-gray-700 text-base font-bold mb-2 mr-1.5 mt-1">User Type</label>
                 <select
-                  className="ml-2 px-4 py-2 rounded bg-gray-200 text-gray-800"
+                  className="ml-2 px-4 py-2 rounded bg-blue-100 text-gray-800 shadow"
                   value={userDetails.role}
                   onChange={e => setUserDetails({ ...userDetails, role: e.target.value })}
                 >
@@ -213,7 +213,7 @@ const SA_ViewUserAccount = () => {
               </div>
               <div className="flex items-center justify-center">
                 <button 
-                  className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-200 transition-colors duration-300 hover:bg-gray-400 hover:text-white"
+                  className="mt-4 text-gray-800 font-semibold py-2 px-4 rounded bg-gray-300 transition-colors duration-300 hover:bg-gray-400 hover:text-white"
                   onClick={handleSave}
                 >
                   Save
