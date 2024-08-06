@@ -16,29 +16,32 @@ const BU_ViewObjects = () => {
 
   const fetchObjData = async () => {
     const token = localStorage.getItem('authToken');
-
+  
     if (!token) {
       navigate('/login');
       return;
     }
-
+  
     const headers = {
       'Content-Type': 'application/json',
       'sense-token': token
     };
-
+  
     try {
       const response = await axios.post(
         'https://api.sensespacesplanningtool.com/object/list',
         {},
         { headers: headers }
       );
-      const filteredObjects = response.data.body.filter(object => object.category_ids.includes(catId));
+      const filteredObjects = response.data.body.filter(object => 
+        object.category_ids && object.category_ids.includes(catId)
+      );
       setObjects(filteredObjects || []);
     } catch (err) {
       console.error('API Error', err);
     }
   };
+  
 
   useEffect(() => {
     fetchObjData();
