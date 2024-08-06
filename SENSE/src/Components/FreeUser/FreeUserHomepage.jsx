@@ -359,7 +359,7 @@ const FreeUserHomepage = () => {
         </div>
       </div>
 
-      <hr style={{ border: "1px solid black" }} />
+      <hr className="border border-black" />
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontWeight: "500" }}>
         <div className={"mt-5 ml-5"}>

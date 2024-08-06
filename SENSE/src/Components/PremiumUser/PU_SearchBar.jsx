@@ -17,27 +17,26 @@ const PU_SearchBar = ({ handleSearch }) => {
   };
 
   return (
-    <div style={{ display: "flex", alignItems: "center" }}>
-      <form onSubmit={handleSubmit} style={{ display: "flex", alignItems: "center" }}>
+    <div className="flex items-center">
+      <form onSubmit={handleSubmit} className="flex items-center">
         <input
           type="text"
           placeholder="Search..."
           onChange={handleSearchChange}
-          className="border text-black"
-          style={{ borderRadius: "5px", padding: "8px 5px", marginRight: "5px", width: "250px" }}
+          className="border text-black rounded px-2 py-1 mr-1.5 w-[250px]"
         />
-        <label style={{ marginRight: "20px", padding: "20px 10px", borderRadius: "2px" }} className="text-black dark:text-white">Filter by:</label>
-        <select className="border rounded text-black" onChange={handleTypeChange} value={searchType} style={{padding: "5px 5px", marginRight: "5px" }}>
+        <label className="mr-5 px-2.5 py-5 text-black dark:text-white rounded">Filter by:</label>
+        <select
+          className="border rounded text-black px-1.5 py-1 mr-1.5"
+          onChange={handleTypeChange}
+          value={searchType}
+        >
           <option value="name">Name</option>
           <option value="category">Category</option>
         </select>
-        {/* <button type="submit" style={{ border: "none", borderRadius: "40px", background: "white", cursor: "pointer", padding: "5px 10px" }}>
-          <svg className="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
-            <path stroke="currentColor" strokeLinecap="round" strokeWidth="2" d="m21 21-3.5-3.5M17 10a7 7 0 1 1-14 0 7 7 0 0 1 14 0Z"/>
-          </svg>
-        </button> */}
       </form>
     </div>
+
   );
 };
 
