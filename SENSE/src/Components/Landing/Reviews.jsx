@@ -8,6 +8,28 @@ import { getHeaders } from '../../../apiUtils'; // Import the getHeaders functio
 
 const Reviews = () => {
     const [reviews, setReviews] = useState([]);
+    const [jobIndustries, setJobIndustries] = useState({});
+
+    useEffect(() => {
+        const fetchJobIndustries = async () => {
+            try {
+                const response = await axios.post(
+                    'https://api.sensespacesplanningtool.com/job_industry/list',
+                    {},
+                    { headers: getHeaders() }
+                );
+                const industryMap = response.data.body.reduce((acc, industry) => {
+                    acc[industry.id] = industry.name;
+                    return acc;
+                }, {});
+                setJobIndustries(industryMap);
+            } catch (error) {
+                console.error('Error fetching job industries:', error.message);
+            }
+        };
+
+        fetchJobIndustries();
+    }, []);
 
     useEffect(() => {
         const fetchReviews = async () => {
@@ -17,7 +39,7 @@ const Reviews = () => {
                     {},
                     { headers: getHeaders() }
                 );
-    
+
                 const filteredReviews = response.data.body
                     .filter(user => user.review && user.rating)
                     .sort((a, b) => {
@@ -27,16 +49,15 @@ const Reviews = () => {
                         return b.last_review_timestamp - a.last_review_timestamp;
                     })
                     .slice(0, 10); // Get the top 10 reviews
-    
+
                 setReviews(filteredReviews);
             } catch (error) {
                 console.error('Error fetching reviews:', error.message);
             }
         };
-    
+
         fetchReviews();
     }, []);
-    
 
     const renderStars = (rating) => {
         return [...Array(5)].map((_, index) => (
@@ -52,7 +73,11 @@ const Reviews = () => {
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(' ');
     };
-    
+
+    const formatDate = (timestamp) => {
+        const date = new Date(timestamp * 1000); // Convert from seconds to milliseconds
+        return date.toLocaleDateString(); // Format the date as a string
+    };
 
     const settings = {
         dots: true,
@@ -87,15 +112,22 @@ const Reviews = () => {
                 <Slider {...settings}>
                     {reviews.map((review, index) => (
                         <div key={index} className='bg-white h-[400px] text-black rounded-xl shadow-lg p-6 flex flex-col items-center overflow-hidden'>
+                            <p className='text-xs text-left text-gray-500'>
+                                    {formatDate(review.last_review_timestamp)}
+                                </p>
                             <img src={userImage} alt={`${review.first_name} ${review.last_name}`} className='w-20 h-20 rounded-full mb-4 object-cover mx-auto' />
                             <div className='flex flex-col items-center gap-4'>
-                                <p className='text-xl font-semibold text-center'>
+                                <p className='text-xl font-semibold text-center text-gray-800'>
                                     {`${capitalizeName(review.first_name)} ${capitalizeName(review.last_name)}`}
+                                </p>
+                                <p className='text-sm text-center text-gray-500'>
+                                   Occupation - {jobIndustries[review.job_industry_id]}
                                 </p>
                                 <div style={styles.stars}>
                                     {renderStars(review.rating)}
                                 </div>
-                                <p className='text-justify overflow-hidden text-ellipsis'>{review.review}</p>
+                                <p className='text-justify overflow-hidden text-ellipsis text-gray-700'>{review.review}</p>
+                                
                             </div>
                         </div>
                     ))}
@@ -108,7 +140,7 @@ const Reviews = () => {
 const styles = {
     stars: {
         display: 'flex',
-        marginBottom: '10px',
+        marginBottom: '0px',
     },
     starFilled: {
         fontSize: '24px',
