@@ -16,6 +16,7 @@ const BU_UpdateObjectInfo = () => {
     const [tagName, setTagNames] = useState([]);
     const [categoryName, setCategoryName] = useState("");
     const [productDescription, setProductDescription] = useState('');
+    const [nameError, setNameError] = useState('');
 
     const [showAlert, setShowAlert] = useState(false);
 
@@ -31,6 +32,28 @@ const BU_UpdateObjectInfo = () => {
         setProductDescription(productDesc);
         fetchCategoriesAndTags();
     }, []);
+
+    const checkObjectName = async (name) => {
+        try {
+            const headers = getHeaders();
+            const response = await axios.post('https://api.sensespacesplanningtool.com/object/list', {}, { headers });
+            const objects = response.data.body;
+            const duplicate = objects.some(object => object.name.toLowerCase() === name.toLowerCase());
+    
+            if (duplicate) {
+                setNameError('Name already exists! Please choose another name');
+            } else {
+                setNameError('');
+            }
+        } catch (error) {
+            console.error('Error checking object name:', error);
+        }
+    };
+
+    const handleObjectNameChange = (e) => {
+        setObjectName(e.target.value);
+        checkObjectName(e.target.value);
+    };
 
     const fetchCategoriesAndTags = async () => {
         try {
@@ -118,13 +141,16 @@ const BU_UpdateObjectInfo = () => {
                             <label htmlFor="objectName">Object Name:</label>
                         </div>
                         <div className="col-span-3">
-                            <input
-                                type="text"
-                                className="border border-gray-400 w-full py-1 px-2 rounded"
-                                value={objectName}
-                                onChange={(e) => setObjectName(e.target.value)}
-                                required
-                            />
+                        <input
+                            type="text"
+                            className="border border-gray-400 w-full py-1 px-2 rounded"
+                            value={objectName}
+                            onChange={handleObjectNameChange}
+                            required
+                        />
+                        {nameError && (
+                            <p className="text-left text-red-500 mt-1">{nameError}</p>
+                        )}
                         </div>
                         <div className="col-span-1 text-right self-center font-semibold">
                             <label htmlFor="objectCat">Category:</label>

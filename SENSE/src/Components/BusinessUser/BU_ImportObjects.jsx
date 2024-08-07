@@ -22,6 +22,7 @@ const BU_ImportObjects = ({ submit }) => {
     const fileInputRef = useRef(null);
     const [objUrl, setObjUrl] = useState('');
     const [mtlUrl, setMtlUrl] = useState('');
+    const [nameError, setNameError] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [screenshotDataUrl, setScreenshotDataUrl] = useState('');
 
@@ -30,7 +31,8 @@ const BU_ImportObjects = ({ submit }) => {
 
     const navigate = useNavigate();
     const handleGoBack = () => {
-        navigate(-1);
+        setShowAlert(false);
+        window.location.href = "/BusinessUserHomepage";
     };
 
     useEffect(() => {
@@ -38,6 +40,28 @@ const BU_ImportObjects = ({ submit }) => {
         window.scrollTo(0, 0);
     }, []);
 
+    const checkObjectName = async (name) => {
+        try {
+            headers = getHeaders();
+            const response = await axios.post('https://api.sensespacesplanningtool.com/object/list', {}, { headers });
+            const objects = response.data.body;
+            const duplicate = objects.some(object => object.name.toLowerCase() === name.toLowerCase());
+    
+            if (duplicate) {
+                setNameError('Name already exists! Please choose another name');
+            } else {
+                setNameError('');
+            }
+        } catch (error) {
+            console.error('Error checking object name:', error);
+        }
+    };
+
+    const handleObjectNameChange = (e) => {
+        setObjectName(e.target.value);
+        checkObjectName(e.target.value);
+    };
+    
     const fetchCategoriesAndTags = async () => {
         try {
             headers = getHeaders();
@@ -267,9 +291,12 @@ const BU_ImportObjects = ({ submit }) => {
                                 placeholder="Enter Object name..."
                                 className="border border-gray-400 w-full py-2 px-3 rounded"
                                 value={objectName}
-                                onChange={(e) => setObjectName(e.target.value)}
+                                onChange={handleObjectNameChange}
                                 required
                             />
+                            {nameError && (
+                                <p className="text-left text-red-500 mt-1">{nameError}</p>
+                            )}
                         </div>
                         <div className="col-span-1 flex flex-col justify-center items-end">
                             <label htmlFor="obj_cat" className="font-bold">Category:</label>
