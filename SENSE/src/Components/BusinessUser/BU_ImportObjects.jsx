@@ -143,8 +143,9 @@ const BU_ImportObjects = ({ submit }) => {
 
     const handleOK = () => {
         setShowAlert(false);
-        navigate("/BusinessUserHomepage");
+        window.location.href = "/BusinessUserHomepage";
     };
+    
 
     const handleImportClick = () => {
         if (!objectName.trim()) {
