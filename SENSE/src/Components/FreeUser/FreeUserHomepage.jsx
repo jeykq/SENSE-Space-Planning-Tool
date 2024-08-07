@@ -321,7 +321,7 @@ const FreeUserHomepage = () => {
 
       <div style={{ paddingTop: "30px", paddingLeft: "20px", fontWeight: "500" }}>
         <div className={"mt-20 ml-5"}>
-          <p style={{ marginRight: '10px', fontSize: "25px" }}>Room Designs</p>
+          <p style={{ marginRight: '10px', fontSize: "25px" }}>Recent Designs</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '15px' }}>
           <FU_SearchBar handleSearch={handleSearch} />

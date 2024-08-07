@@ -128,7 +128,7 @@ const UpdateAccount = () => {
     <div className="bg-white dark:bg-zinc-800 h-screen">
       {renderTopbar()}
       <div className="flex flex-col items-center justify-center mt-5">
-        <div className="rounded-lg p-8 max-w-md w-full bg-[#EDEFF7] dark:bg-zinc-700 dark:text-white">
+        <div className="rounded-lg p-8 max-w-md w-full bg-[#EDEFF7] dark:bg-zinc-700 dark:text-white mt-10">
           <h2 className="text-3xl text-center mb-4">Account Information</h2>
           <div className="flex-grow flex items-center justify-center p-4">
             <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -153,7 +153,10 @@ const UpdateAccount = () => {
                 </div>
                 <div className="w-1/2 ml-2">
                   <label htmlFor="industry" className="block text-gray-700 dark:text-white text-sm font-bold mb-2">Job Industry</label>
-                  <select id="industry" name="industry" className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" value={industry} onChange={(e) => setIndustry(e.target.value)} required>
+                  <select id="industry" name="industry" 
+                    className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" 
+                    value={industry} 
+                    onChange={(e) => setIndustry(e.target.value)} required>
                     <option value="" disabled hidden>-</option>
                     {jobIndustryOptions.map(option => (
                       <option key={option.value} value={option.value}>{option.label}</option>
@@ -184,7 +187,7 @@ const UpdateAccount = () => {
       {isAlertVisible && (
         <AlertPopup
           title="Success"
-          text="Account Updated Successfully"
+          text="Account Updated Successfully!"
           onClose={handleAlertClose}
           onOk={handleAlertOk}
         />
