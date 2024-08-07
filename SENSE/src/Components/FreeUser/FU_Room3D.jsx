@@ -917,7 +917,7 @@ const FU_Room3D = () => {
   return (
     <div className="relative w-full h-full">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <Oval
             height={80}
             width={80}
@@ -933,7 +933,7 @@ const FU_Room3D = () => {
         </div>
       )}
       {pageLoading && ( 
-        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-50">
+        <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
           <Oval
             height={80}
             width={80}
