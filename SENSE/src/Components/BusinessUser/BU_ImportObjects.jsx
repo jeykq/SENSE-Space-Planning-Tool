@@ -5,6 +5,7 @@ import Topbar from '../BusinessUser/Topbar';
 import { getHeaders } from '../../../apiUtils';
 import AlertPopup from '../UI/AlertPopup';
 import axios from 'axios';
+import { Oval } from 'react-loader-spinner';
 
 const BU_ImportObjects = ({ submit }) => {
     const [showAlert, setShowAlert] = useState(false);
@@ -25,6 +26,7 @@ const BU_ImportObjects = ({ submit }) => {
     const [nameError, setNameError] = useState('');
     const [fileContent, setFileContent] = useState(null);
     const [screenshotDataUrl, setScreenshotDataUrl] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     let previewUploadUrl;
     let headers;
@@ -93,6 +95,7 @@ const BU_ImportObjects = ({ submit }) => {
 
         if (objFile && mtlFile && isObjectNameFilled) {
             try {
+                setIsLoading(true); // Set loading state to true
                 const headers = getHeaders();
 
                 const data = {
@@ -159,6 +162,8 @@ const BU_ImportObjects = ({ submit }) => {
 
             } catch (error) {
                 console.error('Error uploading files:', error);
+            } finally {
+                setIsLoading(false); // Reset loading state to false
             }
         } else {
             alert('Please select both .obj and .mtl files to upload.');
@@ -402,7 +407,21 @@ const BU_ImportObjects = ({ submit }) => {
                             className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition-all cursor-pointer"
                             disabled={!isObjectNameFilled || !objFile || !mtlFile}
                         >
-                            Save
+                            {isLoading ? (
+                                <Oval
+                                    height={20}
+                                    width={20}
+                                    color="#ffffff"
+                                    wrapperStyle={{ display: 'inline-block', verticalAlign: 'middle' }}
+                                    visible={true}
+                                    ariaLabel='oval-loading'
+                                    secondaryColor="#ffffff"
+                                    strokeWidth={2}
+                                    strokeWidthSecondary={2}
+                                />
+                            ) : (
+                                'Save'
+                            )}
                         </button>
                     </div>
                 </form>

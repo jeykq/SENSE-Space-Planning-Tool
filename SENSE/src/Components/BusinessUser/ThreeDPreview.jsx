@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { Oval } from 'react-loader-spinner';
 
 const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
     const containerRef = useRef(null);
@@ -10,6 +11,7 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
     const rendererRef = useRef(null);
     const cameraRef = useRef(null);
     const controlsRef = useRef(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (objUrl && mtlUrl) {
@@ -72,6 +74,7 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
                             camera.lookAt(new THREE.Vector3(0, 0, 0));
 
                             animate();
+                            setLoading(false); // Stop the loader when rendering is complete
                             if (onRenderComplete) {
                                 onRenderComplete();
                             }
@@ -79,12 +82,14 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
                         undefined,
                         (error) => {
                             console.error('Error loading OBJ:', error);
+                            setLoading(false); // Stop the loader in case of error
                         }
                     );
                 },
                 undefined,
                 (error) => {
                     console.error('Error loading MTL:', error);
+                    setLoading(false); // Stop the loader in case of error
                 }
             );
 
@@ -100,16 +105,35 @@ const ThreeDPreview = ({ objUrl, mtlUrl, onRenderComplete }) => {
                 if (rendererRef.current) {
                     rendererRef.current.dispose();
                 }
-                while (containerRef.current.firstChild) {
-                    containerRef.current.removeChild(containerRef.current.firstChild);
+                if (containerRef.current && containerRef.current.contains(renderer.domElement)) {
+                    containerRef.current.removeChild(renderer.domElement);
                 }
             };
         }
     }, [objUrl, mtlUrl, onRenderComplete]);
 
     return (
-        <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
+        <div ref={containerRef} style={{ width: '100%', height: '100%', position: 'relative' }}>
+            {loading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50 z-50">
+                    <Oval
+                        height={80}
+                        width={80}
+                        color="#808080"
+                        wrapperStyle={{}}
+                        wrapperClass=""
+                        visible={true}
+                        ariaLabel='oval-loading'
+                        secondaryColor="#808080"
+                        strokeWidth={2}
+                        strokeWidthSecondary={2}
+                    />
+                </div>
+            )}
+        </div>
     );
 };
 
-export default ThreeDPreview;
+export default React.memo(ThreeDPreview, (prevProps, nextProps) => {
+    return prevProps.objUrl === nextProps.objUrl && prevProps.mtlUrl === nextProps.mtlUrl;
+});
