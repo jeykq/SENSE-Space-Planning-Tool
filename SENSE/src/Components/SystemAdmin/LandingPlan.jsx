@@ -137,11 +137,11 @@ const LandingPlan = () => {
         {/* Premium */}
         <div className={`w-96 bg-white rounded-lg p-6 ${editMode ? 'h-auto' : 'h-80'}`} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
           <div className="text-center mb-6">
-            <div className="bg-yellow-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
+            <div className="bg-orange-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
           </div>
           <img src={premiumImage} alt="Premium" className="mx-auto mb-6 w-35 h-30" />
           <div className="text-center mb-6">
-            <div className="bg-yellow-500 text-white py-2 px-4 rounded-full inline-block">Buy Plan</div>
+            <div className="bg-orange-500 text-white py-2 px-4 rounded-full inline-block">Buy Plan</div>
           </div>
           <hr className="border-gray-400 mb-6" />
           {renderFeatures(editMode ? editedPremiumFeatures : premiumFeatures, 'premium')}

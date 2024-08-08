@@ -61,11 +61,11 @@ const Plan = () => {
       {/* Premium */}
       <div className="w-80 bg-white rounded-lg p-6 m-4" style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.3)' }}>
         <div className="text-center mb-6">
-          <div className="bg-yellow-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
+          <div className="bg-orange-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
         </div>
         <img src={premiumImage} alt="Premium" className="mx-auto mb-6 w-35 h-30" />
         <div className="text-center mb-6">
-          <button onClick={handleClickBuyPlan} className="bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-full">Buy Plan</button>
+          <button onClick={handleClickBuyPlan} className="bg-orange-500 hover:bg-orange-600 text-white py-2 px-4 rounded-full">Buy Plan</button>
         </div>
         <hr className="border-gray-400 mb-6" />
         {editedPremiumFeatures.length > 0 ? renderFeatures(editedPremiumFeatures) : <p>No features available</p>}

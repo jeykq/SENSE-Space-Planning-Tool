@@ -326,7 +326,7 @@ const BusinessUserHomepage = () => {
 
       <div style={{ paddingTop: "20px"}}>
         <div className="items-center" style={{ width: "100%" }}>
-          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", width: "100%", overflow: 'hidden'}}>
+          <div ref={swiperContainer2} className="swiper-container" style={{ paddingLeft: "20px", paddingRight: "20px", height: '120px', width: "100%", overflow: 'hidden'}}>
             <div className="swiper-wrapper">
               {objectCategories.map((objectCategory, index) => (
                 <div key={index} className="swiper-slide">
