@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Topbar from './Topbar';
 
 const PU_FillRoomInfo = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { selectedOption } = location.state || {};
   const [roomType, setRoomType] = useState('');
   const [roomLength, setRoomLength] = useState('');
   const [roomWidth, setRoomWidth] = useState('');
@@ -16,7 +19,8 @@ const PU_FillRoomInfo = () => {
           roomType,
           roomLength: parseFloat(roomLength), 
           roomWidth: parseFloat(roomWidth), 
-          roomHeight: parseFloat(roomHeight) 
+          roomHeight: parseFloat(roomHeight), 
+          selectedOption: selectedOption 
         } 
       });
     } else {

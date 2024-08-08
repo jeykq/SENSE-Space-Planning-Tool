@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ObjCategory from './ObjCategory';
 import axios from 'axios';
 
-const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
+const AddObjDropdown = ({ closeDropdown, categoryData, objectListData, selectedOption }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [tags, setTags] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -24,6 +24,23 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         }
     };
 
+    const getSelectedTagIds = () => {
+        switch (selectedOption) {
+            case 'autism':
+                return ['1'];
+            case 'kids':
+                return ['2', '4'];
+            case 'mentally_challenged':
+                return ['5'];
+            case 'peaceful_environment':
+                return ['9'];
+            case 'employees':
+                return ['8'];
+            default:
+                return [];
+        }
+    };
+
     useEffect(() => {
         const fetchTags = async () => {
             try {
@@ -41,6 +58,8 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                 }));
 
                 setTags(response.data.body);
+                const selectedTagIds = getSelectedTagIds();
+                setSelectedTags(selectedTagIds);
                 setAuthError(null);
             } catch (error) {
                 console.error('Error fetching tags:', error);
@@ -49,7 +68,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         };
 
         fetchTags();
-    }, []);
+    }, [selectedOption]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -97,22 +116,22 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         ...objectListData,
         body: objectListData?.body?.filter(obj => 
             obj.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (selectedTags.length === 0 || selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag))))
+            (selectedTags.length === 0 || (obj.tag_ids && obj.tag_ids.length > 0 && selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag)))))
         )
     };
 
     const getTagNames = () => {
         return selectedTags
             .map(tagId => {
-                const tag = tags.find(tag => tag.id === parseInt(tagId));
+                const tag = tags.find(tag => tag.id.toString() === tagId);
                 return tag ? tag.name : '';
             })
             .filter(tagName => tagName !== '');
     };
 
     return (
-        <div className="w-full mt-2 bg-white dark:bg-zinc-700 p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
-            <div className="flex pb-1 mb-2 border-b border-black dark:border-white text-black dark:text-white justify-between items-center">
+        <div className="w-full mt-2 bg-white p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
+            <div className="flex pb-1 mb-2 border-b border-black justify-between items-center">
                 <h3 className="text-lg font-semibold uppercase">Object catalogue</h3>
             </div>
             {authError && <div className="text-red-500 mb-2">{authError}</div>}
@@ -122,9 +141,9 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                     placeholder="Search objects by name..."
                     value={searchQuery}
                     onChange={handleSearch}
-                    className="w-full p-2 bg-white dark:bg-zinc-200 text-black border border-gray-300 rounded-md"
+                    className="w-full p-2 border border-gray-300 rounded-md"
                 />
-                <div className="mt-2 p-2 bg-white dark:bg-zinc-400 border border-gray-300 rounded-md shadow-lg z-10">
+                <div className="mt-2 p-2 bg-white border border-gray-300 rounded-md shadow-lg z-10">
                     <div className="flex justify-between items-center">
                         <h4 className="text-sm font-semibold">Filter by tags</h4>
                     </div>
@@ -140,7 +159,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                             <label key={tag.id} className="mb-2 flex items-center">
                                 <input
                                     type="checkbox"
-                                    value={tag.id}
+                                    value={tag.id.toString()}
                                     onChange={handleTagChange}
                                     className="mr-1"
                                     checked={selectedTags.includes(tag.id.toString())}
@@ -150,7 +169,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         ))}
                     </div>
                 </div>
-            </div>
+                </div>
             {filteredObjectListData.body && filteredObjectListData.body.length > 0 ? (
                 <div className="mt-4">
                     {categoryData?.body?.map((cat) => (

@@ -44,7 +44,7 @@ const PU_CreateRoom = () => {
       alert("Please select an option before proceeding.");
       return;
     } else {
-      navigate('/FU_SelectTemplate', { state: { templates } });
+      navigate('/FU_SelectTemplate', { state: { templates, selectedOption } });
     }
   };
 
@@ -53,7 +53,7 @@ const PU_CreateRoom = () => {
       alert("Please select an option before proceeding.");
       return;
     } else {
-      navigate('/FU_DrawRoom');
+      navigate('/FU_DrawRoom', { state: { selectedOption } });
     }
   };
 
@@ -73,7 +73,7 @@ const PU_CreateRoom = () => {
           className="border border-gray-400 py-2 px-2 w-72 text-center rounded"
         >
           <option value="">-</option>
-          <option value="autistic_person">Autistic person</option>
+          <option value="autism">Autistic person</option>
           <option value="kids">Kids</option>
           <option value="mentally_challenged">Mentally challenged</option>
           <option value="peaceful_environment">Seeking peaceful environment</option>

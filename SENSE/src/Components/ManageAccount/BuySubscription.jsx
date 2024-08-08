@@ -141,7 +141,7 @@ const BuySubscription = () => {
                 <div className="w-1/2 px-10 py-8 mt-4 flex justify-center">
                     <div className="max-w-[400px] bg-white rounded-lg p-6 m-4 shadow-lg translate-x-12">
                         <div className="text-center mb-6">
-                            <div className="bg-yellow-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
+                            <div className="bg-orange-500 text-white rounded-md py-2 px-4 inline-block">Premium</div>
                         </div>
                         <img src={premiumImage} alt="Premium" className="mx-auto mb-6 w-35 h-30 pointer-events-none" />
                         <hr className="border-gray-400 mb-6" />

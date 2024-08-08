@@ -18,7 +18,7 @@ const PU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { roomId, roomName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, isTemplate, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
+  const { roomId, roomName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, isTemplate, selectedOption, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -1111,7 +1111,7 @@ const PU_Room3D = () => {
         </button>
         {showDropdown && (
           <div className="w-[300px]">
-            <AddObjDropdown handleDragStart={handleDragStart} categoryData={categoryData} objectListData={objectListData} />
+            <AddObjDropdown handleDragStart={handleDragStart} categoryData={categoryData} objectListData={objectListData} selectedOption={selectedOption} />
           </div>
         )}
         {!showDropdown && !isObjectSelected && (

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ObjCategory from './ObjCategory';
 import axios from 'axios';
 
-const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
+const AddObjDropdown = ({ closeDropdown, categoryData, objectListData, selectedOption }) => {
     const [searchQuery, setSearchQuery] = useState("");
     const [tags, setTags] = useState([]);
     const [categories, setCategories] = useState([]);
@@ -24,6 +24,23 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         }
     };
 
+    const getSelectedTagIds = () => {
+        switch (selectedOption) {
+            case 'autism':
+                return ['1'];
+            case 'kids':
+                return ['2', '4'];
+            case 'mentally_challenged':
+                return ['5'];
+            case 'peaceful_environment':
+                return ['9'];
+            case 'employees':
+                return ['8'];
+            default:
+                return [];
+        }
+    };
+
     useEffect(() => {
         const fetchTags = async () => {
             try {
@@ -41,6 +58,8 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                 }));
 
                 setTags(response.data.body);
+                const selectedTagIds = getSelectedTagIds();
+                setSelectedTags(selectedTagIds);
                 setAuthError(null);
             } catch (error) {
                 console.error('Error fetching tags:', error);
@@ -49,7 +68,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         };
 
         fetchTags();
-    }, []);
+    }, [selectedOption]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -97,14 +116,14 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         ...objectListData,
         body: objectListData?.body?.filter(obj => 
             obj.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (selectedTags.length === 0 || selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag))))
+            (selectedTags.length === 0 || (obj.tag_ids && obj.tag_ids.length > 0 && selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag)))))
         )
     };
 
     const getTagNames = () => {
         return selectedTags
             .map(tagId => {
-                const tag = tags.find(tag => tag.id === parseInt(tagId));
+                const tag = tags.find(tag => tag.id.toString() === tagId);
                 return tag ? tag.name : '';
             })
             .filter(tagName => tagName !== '');
@@ -140,7 +159,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                             <label key={tag.id} className="mb-2 flex items-center">
                                 <input
                                     type="checkbox"
-                                    value={tag.id}
+                                    value={tag.id.toString()}
                                     onChange={handleTagChange}
                                     className="mr-1"
                                     checked={selectedTags.includes(tag.id.toString())}
@@ -150,7 +169,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         ))}
                     </div>
                 </div>
-            </div>
+                </div>
             {filteredObjectListData.body && filteredObjectListData.body.length > 0 ? (
                 <div className="mt-4">
                     {categoryData?.body?.map((cat) => (

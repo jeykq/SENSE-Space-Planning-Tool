@@ -10,7 +10,6 @@ import './FU_SelectTemplate.css';
 const FU_SelectTemplate = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const templates = location.state.templates || [];
   const [templateName, setTemplateNames] = useState('');
   const [roomTypes, setRoomTypes] = useState([]);
   const [selectedTemplate, setSelectedTemplate] = useState(null);
@@ -21,6 +20,8 @@ const FU_SelectTemplate = () => {
 
   const [hoveredTemplate, setHoveredTemplate] = useState(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+
+  const { templates, selectedOption } = useLocation().state || {};
 
   useEffect(() => {
     const fetchRoomTypes = async () => {
@@ -125,7 +126,8 @@ const FU_SelectTemplate = () => {
         roomWidth: selectedTemplate.dimension.width,
         roomHeight: selectedTemplate.dimension.height,
         roomLayoutUrl: selectedTemplate.room_layout.room_layout,
-        isTemplate: true
+        isTemplate: true,
+        selectedOption: selectedOption
       }
     });
   };

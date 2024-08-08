@@ -97,7 +97,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         ...objectListData,
         body: objectListData?.body?.filter(obj => 
             obj.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-            (selectedTags.length === 0 || selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag))))
+            (selectedTags.length === 0 || (obj.tag_ids && obj.tag_ids.length > 0 && selectedTags.every(tag => obj.tag_ids.includes(parseInt(tag)))))
         )
     };
 
@@ -114,9 +114,6 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
         <div className="w-full mt-2 bg-white p-4 rounded shadow-lg max-h-[85vh] overflow-y-scroll">
             <div className="flex pb-1 mb-2 border-b border-black justify-between items-center">
                 <h3 className="text-lg font-semibold uppercase">Object catalogue</h3>
-                <button onClick={closeDropdown} className="text-black text-lg">
-                    &times;
-                </button>
             </div>
             {authError && <div className="text-red-500 mb-2">{authError}</div>}
             <div className="relative mb-4" ref={dropdownRef}>
@@ -153,7 +150,7 @@ const AddObjDropdown = ({ closeDropdown, categoryData, objectListData }) => {
                         ))}
                     </div>
                 </div>
-            </div>
+                </div>
             {filteredObjectListData.body && filteredObjectListData.body.length > 0 ? (
                 <div className="mt-4">
                     {categoryData?.body?.map((cat) => (
