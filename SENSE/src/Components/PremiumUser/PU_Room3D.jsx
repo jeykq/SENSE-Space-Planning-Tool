@@ -1000,7 +1000,7 @@ const PU_Room3D = () => {
   const [showConfirmExit, setShowConfirmExit] = useState(false);
 
   const handleConfirmExit = () => {
-    navigate('/PremiumUserHomepage');
+    window.location.href = "/PremiumUserHomepage";
   };
 
   return (

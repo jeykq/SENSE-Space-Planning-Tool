@@ -911,8 +911,9 @@ const FU_Room3D = () => {
   const [showConfirmExit, setShowConfirmExit] = useState(false);
 
   const handleConfirmExit = () => {
-    navigate('/FreeUserHomepage');
+    window.location.href = "/FreeUserHomepage";
   };
+
 
   return (
     <div className="relative w-full h-full">

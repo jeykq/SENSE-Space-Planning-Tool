@@ -1040,7 +1040,7 @@ const BU_Room3D = () => {
   const [showConfirmExit, setShowConfirmExit] = useState(false);
 
   const handleConfirmExit = () => {
-    navigate('/BusinessUserHomepage');
+    window.location.href = "/BusinessUserHomepage";
   };
 
   return (
