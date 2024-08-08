@@ -206,7 +206,7 @@ const SignUpForm = () => {
                 required
               />
               <span>
-                Accept <a href="#" className="text-blue-500">Terms & Conditions</a>
+                Accept <a href="/TermsAndConditions" className="text-blue-500">Terms & Conditions</a>
               </span>
             </div>
             <button className="w-full bg-blue-500 py-3 text-white mt-5 rounded">Sign Up</button>

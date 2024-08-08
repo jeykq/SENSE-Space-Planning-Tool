@@ -195,7 +195,7 @@ const PaidSignUpForm = () => {
             <div className="flex items-center mt-5">
               <input type="checkbox" className="border border-gray-400 mr-2" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} required />
               <span>
-                Accept <a href="#" className="text-blue-500">Terms & Conditions</a>
+                Accept <a href="/TermsAndConditions" className="text-blue-500">Terms & Conditions</a>
               </span>
             </div>
 

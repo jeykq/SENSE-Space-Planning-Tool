@@ -4,6 +4,10 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import SignUpForm from './Components/SignUp/SignUpForm';
 import PaidSignUpForm from './Components/SignUp/PaidSignUpForm';
 import Landing from './Components/Landing/Landing';
+import TermsAndConditions from './Components/Landing/TermsAndConditions';
+import Help from './Components/Landing/Help';
+import TermsOfService from './Components/Landing/TermsOfService';
+import PrivacyPolicy from './Components/Landing/PrivacyPolicy';
 import LoginForm from './Components/Login/LoginForm';
 import BusinessUserHomepage from './Components/BusinessUser/BusinessUserHomepage';
 import FreeUserHomepage from './Components/FreeUser/FreeUserHomepage';
@@ -68,6 +72,10 @@ const App = () => {
     <Router>
       <Routes>
         <Route path="/" exact element={<Landing />} />
+        <Route path="/TermsAndConditions" exact element={<TermsAndConditions />} />
+        <Route path="/Help" exact element={<Help />} />
+        <Route path="/TermsOfService" exact element={<TermsOfService />} />
+        <Route path="/PrivacyPolicy" exact element={<PrivacyPolicy />} />
         <Route path="/signup" element={<SignUpForm />} /> 
         <Route path="/paid-signup" element={<PaidSignUpForm />} />
         <Route path="/login" element={<LoginForm />} />

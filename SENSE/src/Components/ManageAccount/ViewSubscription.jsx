@@ -167,7 +167,7 @@ const ViewSubscription = () => {
                 {accountDetails && accountDetails.role === "SYS_ADMIN" && <Topbar title="Subscription Details" onClick={handleGoBack} />}
 
 
-                <div className="flex h-[90vh] justify-center items-center bg-white dark:bg-zinc-800 h-screen">
+                <div className="flex h-[90vh] justify-center items-center bg-white dark:bg-zinc-800">
                     <TailSpin
                         visible={true}
                         height="25"

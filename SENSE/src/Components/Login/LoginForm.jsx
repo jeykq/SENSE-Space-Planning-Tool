@@ -110,8 +110,8 @@ const LoginForm = () => {
                             
                         </form>
                         <div className="flex mt-8 text-xs text-gray-400">
-                            <a href="#" className="hover:underline">Help</a>
-                            <a href="#" className="ml-4 hover:underline">Terms & Conditions</a>
+                            <a href="/Help" className="hover:underline">Help</a>
+                            <a href="/TermsAndConditions" className="ml-4 hover:underline">Terms & Conditions</a>
                         </div>
                     </div>
                     
