@@ -11,20 +11,32 @@ const PU_DrawRoom = () => {
   const [roomLength, setRoomLength] = useState('');
   const [roomWidth, setRoomWidth] = useState('');
   const [roomHeight, setRoomHeight] = useState('');
+  const [popupVisible, setPopupVisible] = useState(false);
 
   const handleCreateRoom = () => {
-    if (roomType && roomLength && roomWidth && roomHeight) {
+    const length = parseFloat(roomLength);
+    const width = parseFloat(roomWidth);
+    const height = parseFloat(roomHeight);
+
+    if (!roomType) {
+      alert('Please select a Room Type.');
+    } else if (
+      length >= 10 && length <= 50 &&
+      width >= 10 && width <= 50 &&
+      height >= 2 && height <= 10
+    ) {
       navigate('/PU_Room3D', { 
         state: { 
           roomType,
-          roomLength: parseFloat(roomLength), 
-          roomWidth: parseFloat(roomWidth), 
-          roomHeight: parseFloat(roomHeight), 
+          roomLength: length, 
+          roomWidth: width, 
+          roomHeight: height, 
           selectedOption: selectedOption
         } 
       });
     } else {
-      alert('Please fill in all fields.');
+      setPopupVisible(true);
+      setTimeout(() => setPopupVisible(false), 3000); // Hide popup after 3 seconds
     }
   };
 
@@ -35,7 +47,13 @@ const PU_DrawRoom = () => {
   return (
     <div className="bg-white dark:bg-zinc-800 h-full text-black dark:text-white">
       <Topbar title="Create A New Room" onClick={handleGoBack} />
-      <div className="flex flex-col gap-4 items-center min-h-screen mt-10">
+      <div className="flex flex-col gap-4 items-center min-h-screen mt-10 relative">
+        {popupVisible && (
+          <div style={styles.popup}>
+            <span style={styles.close} onClick={() => setPopupVisible(false)}>&times;</span>
+            <p>There are invalid dimensions, please fill in correctly!</p>
+          </div>
+        )}
         <div className="col-span-1 text-2xl text-center self-center mb-1">
           <label htmlFor="room_type">Room type</label>
         </div>
@@ -60,42 +78,57 @@ const PU_DrawRoom = () => {
         <div className="col-span-1 text-center self-center">
           <label htmlFor="room_length">Length</label>
         </div>
-        <div className="col-span-2">
+        <div className="col-span-2 flex flex-col items-center mb-4">
           <input 
-            type="text" 
+            type="number" 
             className="border border-gray-400 py-1 w-72 text-center text-black" 
+            placeholder="Enter Length (10-50 m)"
             value={roomLength}
             onChange={(e) => setRoomLength(e.target.value)} 
             required 
+            step="1"
+            min="10"
+            max="50"
           />
+          <small className="text-gray-500 mt-2">Length should be between 10 and 50 meters.</small>
         </div>
         <div className="col-span-1 text-center self-center">
           <label htmlFor="room_width">Width</label>
         </div>
-        <div className="col-span-2">
+        <div className="col-span-2 flex flex-col items-center mb-4">
           <input 
-            type="text" 
+            type="number" 
             className="border border-gray-400 py-1 w-72 text-center text-black" 
+            placeholder="Enter Width (10-50 m)"
             value={roomWidth}
             onChange={(e) => setRoomWidth(e.target.value)} 
             required 
+            step="1"
+            min="10"
+            max="50"
           />
+          <small className="text-gray-500 mt-2">Width should be between 10 and 50 meters.</small>
         </div>
         <div className="col-span-1 text-center self-center">
           <label htmlFor="room_height">Height</label>
         </div>
-        <div className="col-span-2">
+        <div className="col-span-2 flex flex-col items-center mb-4">
           <input 
-            type="text" 
+            type="number" 
             className="border border-gray-400 py-1 w-72 text-center text-black" 
+            placeholder="Enter Height (2-10 m)"
             value={roomHeight}
             onChange={(e) => setRoomHeight(e.target.value)} 
             required 
+            step="1"
+            min="2"
+            max="10"
           />
+          <small className="text-gray-500 mt-2">Height should be between 2 and 10 meters.</small>
         </div>
         <div className="col-span-4 flex items-center justify-center">
           <button 
-            className="rounded w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase"
+            className="rounded w-max-min text-nowrap bg-blue-500 py-3 text-white px-8 mt-5 uppercase hover:bg-blue-600 transition duration-100"
             onClick={handleCreateRoom}
           >
             Generate Room
@@ -104,6 +137,29 @@ const PU_DrawRoom = () => {
       </div>
     </div>
   );
-}
+};
+
+const styles = {
+  popup: {
+    position: 'absolute',
+    top: '30%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    padding: '20px 40px',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    color: '#fff',
+    borderRadius: '10px',
+    zIndex: 1000,
+    textAlign: 'center',
+    width: '300px'
+  },
+  close: {
+    position: 'absolute',
+    top: '10px',
+    right: '10px',
+    fontSize: '20px',
+    cursor: 'pointer'
+  }
+};
 
 export default PU_DrawRoom;
