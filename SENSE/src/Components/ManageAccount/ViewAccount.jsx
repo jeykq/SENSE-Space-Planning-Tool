@@ -5,7 +5,6 @@ import Topbar from '../FreeUser/Topbar';
 import PremiumUserTopbar from '../PremiumUser/Topbar';
 import axios from 'axios';
 import { getHeaders } from '../../../apiUtils';
-import { faBlackboard } from '@fortawesome/free-solid-svg-icons';
 
 const ViewAccount = () => {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ const ViewAccount = () => {
   const [error, setError] = useState(null);
 
   const handleGoBack = () => {
-    if (accountDetails.role.includes("BUSINESS_USER")) {
+    if (accountDetails.role === "BUSINESS_USER") {
       navigate('/BusinessUserHomePage');
     } else if (accountDetails.role === "FREE_USER") {
       navigate('/FreeUserHomePage');
@@ -60,10 +59,10 @@ const ViewAccount = () => {
 
   useEffect(() => {
     const theme = localStorage.getItem('theme');
-      if (theme && theme == 'dark') {
-        document.documentElement.classList.add("dark");
-      }
-  }, [])
+    if (theme && theme === 'dark') {
+      document.documentElement.classList.add("dark");
+    }
+  }, []);
 
   useEffect(() => {
     const headers = getHeaders(); 
@@ -95,28 +94,22 @@ const ViewAccount = () => {
 
     const fetchJobIndustries = async () => {
       try {
-        const storedJobIndustries = localStorage.getItem('jobIndustries');
-        if (storedJobIndustries) {
-          setJobIndustryMapping(JSON.parse(storedJobIndustries));
-        } else {
-          const response = await axios.post(
-            'https://api.sensespacesplanningtool.com/job_industry/list', 
-            {}, 
-            { headers }
-          );
-
-          if (!response.data || !response.data.body) {
-            throw new Error('No job industries data returned');
-          }
-
-          const jobIndustryMap = {};
-          response.data.body.forEach(job => {
-            jobIndustryMap[job.id] = job.name;
-          });
-
-          localStorage.setItem('jobIndustries', JSON.stringify(jobIndustryMap));
-          setJobIndustryMapping(jobIndustryMap);
+        const response = await axios.post(
+          'https://api.sensespacesplanningtool.com/job_industry/list', 
+          {}, 
+          { headers }
+        );
+  
+        if (!response.data || !response.data.body) {
+          throw new Error('No job industries data returned');
         }
+  
+        const jobIndustryMap = {};
+        response.data.body.forEach(job => {
+          jobIndustryMap[job.id] = job.name;
+        });
+  
+        setJobIndustryMapping(jobIndustryMap);
       } catch (error) {
         console.error('Error fetching job industries:', error);
         setError(error.message);
@@ -135,7 +128,7 @@ const ViewAccount = () => {
     };
 
     fetchData();
-  }, []);
+  }, []); // Removed `navigate` from the dependency array
 
   const formatDate = (dateString) => {
     return new Date(dateString).toISOString().split('T')[0];
@@ -182,13 +175,11 @@ const ViewAccount = () => {
     transition: 'background-color 0.3s, color 0.3s', 
   };
 
-  // Function to handle mouse enter event
   const handleMouseEnter = (event) => {
     event.target.style.backgroundColor = '#c5cbeb'; 
     event.target.style.color = '#6c6d70'; 
   };
 
-  // Function to handle mouse leave event
   const handleMouseLeave = (event) => {
     event.target.style.backgroundColor = '#dde0ed'; 
     event.target.style.color = '#333'; 
@@ -261,74 +252,6 @@ const ViewAccount = () => {
             onMouseLeave={handleMouseLeave}>
             Edit Account
           </button>
-          {accountDetails.role.includes("BUSINESS_USER") && (
-            <>
-              <button 
-                onClick={handleChangeUserType}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Change to Normal User
-              </button>
-            </>
-          )}
-          {accountDetails.role === "FREE_USER" && (
-            <>
-              <button 
-                onClick={handleBuySubscription}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Buy Subscription
-              </button>
-              <button 
-                onClick={handleApplyForBusinessUser}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Apply for Business User
-              </button>
-              <button 
-                onClick={handleGiveRatingAndReview}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Give rating and review
-              </button>
-            </>
-          )}
-          {accountDetails.role === "PREMIUM_USER" && (
-            <>
-              <button 
-                onClick={handleViewSubscription}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                View Subscription
-              </button>
-              <button 
-                onClick={handleApplyForBusinessUser}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Apply for Business User
-              </button>
-              <button 
-                onClick={handleGiveRatingAndReview}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Give rating and review
-              </button>
-              <button 
-                onClick={handleEditPreferences}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Edit Preferences
-              </button>
-            </>
-          )}
           <button 
             onClick={handleChangePassword}
             style={buttonStyle}
@@ -336,6 +259,49 @@ const ViewAccount = () => {
             onMouseLeave={handleMouseLeave}>
             Change Password
           </button>
+          <button 
+            onClick={handleEditPreferences}
+            style={buttonStyle}
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}>
+            Edit Preferences
+          </button>
+          {accountDetails && accountDetails.role === "FREE_USER" && (
+            <button 
+              onClick={handleBuySubscription}
+              style={buttonStyle}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}>
+              Buy Subscription
+            </button>
+          )}
+          {accountDetails && accountDetails.role === "PREMIUM_USER" && (
+            <button 
+              onClick={handleViewSubscription}
+              style={buttonStyle}
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}>
+              View Subscription
+            </button>
+          )}
+          {accountDetails && accountDetails.role === "BUSINESS_USER" && (
+            <>
+              <button 
+                onClick={handleChangeUserType}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Change User Type
+              </button>
+              <button 
+                onClick={handleGiveRatingAndReview}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Give Rating and Review
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

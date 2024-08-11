@@ -14,6 +14,7 @@ const UpdateAccount = () => {
   const [email, setEmail] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [industry, setIndustry] = useState('');
+  const [industryList, setIndustryList] = useState([]);
   const [role, setRole] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,7 +22,30 @@ const UpdateAccount = () => {
 
   const handleGoBack = () => {
     navigate(-1);
-  };
+  };useEffect(() => {
+    const fetchIndustryList = async () => {
+      try {
+        const response = await fetch('https://api.sensespacesplanningtool.com/job_industry/list', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({}),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setIndustryList(data.body);
+      } catch (error) {
+        console.error('Error fetching industry list:', error.message);
+      }
+    };
+
+    fetchIndustryList();
+  }, []);
 
   useEffect(() => {
     const headers = getHeaders();
@@ -66,11 +90,12 @@ const UpdateAccount = () => {
     e.preventDefault();
 
     const headers = getHeaders();
+    const selectedIndustry = industryList.find(item => item.id === parseInt(industry, 10));
     const payload = {
       first_name: firstName,
       last_name: lastName,
       dob: dateOfBirth,
-      job_industry_id: industry,
+      job_industry_id: selectedIndustry.id,
     };
 
     try {
@@ -95,17 +120,8 @@ const UpdateAccount = () => {
     navigate('/viewaccount');
   };
 
-  const jobIndustryOptions = [
-    { value: '1', label: 'Educator' },
-    { value: '2', label: 'Interior Designer' },
-    { value: '3', label: 'WHS' },
-    { value: '4', label: 'Support Worker' },
-    { value: '5', label: 'Parents' },
-    { value: '0', label: 'Others' },
-  ];
-
   const renderTopbar = () => {
-    if (role.includes("BUSINESS_USER")) {
+    if (role === "BUSINESS_USER") {
       return <BusinessUserTopbar title="Update Account Details" onClick={handleGoBack} />;
     } else if (role === "FREE_USER" || role === "SYS_ADMIN") {
       return <FreeUserTopbar title="Update Account Details" onClick={handleGoBack} />;
@@ -158,8 +174,8 @@ const UpdateAccount = () => {
                     value={industry} 
                     onChange={(e) => setIndustry(e.target.value)} required>
                     <option value="" disabled hidden>-</option>
-                    {jobIndustryOptions.map(option => (
-                      <option key={option.value} value={option.value}>{option.label}</option>
+                    {industryList.map(option => (
+                      <option key={option.id} value={option.id}>{option.name}</option>
                     ))}
                   </select>
                 </div>
