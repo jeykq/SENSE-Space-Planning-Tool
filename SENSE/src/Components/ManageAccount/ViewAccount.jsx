@@ -252,6 +252,75 @@ const ViewAccount = () => {
             onMouseLeave={handleMouseLeave}>
             Edit Account
           </button>
+          {accountDetails.role.includes("BUSINESS_USER") && (
+            <>
+              <button 
+                onClick={handleChangeUserType}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Change to Normal User
+              </button>
+            </>
+          )}
+            
+            {accountDetails.role === "FREE_USER" && (
+            <>
+              <button 
+                onClick={handleBuySubscription}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Buy Subscription
+              </button>
+          <button 
+                onClick={handleApplyForBusinessUser}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Apply for Business User
+              </button>
+              <button 
+                onClick={handleGiveRatingAndReview}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Give rating and review
+              </button>
+              </>
+            )}
+          {accountDetails.role === "PREMIUM_USER" && (
+            <>
+              <button 
+                onClick={handleViewSubscription}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                View Subscription
+              </button>
+              <button 
+                onClick={handleApplyForBusinessUser}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Apply for Business User
+              </button>
+              <button 
+                onClick={handleGiveRatingAndReview}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Give rating and review
+              </button>
+              <button 
+                onClick={handleEditPreferences}
+                style={buttonStyle}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}>
+                Edit Preferences
+              </button>
+            </>
+          )}
           <button 
             onClick={handleChangePassword}
             style={buttonStyle}
@@ -259,49 +328,6 @@ const ViewAccount = () => {
             onMouseLeave={handleMouseLeave}>
             Change Password
           </button>
-          <button 
-            onClick={handleEditPreferences}
-            style={buttonStyle}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}>
-            Edit Preferences
-          </button>
-          {accountDetails && accountDetails.role === "FREE_USER" && (
-            <button 
-              onClick={handleBuySubscription}
-              style={buttonStyle}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}>
-              Buy Subscription
-            </button>
-          )}
-          {accountDetails && accountDetails.role === "PREMIUM_USER" && (
-            <button 
-              onClick={handleViewSubscription}
-              style={buttonStyle}
-              onMouseEnter={handleMouseEnter}
-              onMouseLeave={handleMouseLeave}>
-              View Subscription
-            </button>
-          )}
-          {accountDetails && accountDetails.role === "BUSINESS_USER" && (
-            <>
-              <button 
-                onClick={handleChangeUserType}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Change User Type
-              </button>
-              <button 
-                onClick={handleGiveRatingAndReview}
-                style={buttonStyle}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}>
-                Give Rating and Review
-              </button>
-            </>
-          )}
         </div>
       </div>
     </div>
