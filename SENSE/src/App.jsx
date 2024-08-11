@@ -64,7 +64,6 @@ const App = () => {
   useEffect(() => {
     const fontSize = localStorage.getItem('textSize');
     const sizeInPx = (fontSize == "large" ? '20px' : (fontSize == "small" ? '12px' : '16px'))
-    console.log('here?');
     document.documentElement.style.setProperty("--html-font-size", sizeInPx)
   }, [])
 
