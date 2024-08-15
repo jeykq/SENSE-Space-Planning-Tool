@@ -190,6 +190,11 @@ const ViewAccount = () => {
     borderTop: "2px solid #ccc5c5",
     margin: "20px 0"
   };
+  
+  if (accountDetails && accountDetails.role != 'PREMIUM_USER') {
+    document.documentElement.classList.remove("dark");
+    localStorage.removeItem("theme");
+  }
 
   if (loading) {
     return (
