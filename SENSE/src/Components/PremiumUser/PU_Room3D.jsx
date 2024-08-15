@@ -18,7 +18,7 @@ const PU_Room3D = () => {
   const mountRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const { roomId, roomName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, isTemplate, selectedOption, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
+  const { roomId, roomName, roomType, roomLength, roomWidth, roomHeight, roomLayoutUrl, isTemplate, selectedOption, isImport, wallColor: initialWallColor, floorTexture: initialFloorTexture } = location.state || {};
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [objects, setObjects] = useState([]);
@@ -53,6 +53,8 @@ const PU_Room3D = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [submitLoading, setSubmitLoading] = useState(false); // State for submit button loading
   const [pageLoading, setPageLoading] = useState(false); // State for page loading
+
+  const [showImportPopup, setShowImportPopup] = useState(false);
 
   const token = localStorage.getItem('authToken');
 
@@ -136,6 +138,10 @@ const PU_Room3D = () => {
 
   useEffect(() => {
     const mount = mountRef.current;
+
+    if (isImport === true) {
+      setShowImportPopup(true);
+    }
 
     if (roomName !== null) {
       setRoomName(roomName);
@@ -554,7 +560,9 @@ const PU_Room3D = () => {
 
   // Import Room functions
   const handleImportRoom = () => {
+    setIsLoading(true);
     fileInputRef.current.click();
+    setShowImportPopup(false);
   };
 
   const handleFileChange = async (event) => {
@@ -567,6 +575,7 @@ const PU_Room3D = () => {
       console.log('File content:', fileContent);
 
       loadGLB(fileContent);
+      setIsLoading(false);
 
       if (file.name.endsWith('.json') || file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
         loadGLB(fileContent);
@@ -1003,6 +1012,26 @@ const PU_Room3D = () => {
     window.location.href = "/PremiumUserHomepage";
   };
 
+  const ImportPopup = ({ onSelectFile }) => {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow-xl text-center">
+          <h2 className="text-2xl mb-4 text-black dark:text-white">Import Your Room</h2>
+          <p className="mb-4 text-black dark:text-white">Click the button below to select a JSON file to import!</p>
+          <div className="flex justify-center">
+            <button
+              onClick={onSelectFile}
+              className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition duration-100"
+            >
+              Select File
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+
   return (
     <div className="relative w-full h-full">
       {isLoading && (
@@ -1207,6 +1236,12 @@ const PU_Room3D = () => {
           text="Do you want to update your room name?"
           onConfirm={handleConfirmInputName}
           onClose={handleCancelInputName}
+        />
+      )}
+      {showImportPopup && (
+        <ImportPopup
+          onClose={() => setShowImportPopup(false)}
+          onSelectFile={handleImportRoom}
         />
       )}
     </div>

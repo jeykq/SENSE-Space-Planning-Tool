@@ -20,7 +20,8 @@ const PU_FillRoomInfo = () => {
           roomLength: parseFloat(roomLength), 
           roomWidth: parseFloat(roomWidth), 
           roomHeight: parseFloat(roomHeight), 
-          selectedOption: selectedOption 
+          selectedOption: selectedOption,
+          isImport: true, 
         } 
       });
     } else {
