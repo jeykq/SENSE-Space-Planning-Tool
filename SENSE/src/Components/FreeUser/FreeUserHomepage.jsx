@@ -246,11 +246,11 @@ const FreeUserHomepage = () => {
 
   const renderDeleteConfirmation = () => (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-opacity-50 bg-gray-900">
-      <div className="bg-white rounded-lg p-8">
+      <div className="bg-white text-black rounded-lg p-8">
         <p className="mb-4">Are you sure you want to delete this room?</p>
         <div className="flex justify-center">
-          <button className="bg-red-500 text-white px-4 py-2 rounded mr-2" onClick={handleConfirmDelete}>Delete</button>
-          <button className="bg-gray-300 px-4 py-2 rounded" onClick={handleCancelDelete}>Cancel</button>
+          <button className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded mr-2" onClick={handleConfirmDelete}>Delete</button>
+          <button className="bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded" onClick={handleCancelDelete}>Cancel</button>
         </div>
       </div>
     </div>
